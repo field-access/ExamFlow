@@ -1486,6 +1486,285 @@ pre{overflow:auto}
   .quick-plan-head .btn{width:100%;margin-top:8px}
   #settingsView .setting-actions{grid-template-columns:1fr!important}
 }
+
+/* Exam palette must never cover the timer/submit controls */
+#examView .exam-head{position:relative;z-index:20}
+#examView .exam-progress-drawer{z-index:40}
+#examView .exam-progress-backdrop{z-index:35}
+#examView .exam-head > div:first-child{min-width:0}
+#examView .exam-progress-btn,#examView #examTimerControl{position:relative;z-index:60}
+@media(min-width:801px){
+  #examView .exam-head{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+    gap:10px;
+  }
+}
+@media(max-width:800px){
+  #examView .exam-head{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+  }
+  #examView .exam-head > div:first-child{grid-column:1}
+  #examView #examProgressBtn{grid-column:2}
+  #examView #examTimerControl{grid-column:3}
+}
+/* Slightly narrower default question card */
+#examView .question{
+  width:min(820px,100%);
+  margin-left:auto;
+  margin-right:auto;
+}
+@media(min-width:1100px){
+  #examView .question{width:min(800px,calc(100% - 24px))}
+}
+@media(max-width:800px){
+  #examView .question{width:100%}
+}
+
+/* Full shortcut grid */
+.keyboard-shortcuts-card .shortcut-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px 14px;
+  margin-top:13px;
+}
+.keyboard-shortcuts-card .shortcut-grid>div{
+  display:flex;align-items:center;gap:5px;min-width:0;
+  padding:7px 8px;border-radius:9px;background:var(--surface2);
+  font-size:10px;color:var(--muted);
+}
+.keyboard-shortcuts-card .shortcut-grid span{margin-left:auto;text-align:right;color:var(--text);font-weight:600}
+.keyboard-shortcuts-card kbd{
+  flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-width:23px;padding:3px 5px;border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;background:var(--surface);color:var(--text);font:800 9px system-ui;
+}
+@media(max-width:600px){
+  .keyboard-shortcuts-card .shortcut-grid{grid-template-columns:1fr}
+  .keyboard-shortcuts-card .shortcut-grid span{margin-left:7px;text-align:left}
+}
+
+.schema-mini{
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface2);
+  color:var(--muted);
+  font:700 10px system-ui;
+  letter-spacing:.02em;
+}
+
+/* =========================================================
+   EXAMFLOW UX POLISH — visual/interaction layer only
+   ========================================================= */
+
+/* 1. Unified visual language */
+:root{
+  --ux-primary:#5865f2;
+  --ux-primary-2:#7c5cff;
+  --ux-green:#24a66f;
+  --ux-amber:#e3a62b;
+  --ux-red:#df626f;
+  --ux-radius-sm:10px;
+  --ux-radius-md:14px;
+  --ux-radius-lg:18px;
+  --ux-shadow-sm:0 3px 12px rgba(24,33,47,.055);
+  --ux-shadow-md:0 10px 30px rgba(24,33,47,.075);
+}
+body.dark{
+  --ux-shadow-sm:0 3px 12px rgba(0,0,0,.20);
+  --ux-shadow-md:0 10px 30px rgba(0,0,0,.28);
+}
+.card{
+  border-radius:var(--ux-radius-lg);
+  box-shadow:var(--ux-shadow-sm);
+}
+.card:hover{box-shadow:var(--ux-shadow-md)}
+.btn{
+  min-height:40px;
+  border-radius:var(--ux-radius-sm);
+  font-weight:800;
+  letter-spacing:.005em;
+}
+.btn.primary{
+  background:linear-gradient(135deg,var(--ux-primary),var(--ux-primary-2));
+  border-color:transparent;
+}
+.btn:not(.primary):hover{background:var(--surface2)}
+.btn:focus-visible,.topnav button:focus-visible,.nav button:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--ux-primary) 24%,transparent);
+  outline-offset:2px;
+}
+
+/* 2. Navigation: clear active state + compact spacing */
+.topnav button.active{
+  position:relative;
+  background:color-mix(in srgb,var(--ux-primary) 9%,var(--surface));
+  color:var(--ux-primary);
+}
+.topnav button.active:after{
+  content:"";
+  position:absolute;
+  left:11px;right:11px;bottom:3px;
+  height:2px;border-radius:99px;background:var(--ux-primary);
+}
+
+/* 3. Home: one obvious starting action */
+#homeView .home-hero .hero-actions .btn.primary{
+  min-height:46px;
+  padding-inline:18px;
+  box-shadow:0 4px 0 color-mix(in srgb,var(--ux-primary) 65%,#000);
+}
+#homeView .home-hero .hero-actions .btn.primary:active{
+  transform:translateY(2px);
+  box-shadow:0 1px 0 color-mix(in srgb,var(--ux-primary) 65%,#000);
+}
+#homeView .json-home{
+  scroll-margin-top:90px;
+}
+#homeView .json-home textarea:focus{
+  border-color:var(--ux-primary);
+  box-shadow:0 0 0 4px color-mix(in srgb,var(--ux-primary) 11%,transparent);
+}
+
+/* 4. Exam: reduce distractions and make the active question dominant */
+#examView .main{
+  width:min(900px,calc(100% - 32px)) !important;
+}
+#examView .exam-head{
+  border-radius:var(--ux-radius-lg) !important;
+  position:sticky;
+  top:80px;
+  z-index:25;
+  background:color-mix(in srgb,var(--surface) 94%,transparent);
+  backdrop-filter:blur(12px);
+}
+#examView .question{
+  width:min(800px,calc(100% - 16px));
+  border-radius:var(--ux-radius-lg);
+  box-shadow:var(--ux-shadow-md) !important;
+}
+#examView .question h2{
+  max-width:740px;
+  margin-left:auto;
+  margin-right:auto;
+  line-height:1.62 !important;
+}
+#examView .options{
+  max-width:740px;
+  margin-left:auto;
+  margin-right:auto;
+}
+#examView .option{
+  border-radius:13px;
+  border-width:1.5px;
+  min-height:64px;
+}
+#examView .option:hover{
+  border-color:color-mix(in srgb,var(--ux-primary) 35%,var(--line));
+}
+#examView .option.selected{
+  border-color:var(--ux-primary);
+  background:color-mix(in srgb,var(--ux-primary) 6%,var(--surface));
+}
+#examView .actions{
+  max-width:740px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Keep palette/timer/submit visually above drawer/backdrop. */
+#examView .exam-head,
+#examView .exam-head button,
+#examView .exam-head .timer,
+#examView .global-exam-controls{
+  isolation:isolate;
+}
+#examView .exam-progress-drawer{box-shadow:0 18px 45px rgba(0,0,0,.18)}
+
+/* 5. Question palette: scannable states */
+#examView .qbtn{
+  min-width:36px;min-height:36px;border-radius:10px;font-weight:850;
+}
+#examView .qbtn.current{
+  outline:2px solid color-mix(in srgb,var(--ux-primary) 30%,transparent);
+  outline-offset:1px;
+}
+
+/* 6. Explanation/correct-answer cards */
+.explanation-content{
+  font-size:16px !important;
+  line-height:1.78 !important;
+}
+.explanation-card,.answer-card,.correct-answer-card{
+  border-radius:14px !important;
+  box-shadow:var(--ux-shadow-sm);
+}
+
+/* 7. Results: hierarchy */
+#testResultsView .results-page{
+  width:min(1080px,calc(100% - 28px));
+}
+#testResultsView .results-topbar{
+  padding:4px 2px 3px;
+}
+#testResultsView .result-hero{
+  border-radius:18px;
+  box-shadow:var(--ux-shadow-md);
+}
+#testResultsView .result-score{
+  letter-spacing:-.045em;
+}
+#testResultsView .results-actions .btn.primary{
+  box-shadow:0 3px 0 color-mix(in srgb,var(--ux-primary) 65%,#000);
+}
+
+/* 8. Planner/settings: stronger section rhythm */
+#plannerView .planner-paste-card,
+#plannerView .planner-list-card,
+#settingsView .setting.card{
+  box-shadow:var(--ux-shadow-sm);
+}
+#plannerView .planner-paste-card:focus-within,
+#settingsView .setting.card:focus-within{
+  border-color:color-mix(in srgb,var(--ux-primary) 28%,var(--line));
+}
+
+/* 9. Touch targets and mobile page rhythm */
+@media(max-width:760px){
+  .btn,.topnav button,.nav button{min-height:42px}
+  #examView .main{width:calc(100% - 14px) !important;margin-top:10px !important}
+  #examView .exam-head{
+    top:58px;
+    border-radius:14px !important;
+    padding:11px 12px !important;
+  }
+  #examView .question{
+    width:100%;
+    padding:20px 16px !important;
+  }
+  #examView .question h2{font-size:18px !important;line-height:1.55 !important}
+  #examView .option{min-height:58px;padding:13px 12px}
+  #testResultsView .results-page{width:calc(100% - 14px)}
+  #testResultsView .results-actions{display:grid;grid-template-columns:1fr 1fr}
+  #testResultsView .results-actions .btn{width:100%}
+  #plannerView .planner-page{width:calc(100% - 14px)}
+  #settingsView .setting.card{border-radius:15px}
+}
+@media(max-width:430px){
+  #testResultsView .results-actions{grid-template-columns:1fr}
+  #homeView .home-hero{gap:9px}
+  #homeView .hero-actions{gap:6px}
+}
+
+/* 10. Reduced motion */
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
 </style></style>
 <style>
 .practice-timer-controls{display:none;align-items:center;gap:5px;flex-wrap:wrap}
@@ -1533,7 +1812,7 @@ pre{overflow:auto}
       <div class="cbq-flow"><span>Question</span><i>→</i><span>5 reasoning steps</span><i>→</i><span>Solution</span></div>
     </section>
     <section class="quick-card card exam-countdown-card">
-      <div class="countdown-top"><span class="hero-kicker">FINAL EXAM</span><button class="icon-btn" onclick="showView('settings')" title="Set exam date">⚙</button></div>
+      <div class="countdown-top"><span class="hero-kicker">FINAL EXAM</span><button class="icon-btn" aria-label="Open exam date settings" onclick="showView('settings')" title="Set exam date">⚙</button></div>
       <div id="homeExamCountdown" class="final-countdown">No date</div>
       <p id="homeStudyTip">Set your final exam date to keep the countdown here.</p>
       <button class="btn countdown-set" onclick="showView('settings')">Set exam date →</button>
@@ -1545,37 +1824,86 @@ pre{overflow:auto}
     <div>
       <div class="hero-kicker">BEGINNER GUIDE</div>
       <h3>📋 CBQ JSON schema</h3>
-      <p>Copy this structure, replace the question text/options/answers, then paste it below. You do not need to understand every field to start.</p>
+      <p>New to CBQ JSON? Copy the complete schema below and replace the example values. The full template stays hidden until you need it.</p>
     </div>
-    <button class="btn" type="button" onclick="navigator.clipboard?.writeText(document.getElementById('beginnerSchema')?.textContent||'').then(()=>toast('Schema copied ✓'))">Copy schema</button>
+    <button class="btn" type="button" onclick="copyBeginnerSchema()">Copy schema</button>
   </div>
-  <pre id="beginnerSchema" class="schema-code"><code>{
-  "name": "My CBQ",
+  <div class="schema-mini">7 question types · sections · timing · marks · explanations · LaTeX · images</div>
+  <textarea id="beginnerSchema" hidden>{
+  "name": "My Exam",
   "sections": [
     {
-      "name": "Concept Breakdown",
-      "timeMinutes": 10,
-      "marks": 1,
-      "negativeMarks": 0,
+      "name": "Physics",
+      "timeMinutes": 30,
+      "marks": 4,
+      "negativeMarks": 1,
       "questions": [
         {
-          "question": "Your question with $LaTeX$",
-          "options": ["Option A", "Option B"],
-          "answer": "A",
-          "explanation": "Why this answer is correct."
+          "type": "mcq",
+          "question": "What is the SI unit of force?",
+          "options": ["Joule", "Newton", "Watt", "Pascal"],
+          "answer": "B",
+          "explanation": "The SI unit of force is the newton (N)."
+        },
+        {
+          "type": "true_false",
+          "question": "Acceleration is the rate of change of velocity.",
+          "answer": "True",
+          "explanation": "Acceleration is defined as the rate of change of velocity with respect to time."
+        },
+        {
+          "type": "fill_blank",
+          "question": "The acceleration due to gravity near Earth's surface is approximately ____.",
+          "acceptedAnswers": ["9.8 m/s²", "9.8 m/s^2", "9.8"],
+          "explanation": "The standard approximate value is $g = 9.8\\,m/s^2$."
+        },
+        {
+          "type": "match",
+          "question": "Match each quantity with its SI unit.",
+          "pairs": [
+            {"left": "Force", "right": "Newton"},
+            {"left": "Energy", "right": "Joule"},
+            {"left": "Power", "right": "Watt"}
+          ],
+          "explanation": "Each physical quantity has its corresponding SI unit."
+        },
+        {
+          "type": "drag_drop",
+          "question": "Match each concept with its definition.",
+          "pairs": [
+            {"left": "Velocity", "right": "Rate of change of displacement"},
+            {"left": "Acceleration", "right": "Rate of change of velocity"},
+            {"left": "Momentum", "right": "Mass × velocity"}
+          ]
+        },
+        {
+          "type": "ordering",
+          "question": "Arrange the following steps of the scientific method in the correct order.",
+          "items": [
+            "Make an observation",
+            "Form a hypothesis",
+            "Conduct an experiment",
+            "Analyze the results"
+          ],
+          "answer": [
+            "Make an observation",
+            "Form a hypothesis",
+            "Conduct an experiment",
+            "Analyze the results"
+          ]
+        },
+        {
+          "type": "image_choice",
+          "question": "Which diagram represents a projectile following a parabolic trajectory?",
+          "image": "https://example.com/projectile.png",
+          "options": ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+          "answer": "C",
+          "explanation": "Ignoring air resistance, projectile motion follows a parabolic path."
         }
       ]
     }
   ]
-}</code></pre>
-  <div class="schema-notes">
-    <span><b>question</b> = what you ask</span>
-    <span><b>options</b> = choices</span>
-    <span><b>answer</b> = correct choice</span>
-    <span><b>explanation</b> = shown after answering</span>
-    <span><b>$...$</b> = inline maths</span>
-    <span><b>$$...$$</b> = display maths</span>
-  </div>
+}</textarea>
 </section>
 
 <section class="json-home card">
@@ -1705,7 +2033,7 @@ pre{overflow:auto}
     <div class="metric card metric-questions"><span class="metric-icon">#</span><small>Questions attempted</small><b id="mQuestions">0</b></div>
   </div>
   <div class="dashcols">
-    <section class="panel card results-panel"><div class="panel-heading"><div><h3>Recent performance</h3><small>Your latest saved sessions</small></div><button class="text-btn" onclick="renderDashboard()">↻</button></div><div id="resultsList"></div></section>
+    <section class="panel card results-panel"><div class="panel-heading"><div><h3>Recent performance</h3><small>Your latest saved sessions</small></div><button class="text-btn" aria-label="Refresh dashboard" onclick="renderDashboard()">↻</button></div><div id="resultsList"></div></section>
     <section class="panel card advice-panel"><div class="panel-heading"><div><h3>Next improvement</h3><small>A simple direction for your next session</small></div><span class="advice-mark">↗</span></div><div id="advice" class="empty">Complete a test to unlock performance advice.</div></section>
   </div>
 </div>
@@ -1792,15 +2120,31 @@ pre{overflow:auto}
     <section class="setting card"><h3>🌙 Appearance</h3><p>Switch between light and dark mode.</p><div id="persistentStorageStatus" class="paste-status" style="margin-top:10px">💾 Automatic persistent backup enabled</div>
 <div class="setting-actions"><button id="lightBtn" class="modebtn" onclick="setTheme('light')">☀️ Light</button><button id="darkBtn" class="modebtn" onclick="setTheme('dark')">🌙 Dark</button></div></section>
     <section class="setting card"><h3>🧠 Default mode</h3><p>New quizzes start in this mode.</p><div class="setting-actions"><button id="defaultPractice" class="modebtn" onclick="setDefaultMode('practice')">Practice</button><button id="defaultExam" class="modebtn" onclick="setDefaultMode('exam')">Exam</button></div></section>
-    <section class="setting card"><h3>⏱️ Default duration</h3><p>Used for quizzes without an explicit duration. Maximum test time is 10 minutes.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()"><option value="5">5 minutes</option><option value="10">10 minutes</option></select></div></section>
+    <section class="setting card"><h3>⏱️ Default duration</h3><p>Used for quizzes without an explicit duration. Maximum test time is 10 minutes.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
+<option value="5">5 minutes</option><option value="10">10 minutes</option>
+<option value="15">15 minutes</option><option value="20">20 minutes</option>
+<option value="30">30 minutes</option><option value="45">45 minutes</option>
+<option value="60">60 minutes</option>
+</select></div></section>
 
     <section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
-    <section class="setting card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for distraction-free quiz taking.</p>
-<div style="margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:7px;font-size:11px">
-<div><b>1–9</b> choose option</div><div><b>Enter</b> check answer</div>
-<div><b>← / →</b> previous / next</div><div><b>R</b> mark review</div>
-<div><b>C</b> clear answer</div><div><b>K</b> dark mode</div>
-<div><b>H</b> home</div><div><b>Esc</b> close dialogs</div>
+    <section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. Shortcuts are ignored while you are typing in an input, textarea or select.</p>
+<div class="shortcut-grid">
+<div><kbd>Ctrl</kbd> + <kbd>Enter</kbd><span>Paste clipboard JSON and start quiz</span></div>
+<div><kbd>Ctrl</kbd> + <kbd>O</kbd><span>Import ExamFlow data backup</span></div>
+<div><kbd>Ctrl</kbd> + <kbd>S</kbd><span>Save current session</span></div>
+<div><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd><span>Submit current test</span></div>
+<div><kbd>1</kbd>–<kbd>4</kbd><span>Select option 1–4</span></div>
+<div><kbd>Enter</kbd><span>Check / reveal current answer</span></div>
+<div><kbd>←</kbd> / <kbd>→</kbd><span>Previous / next question</span></div>
+<div><kbd>N</kbd> / <kbd>B</kbd><span>Next / previous question</span></div>
+<div><kbd>V</kbd><span>View answer in Practice Mode</span></div>
+<div><kbd>P</kbd><span>Open / close question palette</span></div>
+<div><kbd>R</kbd><span>Mark / unmark question for review</span></div>
+<div><kbd>Backspace</kbd> / <kbd>Delete</kbd><span>Clear current answer</span></div>
+<div><kbd>K</kbd><span>Toggle dark / light mode</span></div>
+<div><kbd>H</kbd><span>Return to home</span></div>
+<div><kbd>Esc</kbd><span>Close importer, submit dialog, sessions or palette</span></div>
 </div></section>
 <section class="setting card"><h3>💾 Local data</h3><p>Quizzes, sessions, results, goals and plans stay in this browser.</p><div class="setting-actions">
 <button class="btn" onclick="exportData()">Export JSON</button>
@@ -2017,19 +2361,19 @@ async function requestPersistentStorage(){
 
 function loadSettings(){
  const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
- s.defaultDuration=[5,10].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
+ s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
 function saveSettings(){
   const feedbackToggle=document.getElementById("instantFeedback");
   if(feedbackToggle)settings.instantFeedback=feedbackToggle.checked;
-  settings.defaultDuration=[5,10].includes(Number(document.getElementById("defaultDuration").value))?Number(document.getElementById("defaultDuration").value):5;
+  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(document.getElementById("defaultDuration").value))?Number(document.getElementById("defaultDuration").value):5;
   settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
- settings.defaultDuration=[5,10].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
+ settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
  mode=settings.defaultMode;updateModeUI()
@@ -2537,22 +2881,30 @@ function examflowSelectOptionByNumber(n){
   choose(String.fromCharCode(64+n));
 }
 function examflowKeyboardHandler(e){
-  const key=e.key;
-  const lower=key.toLowerCase();
-  const typing=isTypingTarget(e.target);
+  const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
 
+  // More-specific modifier combinations must be handled first.
+  if(e.ctrlKey && e.shiftKey && e.key==="Enter"){
+    if(document.getElementById("examView")?.classList.contains("active")){
+      e.preventDefault();
+      submitExam();
+    }
+    return;
+  }
   if(e.ctrlKey && e.key==="Enter"){
-    e.preventDefault();
-    examflowCtrlEnter();
-    return;
+    e.preventDefault();examflowCtrlEnter();return;
   }
-  if(e.ctrlKey && e.key.toLowerCase()==="o"){
-    e.preventDefault();
-    document.getElementById("dataImportFile")?.click();
+  if(e.ctrlKey && lower==="o"){
+    e.preventDefault();document.getElementById("dataImportFile")?.click();return;
+  }
+  if(e.ctrlKey && lower==="s"){
+    if(!typing && document.getElementById("examView")?.classList.contains("active")){
+      e.preventDefault();saveSession();toast("Session saved ✓");
+    }
     return;
   }
 
-  // Never hijack normal text editing except the explicit Ctrl+Enter action.
+  // Never hijack normal text editing.
   if(typing)return;
 
   const examActive=document.getElementById("examView")?.classList.contains("active");
@@ -2566,40 +2918,29 @@ function examflowKeyboardHandler(e){
 
   if(lower==="k"){e.preventDefault();examflowToggleThemeFast();return}
   if(lower==="h"){e.preventDefault();showView("home");return}
-
   if(!examActive)return;
 
   if(e.key==="ArrowRight" || lower==="n"){
-    e.preventDefault();nextQuestion();return;
+    e.preventDefault();
+    if(e.repeat)return;
+    nextQuestion();
+    return;
   }
   if(e.key==="ArrowLeft" || lower==="b"){
-    e.preventDefault();previousQuestion();return;
+    e.preventDefault();
+    if(e.repeat)return;
+    previousQuestion();
+    return;
   }
-  if(e.key==="Enter"){
-    e.preventDefault();checkCurrentAnswer();return;
-  }
-  if(lower==="v" && mode==="practice"){
-    e.preventDefault();viewPracticeAnswer();return;
-  }
-  if(lower==="p"){
-    e.preventDefault();toggleQuestionProgress();return;
-  }
-  if(lower==="r"){
-    e.preventDefault();toggleReview();return;
-  }
-  if(e.key==="Delete" || e.key==="Backspace"){
-    e.preventDefault();clearAnswer();return;
-  }
-  if(e.key==="1"||e.key==="2"||e.key==="3"||e.key==="4"){
-    e.preventDefault();examflowSelectOptionByNumber(Number(e.key));return;
-  }
-  if(e.ctrlKey && e.key.toLowerCase()==="s"){
-    e.preventDefault();saveSession();toast("Session saved ✓");return;
-  }
-  if(e.ctrlKey && e.shiftKey && e.key==="Enter"){
-    e.preventDefault();submitExam();return;
-  }
+  if(e.key==="Enter"){e.preventDefault();checkCurrentAnswer();return}
+  if(lower==="v" && mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
+  if(lower==="p"){e.preventDefault();toggleQuestionProgress();return}
+  if(lower==="r"){e.preventDefault();toggleReview();return}
+  if(e.key==="Delete" || e.key==="Backspace"){e.preventDefault();clearAnswer();return}
+  if(/^[1-4]$/.test(e.key)){e.preventDefault();examflowSelectOptionByNumber(Number(e.key));return}
 }
+
+/* Single keyboard router: all app shortcuts live here. */
 document.addEventListener("keydown",examflowKeyboardHandler);
 
 
@@ -2612,6 +2953,26 @@ document.addEventListener("pointerdown",e=>{
   b.classList.add("click-pulse");
   setTimeout(()=>b.classList.remove("click-pulse"),180);
 });
+
+function copyBeginnerSchema(){
+  const source=document.getElementById("beginnerSchema");
+  if(!source)return;
+  const text=source.value||source.textContent||"";
+  const done=()=>toast("Complete schema copied ✓");
+  if(navigator.clipboard?.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>{
+      const ta=document.createElement("textarea");
+      ta.value=text;document.body.appendChild(ta);ta.select();
+      try{document.execCommand("copy");done()}catch(e){toast("Copy failed")}
+      ta.remove();
+    });
+  }else{
+    const ta=document.createElement("textarea");
+    ta.value=text;document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");done()}catch(e){toast("Copy failed")}
+    ta.remove();
+  }
+}
 
 function render(){
  updateModeUI();
@@ -3352,81 +3713,6 @@ function showView(name){
  updateTheme();updateModeUI()}
 }
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
-
-
-function keyboardEnabled(){
- const tag=(document.activeElement?.tagName||"").toLowerCase();
- return !["input","textarea","select","button"].includes(tag);
-}
-document.addEventListener("keydown",(e)=>{
- const key=e.key;
- const lower=key.toLowerCase();
-
- // Global shortcuts.
- if(lower==="k" && keyboardEnabled()){
-   e.preventDefault();
-   setTheme(settings.theme==="dark"?"light":"dark");
-   toast(settings.theme==="dark"?"🌙 Dark mode":"☀️ Light mode");
-   return;
- }
- if(lower==="h" && keyboardEnabled()){
-   e.preventDefault();
-   showView("home");
-   return;
- }
- if(key==="Escape"){
-   document.querySelectorAll(".modal.show").forEach(m=>m.classList.remove("show"));
-   return;
- }
-
- // Quiz shortcuts only when an exam is loaded and exam view is visible.
- if(!questions.length || !document.getElementById("examView").classList.contains("active")) return;
- if(!keyboardEnabled()) return;
-
- // 1-9 select options.
- if(/^[1-9]$/.test(key)){
-   const n=Number(key)-1;
-   const q=questions[current];
-   if(n<q.options.length){
-     e.preventDefault();
-     choose(String.fromCharCode(65+n));
-     flashKey(key);
-   }
-   return;
- }
-
- // Enter = check current answer.
- if(key==="Enter"){
-   e.preventDefault();
-   checkCurrentAnswer();
-   return;
- }
-
- // Arrow navigation.
- if(key==="ArrowRight"){
-   e.preventDefault();
-   nextQuestion();
-   return;
- }
- if(key==="ArrowLeft"){
-   e.preventDefault();
-   previousQuestion();
-   return;
- }
-
- if(lower==="r"){
-   e.preventDefault();
-   toggleReview();
-   flashKey("R");
-   return;
- }
- if(lower==="c"){
-   e.preventDefault();
-   clearAnswer();
-   flashKey("C");
-   return;
- }
-});
 
 
 let examAudioCtx=null;
