@@ -1765,13 +1765,182 @@ body.dark{
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
+
+/* Readability pass: controlled text measure + aligned question/option columns. */
+:root{--question-font:Georgia,"Times New Roman",serif}
+#examView .question,
+#examView .question h2,
+#examView .options,
+#examView .option,
+#examView .option-text{font-family:var(--question-font)}
+#examView .question{
+  width:min(820px,calc(100% - 24px));
+  padding:26px 28px 22px;
+  box-sizing:border-box;
+}
+#examView .question h2{
+  width:min(68ch,100%);
+  margin:20px auto 22px;
+  font-size:clamp(19px,2vw,22px);
+  line-height:1.65;
+  font-weight:500;
+}
+#examView .options{
+  width:min(68ch,100%);
+  margin:0 auto;
+  gap:10px;
+}
+#examView .option{
+  box-sizing:border-box;
+  min-height:64px;
+  padding:15px 16px;
+  align-items:flex-start;
+}
+#examView .option-text{
+  flex:1 1 auto;
+  min-width:0;
+  font-size:16px;
+  line-height:1.58;
+  font-weight:400;
+}
+#examView .actions{width:min(68ch,100%);margin:20px auto 0}
+#questionFont{font-family:var(--question-font);font-size:14px;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--text)}
+@media(max-width:760px){
+ #examView .question{width:100%;padding:20px 15px 17px}
+ #examView .question h2,#examView .options,#examView .actions{width:100%}
+ #examView .question h2{font-size:18px;line-height:1.58}
+ #examView .option-text{font-size:15px;line-height:1.55}
+}
+
+/* === QUESTION TEXT FONT: explicit, high-specificity override === */
+:root{
+  --exam-question-font: Georgia, "Times New Roman", serif;
+}
+#examView .question,
+#examView .question *,
+#examView .option,
+#examView .option *,
+#examView .explanation-card,
+#examView .explanation-card *,
+#examView .answer-card,
+#examView .answer-card *,
+#testResultsView .result-question,
+#testResultsView .result-question *{
+  font-family:var(--exam-question-font);
+}
+
+/* Never replace KaTeX's own math fonts. */
+#examView .katex,
+#examView .katex *,
+#testResultsView .katex,
+#testResultsView .katex *{
+  font-family:KaTeX_Main, "Times New Roman", serif;
+}
+#examView .katex .mathnormal,
+#examView .katex .mathit{font-family:KaTeX_Math, KaTeX_Main, serif}
+
+/* Code stays monospaced. */
+#examView pre,#examView pre *,
+#examView code,#examView code *,
+#testResultsView pre,#testResultsView pre *,
+#testResultsView code,#testResultsView code *{
+  font-family:"Cascadia Code","SFMono-Regular",Consolas,monospace;
+}
+
+/* Readable exam typography */
+#examView .question h2{
+  font-size:21px;
+  line-height:1.65;
+  font-weight:400;
+  letter-spacing:0;
+}
+#examView .option-text{
+  font-size:17px;
+  line-height:1.58;
+  font-weight:400;
+  letter-spacing:0;
+}
+#examView .option .letter{
+  font-family:system-ui,sans-serif;
+  font-weight:800;
+}
+#examView .qtop,
+#examView .qtop *,
+#examView .actions,
+#examView .actions *{
+  font-family:system-ui,sans-serif;
+}
 </style></style>
 <style>
 .practice-timer-controls{display:none;align-items:center;gap:5px;flex-wrap:wrap}
 .preset-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:7px 9px;font:700 10px system-ui;cursor:pointer}
 .preset-btn:hover,.preset-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-soft,#eef1ff)}
 @media(max-width:600px){.practice-timer-controls{gap:4px}.preset-btn{padding:6px 7px;font-size:9px}}
-</style></head>
+</style>
+<style id="examflow-question-font-final">
+/* FINAL QUESTION TYPOGRAPHY — deliberately scoped to content, not controls */
+#examView #questionText,
+#examView #questionText *,
+#examView #options .option,
+#examView #options .option *,
+#examView #options .special-answer,
+#examView #options .special-answer *,
+#examView #options .matching-grid,
+#examView #options .matching-grid *,
+#examView #options .ordering-list,
+#examView #options .ordering-list *,
+#examView #options .image-choice-grid,
+#examView #options .image-choice-grid *,
+#examView #explanation,
+#examView #explanation *,
+#examView #practiceAnswerPanel,
+#examView #practiceAnswerPanel *,
+#testResultsView .result-question,
+#testResultsView .result-question * {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+}
+
+/* Keep math and code in their appropriate specialist fonts. */
+#examView .katex, #examView .katex *,
+#testResultsView .katex, #testResultsView .katex * {
+  font-family: KaTeX_Main, "Times New Roman", serif !important;
+}
+#examView pre, #examView pre *,
+#examView code, #examView code *,
+#testResultsView pre, #testResultsView pre *,
+#testResultsView code, #testResultsView code * {
+  font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace !important;
+}
+
+/* Readable text measure and matching question/options columns. */
+#examView #questionText {
+  max-width: 68ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  font-size: 22px !important;
+  line-height: 1.65 !important;
+}
+#examView #options {
+  max-width: 68ch !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+#examView #options .option {
+  font-size: 17px !important;
+  line-height: 1.58 !important;
+}
+#examView #options .option .letter {
+  font-family: system-ui, sans-serif !important;
+  font-weight: 800 !important;
+}
+@media(max-width:760px){
+  #examView #questionText{font-size:19px !important;line-height:1.58 !important}
+  #examView #options .option{font-size:16px !important;line-height:1.55 !important}
+}
+</style>
+</head>
 <body>
 <div class="app">
 <header>
@@ -2127,7 +2296,15 @@ body.dark{
 <option value="60">60 minutes</option>
 </select></div></section>
 
-    <section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
+    <section class="setting card"><h3>📖 Question typography</h3><p>Choose the reading font for questions, options and problem-solving explanations. Mathematics continues to use KaTeX.</p>
+<select id="questionFont" class="goalinput" onchange="saveSettings();applyQuestionFont()" style="margin-top:12px;width:100%">
+<option value="Georgia, 'Times New Roman', serif">Georgia / Times — exam style</option>
+<option value="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">System — clean modern</option>
+<option value="'Palatino Linotype', Palatino, Georgia, serif">Palatino — book style</option>
+<option value="Arial, Helvetica, sans-serif">Arial — simple</option>
+</select></section>
+
+<section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
     <section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. Shortcuts are ignored while you are typing in an input, textarea or select.</p>
 <div class="shortcut-grid">
 <div><kbd>Ctrl</kbd> + <kbd>Enter</kbd><span>Paste clipboard JSON and start quiz</span></div>
@@ -2360,7 +2537,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0,questionFont:"Georgia, 'Times New Roman', serif"},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -2370,13 +2547,15 @@ function saveSettings(){
   settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(document.getElementById("defaultDuration").value))?Number(document.getElementById("defaultDuration").value):5;
   settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
+  const qf=document.getElementById("questionFont");
+  if(qf)settings.questionFont=qf.value;
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
- mode=settings.defaultMode;updateModeUI()
+ mode=settings.defaultMode;updateModeUI();loadQuestionFontSetting()
 }
 function setTheme(x){settings.theme=x;put(K.settings,settings);applySettings()}
 function setDefaultMode(x){settings.defaultMode=x;put(K.settings,settings);setMode(x)}
@@ -3711,6 +3890,16 @@ function showView(name){
  document.getElementById("defaultMarks").value=settings.defaultMarks??1;
  document.getElementById("defaultNegative").value=settings.defaultNegative??0;
  updateTheme();updateModeUI()}
+}
+function applyQuestionFont(){
+  const font=settings?.questionFont||"Georgia, 'Times New Roman', serif";
+  document.documentElement.style.setProperty("--exam-question-font",font);
+  document.documentElement.style.setProperty("--question-font",font);
+}
+function loadQuestionFontSetting(){
+  const el=document.getElementById("questionFont");
+  if(el)el.value=settings?.questionFont||"Georgia, 'Times New Roman', serif";
+  applyQuestionFont();
 }
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
