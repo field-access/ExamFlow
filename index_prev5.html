@@ -388,11 +388,6 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 .progress-q.current.answered{background:#eef1ff}
 @media(max-width:600px){.exam-progress-drawer{width:290px}.exam-progress-grid{grid-template-columns:repeat(4,1fr)}}
 
-/* ===== Exam countdown ===== */
-#homeExamCountdown{font-size:24px;margin:5px 0 4px}
-.countdown-expired{color:var(--bad)!important}
-.countdown-good{color:var(--good)!important}
-
 /* Working question-progress control */
 #examProgressBtn{
   position:relative !important;
@@ -1155,7 +1150,7 @@ button,.btn,.modebtn,.preset-btn,.qbtn,.bookmark,.option,.session-load,.session-
 .cbq-flow{display:flex;align-items:center;gap:9px;margin-top:22px;font-size:11px;font-weight:800;color:var(--muted);flex-wrap:wrap}
 .cbq-flow span{padding:7px 10px;border-radius:999px;background:var(--surface2);color:var(--text)}
 .cbq-flow i{font-style:normal;color:#5865f2}
-.exam-countdown-card{padding:25px;display:flex;flex-direction:column;justify-content:space-between;min-height:245px}
+
 .countdown-top{display:flex;justify-content:space-between;align-items:center}
 .icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:9px;width:34px;height:34px;cursor:pointer}
 .final-countdown{font-size:clamp(34px,4vw,52px);font-weight:900;letter-spacing:-.04em;line-height:1}
@@ -1179,7 +1174,7 @@ button,.btn,.modebtn,.preset-btn,.qbtn,.bookmark,.option,.session-load,.session-
 .text-btn{border:0;background:var(--surface2);border-radius:8px;width:31px;height:31px;color:var(--muted);cursor:pointer}.advice-mark{width:32px;height:32px;display:grid;place-items:center;border-radius:9px;background:#eef2ff;color:#5865f2;font-weight:900}
 .planner-page{width:min(1000px,calc(100% - 32px));margin:28px auto}.planner-hero{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:18px}.planner-hero h1{font-size:clamp(27px,4vw,39px);margin:6px 0}.planner-hero p{margin:0;color:var(--muted);max-width:650px;line-height:1.55}.planner-paste-card,.planner-list-card{padding:20px;border-radius:15px}.planner-list-card{margin-top:14px}.planner-count{min-width:28px;height:28px;display:grid;place-items:center;border-radius:99px;background:var(--surface2);font-weight:850;font-size:11px}
 @media(max-width:850px){.home-hero{grid-template-columns:1fr}.main{grid-template-columns:1fr}.sidebar,.right{position:relative;top:auto}.dashboard{width:min(100% - 24px,700px)}.metrics{grid-template-columns:repeat(2,1fr)}.dashcols{grid-template-columns:1fr}}
-@media(max-width:600px){.cbq-intro{padding:23px 20px}.cbq-intro h1{font-size:31px}.cbq-intro p{font-size:14px}.hero-actions,.dashactions{display:grid;grid-template-columns:1fr;gap:7px}.hero-actions .btn,.dashactions .btn{width:100%}.exam-countdown-card{min-height:205px;padding:20px}.final-countdown{font-size:39px}.dashboard{width:calc(100% - 20px);margin:17px auto}.dashboard-countdown{align-items:flex-start;flex-wrap:wrap}.dashboard-countdown .btn{width:100%}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:22px}.planner-page{width:calc(100% - 20px);margin:18px auto}.planner-hero{display:block}.planner-hero>.btn{margin-top:12px;width:100%}.planner-paste-card,.planner-list-card{padding:14px}.quick-plan-head{display:block}.quick-plan-head .btn{margin-top:10px;width:100%}.quick-plan-foot{display:grid!important;grid-template-columns:1fr;gap:8px}}
+@media(max-width:600px){.cbq-intro{padding:23px 20px}.cbq-intro h1{font-size:31px}.cbq-intro p{font-size:14px}.hero-actions,.dashactions{display:grid;grid-template-columns:1fr;gap:7px}.hero-actions .btn,.dashactions .btn{width:100%}.final-countdown{font-size:39px}.dashboard{width:calc(100% - 20px);margin:17px auto}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:22px}.planner-page{width:calc(100% - 20px);margin:18px auto}.planner-hero{display:block}.planner-hero>.btn{margin-top:12px;width:100%}.planner-paste-card,.planner-list-card{padding:14px}.quick-plan-head{display:block}.quick-plan-head .btn{margin-top:10px;width:100%}.quick-plan-foot{display:grid!important;grid-template-columns:1fr;gap:8px}}
 
 .schema-guide{margin:14px 0;padding:20px;border-radius:15px;border:1px solid color-mix(in srgb,#5865f2 18%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,#5865f2 5%,var(--surface)),var(--surface))}
 .schema-guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
@@ -1940,6 +1935,815 @@ body.dark{
   #examView #options .option{font-size:16px !important;line-height:1.55 !important}
 }
 </style>
+
+<style id="examflow-final-exam-ui">
+/* =========================================================
+   FINAL EXAM UI PASS
+   1. Question text uses exactly the same readable measure
+      as the answer cards.
+   2. Dark mode uses a purpose-built palette rather than
+      simply inverting the light theme.
+   ========================================================= */
+
+/* ---------- Exam content alignment ---------- */
+#examView{
+  --exam-content-width:620px;
+}
+
+/* The question itself, options and action row share one
+   optical column. This prevents the question from spanning
+   much farther than its answer cards. */
+#examView .question h2,
+#examView .question > .question-text,
+#examView .question > #questionText,
+#examView .options,
+#examView #options,
+#examView .actions{
+  width:min(var(--exam-content-width),100%) !important;
+  max-width:var(--exam-content-width) !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
+  box-sizing:border-box !important;
+}
+
+#examView .question h2,
+#examView #questionText{
+  font-size:clamp(20px,2vw,22px) !important;
+  line-height:1.62 !important;
+  text-align:left !important;
+}
+
+#examView .options,
+#examView #options{
+  gap:12px !important;
+}
+
+#examView .option{
+  width:100% !important;
+  box-sizing:border-box !important;
+}
+
+#examView .actions{
+  margin-top:20px !important;
+}
+
+/* Code blocks inside questions obey the same measure,
+   while remaining horizontally scrollable when necessary. */
+#examView .question pre,
+#examView #questionText pre{
+  width:100% !important;
+  max-width:100% !important;
+  box-sizing:border-box !important;
+  overflow-x:auto !important;
+}
+
+@media(max-width:760px){
+  #examView{--exam-content-width:100%}
+  #examView .question h2,
+  #examView #questionText{
+    font-size:19px !important;
+    line-height:1.58 !important;
+  }
+}
+
+/* ---------- Purpose-built dark mode ---------- */
+body.dark{
+  /* Deep slate background; not a photographic inversion of light mode. */
+  --bg:#0b1018;
+  --surface:#121923;
+  --surface2:#182230;
+  --text:#e8edf5;
+  --muted:#98a5b7;
+  --line:#293546;
+  --primary:#7180ff;
+  --good:#43c88b;
+  --warn:#e2ad55;
+  --bad:#ef747e;
+  --shadow:0 18px 48px rgba(0,0,0,.34);
+
+  /* UI palette */
+  --dark-panel:#141d29;
+  --dark-panel-2:#192433;
+  --dark-border:#2c394b;
+  --dark-hover:#1d2a3b;
+  --dark-primary:#7180ff;
+  --dark-primary-soft:rgba(113,128,255,.13);
+  --dark-text:#edf2f8;
+  --dark-muted:#9aa8ba;
+}
+
+/* Page background */
+body.dark,
+body.dark .app{
+  background:
+    radial-gradient(circle at 50% -15%,rgba(113,128,255,.07),transparent 38%),
+    var(--bg) !important;
+  color:var(--dark-text);
+}
+
+/* Header */
+body.dark header{
+  background:rgba(14,20,29,.94) !important;
+  border-bottom:1px solid var(--dark-border) !important;
+  box-shadow:0 5px 24px rgba(0,0,0,.20);
+}
+
+body.dark .brand,
+body.dark .topnav button{
+  color:var(--dark-text);
+}
+
+body.dark .topnav button{
+  color:var(--dark-muted);
+}
+
+body.dark .topnav button.active,
+body.dark .topnav button:hover{
+  background:var(--dark-primary-soft) !important;
+  color:#aeb7ff !important;
+}
+
+/* Generic cards */
+body.dark .card{
+  background:var(--dark-panel) !important;
+  border-color:var(--dark-border) !important;
+  box-shadow:0 12px 34px rgba(0,0,0,.22);
+}
+
+body.dark .card:hover{
+  box-shadow:0 16px 42px rgba(0,0,0,.30);
+}
+
+/* Exam header */
+body.dark #examView .exam-head{
+  background:rgba(20,29,41,.94) !important;
+  border-color:var(--dark-border) !important;
+  box-shadow:0 10px 30px rgba(0,0,0,.22) !important;
+}
+
+/* Main question card */
+body.dark #examView .question{
+  background:#111923 !important;
+  border-color:#2d3a4b !important;
+  box-shadow:0 20px 50px rgba(0,0,0,.30) !important;
+}
+
+body.dark #examView .question:before{
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(113,128,255,.55),
+    transparent
+  ) !important;
+}
+
+/* Question text */
+body.dark #examView .question h2,
+body.dark #examView #questionText{
+  color:#edf2f8 !important;
+}
+
+/* Answer cards */
+body.dark #examView .option{
+  background:#151f2b !important;
+  border-color:#304052 !important;
+  color:#e5ebf3 !important;
+  box-shadow:0 2px 0 rgba(0,0,0,.18);
+}
+
+body.dark #examView .option:hover{
+  background:#1a2635 !important;
+  border-color:#53658a !important;
+  transform:translateY(-1px);
+}
+
+body.dark #examView .option.selected{
+  background:rgba(113,128,255,.12) !important;
+  border-color:#7180ff !important;
+  box-shadow:
+    0 0 0 1px rgba(113,128,255,.15),
+    0 5px 18px rgba(0,0,0,.20);
+}
+
+body.dark #examView .option .letter{
+  background:#111923 !important;
+  border-color:#3b4a5e !important;
+  color:#aeb9c9 !important;
+}
+
+body.dark #examView .option.selected .letter{
+  background:#7180ff !important;
+  border-color:#7180ff !important;
+  color:#fff !important;
+}
+
+/* Mode buttons */
+body.dark #examView .modebtn{
+  background:#151f2b !important;
+  border-color:#304052 !important;
+  color:#a3afc0 !important;
+}
+
+body.dark #examView .modebtn:hover{
+  background:#1c2938 !important;
+  color:#d8e0ea !important;
+}
+
+body.dark #examView .modebtn.active{
+  background:rgba(113,128,255,.15) !important;
+  border-color:#6474e8 !important;
+  color:#b5bdff !important;
+}
+
+/* Shuffle / palette controls */
+body.dark #examView .exam-progress-btn,
+body.dark #examView .btn:not(.primary){
+  background:#151f2b !important;
+  border-color:#304052 !important;
+  color:#c1cad6 !important;
+}
+
+body.dark #examView .exam-progress-btn:hover,
+body.dark #examView .btn:not(.primary):hover{
+  background:#1d2a3a !important;
+  border-color:#52627b !important;
+  color:#eef3f8 !important;
+}
+
+/* Primary buttons */
+body.dark #examView .btn.primary,
+body.dark #examView .actions .primary{
+  background:linear-gradient(135deg,#6575f5,#7c62e8) !important;
+  color:#fff !important;
+  border-color:transparent !important;
+  box-shadow:0 4px 0 #414da5 !important;
+}
+
+body.dark #examView .btn.primary:hover,
+body.dark #examView .actions .primary:hover{
+  filter:brightness(1.07);
+}
+
+/* Timer */
+body.dark #examView .timer{
+  background:#211d20 !important;
+  border-color:#514044 !important;
+  color:#f0b4ba !important;
+}
+
+/* Question progress drawer */
+body.dark #examView .exam-progress-drawer{
+  background:#111923 !important;
+  border-left-color:#2d3a4b !important;
+  box-shadow:-20px 0 55px rgba(0,0,0,.42) !important;
+}
+
+body.dark #examView .progress-q{
+  background:#151f2b !important;
+  border-color:#304052 !important;
+  color:#aeb9c9 !important;
+}
+
+body.dark #examView .progress-q.current{
+  background:rgba(113,128,255,.14) !important;
+  border-color:#7180ff !important;
+  color:#b7bfff !important;
+}
+
+body.dark #examView .progress-q.answered{
+  background:rgba(67,200,139,.11) !important;
+  border-color:#347b61 !important;
+  color:#70d6aa !important;
+}
+
+/* Bottom actions divider */
+body.dark #examView .actions{
+  border-top-color:#2b3849 !important;
+}
+
+/* Explanation / answer cards */
+body.dark #examView .explanation-card,
+body.dark #examView .answer-card,
+body.dark #examView .correct-answer-card{
+  background:#151f2b !important;
+  border-color:#304052 !important;
+  color:#dfe6ef !important;
+}
+
+/* Inputs / selects in dark mode */
+body.dark input,
+body.dark textarea,
+body.dark select{
+  background:#121b26 !important;
+  color:#e7edf5 !important;
+  border-color:#304052 !important;
+}
+
+body.dark input::placeholder,
+body.dark textarea::placeholder{
+  color:#6f7e91 !important;
+}
+
+/* Scrollbars */
+body.dark ::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+body.dark ::-webkit-scrollbar-track{
+  background:#0c121a;
+}
+body.dark ::-webkit-scrollbar-thumb{
+  background:#2c394b;
+  border-radius:10px;
+}
+body.dark ::-webkit-scrollbar-thumb:hover{
+  background:#3b4b61;
+}
+</style>
+
+<style id="examflow-timer-palette-fix">
+/* Palette must never cover the sticky exam header/timer. */
+#examView .exam-progress-drawer{
+  top:78px !important;
+  height:calc(100vh - 78px) !important;
+  z-index:40 !important;
+}
+#examView .exam-progress-backdrop{z-index:39 !important}
+#examView .exam-head,
+#examView .exam-head .timer,
+#examView #examTimerControl,
+#examView #practiceTimerControls{
+  position:relative !important;
+  z-index:50 !important;
+}
+@media(max-width:800px){
+  #examView .exam-progress-drawer{
+    top:118px !important;
+    height:calc(100vh - 118px) !important;
+  }
+  #examView .exam-progress-backdrop{z-index:39 !important}
+}
+/* When palette is open, leave a clean content gutter on desktop. */
+@media(min-width:1050px){
+  #examView .main.palette-shift{
+    padding-right:310px !important;
+  }
+}
+</style>
+
+<style id="examflow-match-menu-fix">
+#examView .question,
+#examView #options,
+#examView .matching-grid,
+#examView .match-row,
+#examView .match-choice{
+  overflow:visible !important;
+}
+#examView .match-choice{z-index:10}
+#examView .match-choice.open{z-index:1000}
+#examView .match-menu{
+  z-index:10000 !important;
+  max-height:300px !important;
+}
+#examView .match-menu-item{
+  min-height:40px;
+}
+#examView .match-check-btn{
+  position:relative;
+  z-index:2;
+}
+@media(max-width:760px){
+  #examView .match-menu{
+    position:absolute !important;
+    left:0 !important;
+    right:0 !important;
+    top:calc(100% + 6px) !important;
+    bottom:auto !important;
+    max-height:42vh !important;
+    overflow:auto !important;
+  }
+}
+</style>
+
+<style id="examflow-dragdrop-ui">
+.dragdrop-wrap{display:grid;gap:14px;margin:16px 0}
+.dragdrop-board{display:grid;gap:9px}
+.dragdrop-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(230px,.9fr);gap:12px;align-items:stretch}
+.dragdrop-left,.dragdrop-zone{
+  min-height:56px;box-sizing:border-box;border:1px solid var(--line);
+  border-radius:12px;padding:13px 15px;
+  display:flex;align-items:center;
+}
+.dragdrop-left{background:var(--surface2);color:var(--text)}
+.dragdrop-zone{
+  background:var(--surface);border-style:dashed;color:var(--muted);
+  transition:.15s ease;
+}
+.dragdrop-zone.drag-over{
+  border-color:var(--primary);
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface));
+  transform:translateY(-1px);
+}
+.dragdrop-zone.filled{border-style:solid;color:var(--text)}
+.drag-placeholder{font-size:14px;font-style:italic}
+.drag-chip,.drag-bank-item{
+  font:400 15px/1.45 Georgia,"Times New Roman",serif;
+}
+.drag-chip{
+  display:inline-flex;align-items:center;padding:8px 11px;border-radius:9px;
+  background:var(--surface2);border:1px solid var(--line);cursor:grab;
+}
+.drag-bank{display:flex;flex-wrap:wrap;gap:8px}
+.dragdrop-bank{display:flex;flex-wrap:wrap;gap:8px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface2)}
+.dragdrop-bank-title{font:800 11px/1.3 system-ui;color:var(--muted);letter-spacing:.04em}
+.drag-bank-item{
+  border:1px solid var(--line);background:var(--surface);color:var(--text);
+  border-radius:10px;padding:9px 12px;cursor:grab;text-align:left;
+}
+.drag-bank-item:hover{border-color:var(--primary);transform:translateY(-1px)}
+body.dark .dragdrop-left{background:#151f2b}
+body.dark .dragdrop-zone{background:#121b26;border-color:#344457}
+body.dark .dragdrop-zone.drag-over{background:rgba(113,128,255,.12);border-color:#7180ff}
+body.dark .dragdrop-bank{background:#151f2b;border-color:#304052}
+body.dark .drag-bank-item{background:#121b26;border-color:#344457;color:#e5ebf3}
+@media(max-width:760px){
+  .dragdrop-row{grid-template-columns:1fr;gap:7px}
+  .dragdrop-zone{min-height:52px}
+}
+</style>
+
+<style id="examflow-dashboard-goal-redesign">
+/* Dashboard visual layer: a restrained academic/network background, kept behind cards. */
+#dashboardView .beautiful-dashboard{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+}
+#dashboardView .beautiful-dashboard::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-2;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22900%22%20height%3D%22500%22%20viewBox%3D%220%200%20900%20500%22%3E%0A%3Cdefs%3E%3Cpattern%20id%3D%22p%22%20width%3D%2290%22%20height%3D%2290%22%20patternUnits%3D%22userSpaceOnUse%22%3E%0A%3Cpath%20d%3D%22M0%2045H90M45%200V90%22%20stroke%3D%22%237180ff%22%20stroke-opacity%3D%22.07%22%20stroke-width%3D%221%22%2F%3E%0A%3Ccircle%20cx%3D%2245%22%20cy%3D%2245%22%20r%3D%222.5%22%20fill%3D%22%237180ff%22%20fill-opacity%3D%22.14%22%2F%3E%0A%3C%2Fpattern%3E%3C%2Fdefs%3E%0A%3Crect%20width%3D%22900%22%20height%3D%22500%22%20fill%3D%22url%28%23p%29%22%2F%3E%0A%3Cg%20fill%3D%22none%22%20stroke%3D%22%237180ff%22%20stroke-opacity%3D%22.10%22%20stroke-width%3D%221.5%22%3E%0A%3Cpath%20d%3D%22M80%20120L230%2065L370%20150L525%2082L680%20170L825%20105%22%2F%3E%0A%3Cpath%20d%3D%22M125%20360L260%20285L410%20380L560%20295L735%20360%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%237180ff%22%20fill-opacity%3D%22.11%22%3E%0A%3Ccircle%20cx%3D%2280%22%20cy%3D%22120%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22230%22%20cy%3D%2265%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22370%22%20cy%3D%22150%22%20r%3D%227%22%2F%3E%0A%3Ccircle%20cx%3D%22525%22%20cy%3D%2282%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22680%22%20cy%3D%22170%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22825%22%20cy%3D%22105%22%20r%3D%225%22%2F%3E%0A%3Ccircle%20cx%3D%22125%22%20cy%3D%22360%22%20r%3D%225%22%2F%3E%3Ccircle%20cx%3D%22260%22%20cy%3D%22285%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22410%22%20cy%3D%22380%22%20r%3D%225%22%2F%3E%0A%3Ccircle%20cx%3D%22560%22%20cy%3D%22295%22%20r%3D%227%22%2F%3E%3Ccircle%20cx%3D%22735%22%20cy%3D%22360%22%20r%3D%225%22%2F%3E%0A%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-size:cover;
+  background-position:center top;
+  opacity:.9;
+  pointer-events:none;
+}
+#dashboardView .beautiful-dashboard::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(180deg,
+    color-mix(in srgb,var(--bg) 82%,transparent),
+    color-mix(in srgb,var(--bg) 94%,transparent));
+  pointer-events:none;
+}
+#dashboardView .beautiful-dashboard > *{position:relative;z-index:1}
+
+.goal-tracker-card{
+  margin:0 0 16px;
+  padding:20px;
+  border:1px solid var(--line);
+  background:color-mix(in srgb,var(--surface) 92%,transparent);
+  backdrop-filter:blur(12px);
+}
+.goal-tracker-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+}
+.goal-tracker-head h3{margin:3px 0 4px;font-size:19px}
+.goal-tracker-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.5}
+.todo-progress{
+  flex:0 0 auto;padding:6px 9px;border-radius:999px;
+  background:var(--surface2);border:1px solid var(--line);
+  color:var(--muted);font:800 11px system-ui;
+}
+.todo-add{
+  display:grid;grid-template-columns:minmax(0,1fr) 150px auto;
+  gap:8px;margin-top:15px;
+}
+.todo-add input{
+  min-width:0;border:1px solid var(--line);background:var(--surface);
+  color:var(--text);border-radius:10px;padding:11px 12px;font:500 14px/1.3 system-ui;
+}
+.todo-add input:focus{
+  outline:none;border-color:var(--primary);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 12%,transparent);
+}
+.todo-list{display:grid;gap:7px;margin-top:14px}
+.todo-empty{padding:18px;border:1px dashed var(--line);border-radius:11px;color:var(--muted);font-size:12px;text-align:center}
+.todo-item{
+  display:grid;grid-template-columns:26px minmax(0,1fr) auto auto;
+  align-items:center;gap:10px;padding:11px 12px;
+  border:1px solid var(--line);border-radius:11px;background:var(--surface);
+  transition:.15s ease;
+}
+.todo-item:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--primary) 40%,var(--line))}
+.todo-check{
+  width:21px;height:21px;margin:0;accent-color:var(--primary);cursor:pointer;
+}
+.todo-title{font:600 14px/1.45 system-ui;color:var(--text);min-width:0}
+.todo-item.done .todo-title{text-decoration:line-through;color:var(--muted)}
+.todo-deadline{font:700 11px/1.3 system-ui;color:var(--muted);white-space:nowrap}
+.todo-deadline.overdue{color:var(--bad)}
+.todo-delete{
+  border:0;background:transparent;color:var(--muted);cursor:pointer;
+  width:28px;height:28px;border-radius:7px;font-size:17px;
+}
+.todo-delete:hover{background:var(--surface2);color:var(--bad)}
+body.dark #dashboardView .beautiful-dashboard::after{
+  background:linear-gradient(180deg,rgba(10,15,22,.72),rgba(10,15,22,.90));
+}
+body.dark #dashboardView .goal-tracker-card,
+body.dark #dashboardView .todo-item,
+body.dark #dashboardView .todo-add input{
+  background:rgba(18,27,38,.90);
+  border-color:#304052;
+}
+@media(max-width:700px){
+  .goal-tracker-card{padding:15px}
+  .todo-add{grid-template-columns:1fr 1fr}
+  .todo-add input:first-child{grid-column:1 / -1}
+  .todo-add button{grid-column:1 / -1}
+  .todo-item{grid-template-columns:25px minmax(0,1fr) auto}
+  .todo-deadline{grid-column:2;white-space:normal}
+  .todo-delete{grid-column:3;grid-row:1 / span 2}
+}
+</style>
+
+<style id="examflow-explanation-redesign">
+#examView .exam-summary{
+  margin-top:18px !important;
+  padding:20px 22px !important;
+  border-radius:14px !important;
+  border:1px solid color-mix(in srgb,var(--primary) 20%,var(--line)) !important;
+  background:linear-gradient(145deg,
+    color-mix(in srgb,var(--surface) 94%,var(--primary)),
+    var(--surface2)) !important;
+  box-shadow:0 8px 24px rgba(20,25,35,.06) !important;
+}
+#examView .exam-summary > strong{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  margin-bottom:12px !important;
+  padding-bottom:10px !important;
+  border-bottom:1px solid var(--line) !important;
+  font:800 13px/1.3 system-ui !important;
+  letter-spacing:.02em !important;
+}
+#examView .explanation-content{
+  font-family:var(--question-font,Georgia,"Times New Roman",serif) !important;
+  font-size:18px !important;
+  line-height:1.82 !important;
+  letter-spacing:.005em !important;
+  color:var(--text) !important;
+  max-width:72ch !important;
+}
+#examView .explanation-content br{
+  content:"";
+  display:block;
+  margin-bottom:.28em;
+}
+#examView .explanation-content .katex{font-size:1.02em}
+body.dark #examView .exam-summary{
+  background:linear-gradient(145deg,#151f2b,#121b26) !important;
+  border-color:#304052 !important;
+  box-shadow:0 10px 30px rgba(0,0,0,.22) !important;
+}
+@media(max-width:700px){
+  #examView .exam-summary{padding:16px 15px !important}
+  #examView .explanation-content{font-size:17px !important;line-height:1.78 !important}
+}
+</style>
+
+<style id="examflow-narrow-card-fix-v2">
+/* Keep the original 3-column exam workspace on desktop/tablet. */
+#examView .main{
+  box-sizing:border-box;
+  min-width:0;
+}
+#examView .main > main{
+  min-width:0;
+  width:100%;
+}
+
+/* Cards participate in normal flow. */
+#examView .exam-head,
+#examView .question,
+#examView .actions,
+#examView #feedback,
+#examView #explanation{
+  box-sizing:border-box;
+  position:relative;
+  float:none;
+  clear:none;
+}
+#examView .question{
+  overflow:visible;
+}
+#examView .question h2{
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+#examView .options{
+  width:100%;
+  min-width:0;
+}
+#examView .option{
+  box-sizing:border-box;
+  min-width:0;
+}
+#examView .option-text{
+  min-width:0;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* Do not let the sticky mobile action bar cover the card above it. */
+#examView .actions{
+  z-index:5;
+}
+#examView .actions::before{
+  content:"";
+  display:block;
+  height:0;
+}
+
+/* MTF / ordering controls must be able to expand vertically. */
+#examView .matching-grid,
+#examView .match-row,
+#examView .ordering-list,
+#examView .order-item{
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+}
+#examView .match-menu{
+  max-width:min(100%,420px);
+  box-sizing:border-box;
+}
+
+/* KaTeX display equations get their own scroll container instead of forcing
+   the whole card wider. */
+#examView .katex-display{
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+/* Narrow phones: one predictable vertical flow. */
+@media(max-width:760px){
+  #examView .main{
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:10px !important;
+  }
+  #examView .sidebar,
+  #examView .right{
+    display:none !important;
+  }
+  #examView .main > main{
+    display:block !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  #examView .exam-head{
+    width:100% !important;
+    margin:0 0 10px !important;
+    height:auto !important;
+    min-height:0 !important;
+    display:block !important;
+  }
+  #examView .exam-head > div:first-child{
+    width:100% !important;
+    min-width:0 !important;
+  }
+  #examView .exam-head h1,
+  #examView .exam-head p{
+    max-width:100% !important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  #examView .exam-progress-btn,
+  #examView .timer{
+    display:inline-flex !important;
+    vertical-align:middle;
+    margin-top:9px !important;
+  }
+
+  #examView .question{
+    width:100% !important;
+    margin:0 0 10px !important;
+    min-height:0 !important;
+    height:auto !important;
+  }
+  #examView .qtop{
+    display:flex !important;
+    align-items:flex-start !important;
+    flex-wrap:wrap !important;
+    gap:7px !important;
+    height:auto !important;
+  }
+  #examView .qtop > *{
+    min-width:0 !important;
+  }
+  #examView .modepicker{
+    max-width:100% !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+  }
+  #examView .question h2{
+    width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    margin:14px 0 17px !important;
+  }
+
+  #examView .options{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:10px !important;
+    height:auto !important;
+  }
+  #examView .option{
+    height:auto !important;
+    min-height:60px !important;
+    white-space:normal !important;
+    align-items:flex-start !important;
+  }
+
+  #examView #feedback,
+  #examView #explanation{
+    height:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+
+  #examView .actions{
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:10px 0 !important;
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:7px !important;
+    position:sticky !important;
+    bottom:0 !important;
+    box-sizing:border-box !important;
+  }
+  #examView .actions > *{
+    min-width:0 !important;
+  }
+  #examView .actions > div{
+    display:flex !important;
+    flex-wrap:wrap !important;
+    gap:7px !important;
+  }
+  #examView .actions .btn{
+    min-height:40px !important;
+  }
+}
+
+/* Very narrow screens: eliminate horizontal pressure completely. */
+@media(max-width:430px){
+  #examView .main{padding:6px !important}
+  #examView .exam-head{padding:12px !important}
+  #examView .question{padding:14px !important}
+  #examView .qtop .modepicker{
+    width:100% !important;
+    margin-left:0 !important;
+  }
+  #examView .qtop .modebtn{
+    flex:0 1 auto !important;
+  }
+  #examView .question h2{
+    font-size:18px !important;
+    line-height:1.55 !important;
+  }
+  #examView .option{
+    padding:11px !important;
+  }
+  #examView .option-text{
+    font-size:15px !important;
+    line-height:1.5 !important;
+  }
+  #examView .actions > div{
+    width:100% !important;
+  }
+  #examView .actions .btn{
+    flex:1 1 95px !important;
+  }
+}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -1980,13 +2784,7 @@ body.dark{
       </div>
       <div class="cbq-flow"><span>Question</span><i>→</i><span>5 reasoning steps</span><i>→</i><span>Solution</span></div>
     </section>
-    <section class="quick-card card exam-countdown-card">
-      <div class="countdown-top"><span class="hero-kicker">FINAL EXAM</span><button class="icon-btn" aria-label="Open exam date settings" onclick="showView('settings')" title="Set exam date">⚙</button></div>
-      <div id="homeExamCountdown" class="final-countdown">No date</div>
-      <p id="homeStudyTip">Set your final exam date to keep the countdown here.</p>
-      <button class="btn countdown-set" onclick="showView('settings')">Set exam date →</button>
-    </section>
-  </div>
+</div>
 
   <section class="card schema-guide">
   <div class="schema-guide-head">
@@ -2099,13 +2897,6 @@ body.dark{
 
   <div class="dashcols">
     <section class="panel card"><h3>Continue studying</h3><div id="homeSessionsList"></div></section>
-    <section class="panel card"><h3>🎓 Final Exam Countdown</h3>
-            <div style="display:flex;gap:7px;align-items:center;margin:10px 0">
-              <input id="examDeadlineInput" type="date" class="goal-target">
-              <button class="btn primary" onclick="saveExamDeadline()">Set Date</button>
-            </div>
-            <div id="examDeadlineLabel" style="font-size:11px;color:var(--muted)">No final exam date set.</div>
-            </section>
   </div>
 </div>
 </section>
@@ -2190,12 +2981,23 @@ body.dark{
     <div><div class="hero-kicker">YOUR STUDY COMMAND CENTER</div><h1>Progress, without the clutter.</h1><p>Track completed tests, spot weak areas and return to questions that need another attempt.</p></div>
     <div class="dashactions"><button class="btn" onclick="showView('planner')">🗓 Future tests</button><button class="btn primary" onclick="showView('home')">＋ New CBQ</button></div>
   </div>
-  <div class="dashboard-countdown card">
-    <div class="dash-count-icon">⏳</div>
-    <div class="dash-count-copy"><small>FINAL EXAM COUNTDOWN</small><strong id="dashExamCountdown">No exam date set</strong><span id="dashExamDate">Set a date in Settings.</span></div>
-    <button class="btn" onclick="showView('settings')">Set date</button>
-  </div>
-  <div class="metrics">
+    <section class="goal-tracker-card card">
+    <div class="goal-tracker-head">
+      <div>
+        <div class="hero-kicker">STUDY GOALS</div>
+        <h3>🎯 Next steps</h3>
+        <p>Keep a short list of concrete tasks with deadlines.</p>
+      </div>
+      <span id="todoProgress" class="todo-progress">0 / 0</span>
+    </div>
+    <form class="todo-add" onsubmit="addTodo(event)">
+      <input id="todoTitle" type="text" maxlength="120" placeholder="e.g. Revise BFS implementation" autocomplete="off">
+      <input id="todoDeadline" type="date" aria-label="Deadline">
+      <button class="btn primary" type="submit">＋ Add</button>
+    </form>
+    <div id="todoList" class="todo-list"></div>
+  </section>
+<div class="metrics">
     <div class="metric card metric-tests"><span class="metric-icon">✓</span><small>Tests completed</small><b id="mTests">0</b></div>
     <div class="metric card metric-average"><span class="metric-icon">◔</span><small>Average score</small><b id="mAvg">0%</b></div>
     <div class="metric card metric-best"><span class="metric-icon">★</span><small>Best score</small><b id="mBest">0%</b></div>
@@ -2304,6 +3106,12 @@ body.dark{
 <option value="Arial, Helvetica, sans-serif">Arial — simple</option>
 </select></section>
 
+<section class="setting card"><h3>🔀 Smart answer shuffle</h3>
+<p>Balances correct-answer positions across a quiz so JSON with mostly option A answers does not create an answer-position pattern.</p>
+<label style="display:flex;align-items:center;gap:9px;margin-top:12px;font-weight:700">
+<input id="smartShuffleToggle" type="checkbox" checked onchange="saveSettings()"> Balance answer positions
+</label></section>
+
 <section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
     <section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. Shortcuts are ignored while you are typing in an input, textarea or select.</p>
 <div class="shortcut-grid">
@@ -2357,7 +3165,7 @@ body.dark{
 <div id="toast" class="toast"></div>
 
 <script>
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",todos:"examflow_todos_v1",plans:"examflow_plans_v2",settings:"examflow_settings_v2"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -2405,7 +3213,6 @@ async function savePersistentBackup(){
     const db=await openExamFlowDB();
     const data={};
     Object.values(K).forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)data[k]=JSON.parse(v)}catch(e){}});
-    data.examDeadline=localStorage.getItem("examflow_exam_deadline")||null;
     await new Promise((resolve,reject)=>{
       const tx=db.transaction("backup","readwrite");tx.objectStore("backup").put({data,savedAt:new Date().toISOString()},"latest");
       tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
@@ -2424,15 +3231,14 @@ async function restorePersistentBackup(){
     if(!record?.data)return false;
     let restored=false;
     Object.entries(record.data).forEach(([k,v])=>{
-      if(k===K.settings||k===K.results||k===K.goal||k===K.plans||k===K.sessions){
-        if(localStorage.getItem(k)===null){try{localStorage.setItem(k,JSON.stringify(v));restored=true}catch(e){}}
+      if(k===K.settings||k===K.results||k===K.todos||k===K.plans||k===K.sessions){
+        if(localStorage.getItem(k)===null){
+          try{localStorage.setItem(k,JSON.stringify(v));restored=true}catch(e){}
+        }
       }
     });
-    if(record.data.examDeadline && !localStorage.getItem("examflow_exam_deadline")){
-      try{localStorage.setItem("examflow_exam_deadline",record.data.examDeadline);restored=true}catch(e){}
-    }
     if(restored){
-      try{renderSessions();renderDashboard();renderPlans();renderHome();renderExamDeadline()}catch(e){}
+      try{renderSessions();renderDashboard();renderPlans();renderHome();}catch(e){}
     }
     return restored;
   }catch(e){return false}
@@ -2460,10 +3266,6 @@ function backupPayload(){
       if(raw!==null)data[key]=JSON.parse(raw);
     }catch(e){}
   });
-  try{
-    const deadline=localStorage.getItem("examflow_exam_deadline");
-    if(deadline!==null)data.examflow_exam_deadline=deadline;
-  }catch(e){}
   return data;
 }
 
@@ -2517,13 +3319,6 @@ async function restoreFromPersistentStorage(){
         }catch(e){}
       }
     });
-
-    try{
-      if(localStorage.getItem("examflow_exam_deadline")===null &&
-         snapshot.data.examflow_exam_deadline!==undefined){
-        localStorage.setItem("examflow_exam_deadline",snapshot.data.examflow_exam_deadline);
-      }
-    }catch(e){}
   }catch(e){}
 }
 
@@ -2537,7 +3332,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0,questionFont:"Georgia, 'Times New Roman', serif"},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0,questionFont:"Georgia, 'Times New Roman', serif",shuffleOptions:true},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -2549,12 +3344,15 @@ function saveSettings(){
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
   const qf=document.getElementById("questionFont");
   if(qf)settings.questionFont=qf.value;
+  const st=document.getElementById("smartShuffleToggle");
+  if(st)settings.shuffleOptions=st.checked;
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
+ const st=document.getElementById("smartShuffleToggle");if(st)st.checked=settings.shuffleOptions!==false;
  mode=settings.defaultMode;updateModeUI();loadQuestionFontSetting()
 }
 function setTheme(x){settings.theme=x;put(K.settings,settings);applySettings()}
@@ -2619,14 +3417,17 @@ function updateModeUI(){
  updateTimerUI();
 }
 function setMode(x){
- mode=x==="practice"?"practice":"exam";
+ const next=x==="practice"?"practice":"exam";
+ mode=next;
  if(mode==="practice"){
    if(!Number.isFinite(timerState.practiceSeconds)||timerState.practiceSeconds<=0)timerState.practiceSeconds=5*60;
+   // Practice timer is independently controlled by its Start/Pause button.
+   timerState.running=false;
  }else{
    const maxExam=Math.min(10,Math.max(1,quizDurationMinutes||settings.defaultDuration||5))*60;
    if(!Number.isFinite(timerState.examSeconds)||timerState.examSeconds<=0)timerState.examSeconds=maxExam;
+   timerState.running=true;
  }
- timerState.running=true;
  updateModeUI();
  updateTimerUI();
  render();
@@ -2818,10 +3619,9 @@ function formatExplanationText(text){
   if(text==null)return "";
   let s=String(text).replace(/\r\n?/g,"\n").trim();
 
-  // Protect LaTeX and code so punctuation inside them isn't treated as
-  // sentence/list punctuation.
+  // Protect LaTeX and code first so punctuation inside them is never altered.
   const protectedParts=[];
-  const protect=(value)=>{
+  const protect=value=>{
     const id=`\uE100${protectedParts.length}\uE101`;
     protectedParts.push(value);
     return id;
@@ -2834,18 +3634,18 @@ function formatExplanationText(text){
   s=s.replace(/\\\([\s\S]*?\\\)/g,m=>protect(m));
   s=s.replace(/\$[^$\n]+\$/g,m=>protect(m));
 
-  // Normalize numbered lists: "1. ... 2. ..." becomes separate lines.
+  // Normalize numbered lists even when the generator puts them on one line.
   s=s.replace(/(^|[ \t])(\d+)[.)][ \t]+/g,"$1\n$2. ");
-
-  // Normalize common bullet styles.
   s=s.replace(/[ \t]+([•●▪◦‣])[ \t]+/g,"\n$1 ");
   s=s.replace(/(^|\n)[ \t]*[-*][ \t]+/g,"$1• ");
 
-  // Add a line break after sentence-ending punctuation when another sentence
-  // follows on the same line. Avoid decimals, abbreviations, and LaTeX tokens.
-  s=s.replace(/([.!?])(?:["'”’)\]]*)[ \t]+(?=[A-Z0-9🧠🔹🔸➡️])/g,"$1\n");
+  // Every sentence-ending full stop followed by whitespace gets its own line.
+  // Decimal values such as 9.8 are safe because they have no whitespace after ".".
+  s=s.replace(/\.(?=[ \t]+(?=\S))/g,".\n");
 
-  // Clean excessive blank lines while retaining intentional paragraph breaks.
+  // Do the same for ? and ! while avoiding accidental spacing noise.
+  s=s.replace(/([!?])(?=[ \t]+(?=\S))/g,"$1\n");
+
   s=s.replace(/[ \t]+\n/g,"\n");
   s=s.replace(/\n{3,}/g,"\n\n");
 
@@ -2911,7 +3711,7 @@ function renderSpecialQuestion(q,opts){
    input.value=answers[current]||"";
    input.oninput=()=>{answers[current]=input.value;checkedQuestions.delete(current);saveSessionSoon()};
    wrap.appendChild(input);opts.appendChild(wrap);
- }else if(q.type==="match"||q.type==="drag_drop"){
+ }else if(q.type==="match"){
    const chosen=answers[current]||[];
    const rights=q.pairs.map(p=>p.right);
    if(!matchOrders[current]){
@@ -2971,6 +3771,91 @@ function renderSpecialQuestion(q,opts){
      check.type="button";check.className="btn primary match-check-btn";
      check.textContent="✓ Check matches";
      check.onclick=()=>{if(!answerIsPresent(answers[current],q)){toast("Complete every match first");return}checkedQuestions.add(current);render();saveSessionSoon()};
+     opts.appendChild(check);
+   }
+ }else if(q.type==="drag_drop"){
+   /*
+    * Drag-drop questions are true placement questions:
+    * each right-hand concept can be dragged onto its corresponding left slot.
+    * A click fallback is also provided for touch/mobile devices.
+    */
+   const chosen=Array.isArray(answers[current])?[...answers[current]]:Array(q.pairs.length).fill("");
+   const rights=q.pairs.map(p=>p.right);
+   if(!matchOrders[current]){
+     const shuffled=[...rights];
+     for(let i=shuffled.length-1;i>0;i--){
+       const j=Math.floor(Math.random()*(i+1));
+       [shuffled[i],shuffled[j]]=[shuffled[j],shuffled[i]];
+     }
+     matchOrders[current]=shuffled;
+     saveSessionSoon();
+   }
+
+   const wrap=document.createElement("div");wrap.className="dragdrop-wrap";
+   const board=document.createElement("div");board.className="dragdrop-board";
+   q.pairs.forEach((pair,i)=>{
+     const row=document.createElement("div");row.className="dragdrop-row";
+     const left=document.createElement("div");left.className="dragdrop-left";
+     left.innerHTML=esc(pair.left);
+
+     const zone=document.createElement("div");
+     zone.className="dragdrop-zone"+(chosen[i]?" filled":"");
+     zone.dataset.index=String(i);
+     zone.innerHTML=chosen[i]
+       ? `<span class="drag-chip" draggable="true" data-value="${esc(chosen[i])}">${esc(chosen[i])}</span>`
+       : `<span class="drag-placeholder">Drop the correct match here</span>`;
+
+     zone.ondragover=e=>{e.preventDefault();zone.classList.add("drag-over")};
+     zone.ondragleave=()=>zone.classList.remove("drag-over");
+     zone.ondrop=e=>{
+       e.preventDefault();
+       zone.classList.remove("drag-over");
+       const value=e.dataTransfer.getData("text/plain")||"";
+       if(!value)return;
+       const a=Array.isArray(answers[current])?[...answers[current]]:Array(q.pairs.length).fill("");
+       const previous=a[i];
+       const existing=a.indexOf(value);
+       if(existing>=0)a[existing]=previous||"";
+       a[i]=value;
+       answers[current]=a;checkedQuestions.delete(current);saveSessionSoon();render();
+     };
+     zone.onclick=e=>{
+       if(e.target.closest(".drag-chip"))return;
+       const unused=matchOrders[current].find(x=>!chosen.includes(x));
+       if(!unused)return;
+       const a=[...chosen];a[i]=unused;answers[current]=a;checkedQuestions.delete(current);saveSessionSoon();render();
+     };
+     row.append(left,zone);board.appendChild(row);
+   });
+
+   const bank=document.createElement("div");bank.className="dragdrop-bank";
+   const used=new Set(chosen.filter(Boolean));
+   matchOrders[current].forEach(value=>{
+     if(used.has(value))return;
+     const chip=document.createElement("button");chip.type="button";chip.className="drag-bank-item";
+     chip.draggable=true;chip.innerHTML=esc(value);
+     chip.dataset.value=value;
+     chip.ondragstart=e=>e.dataTransfer.setData("text/plain",value);
+     chip.onclick=()=>{
+       const empty=chosen.findIndex(x=>!x);
+       if(empty<0){toast("All positions are filled");return}
+       const a=[...chosen];a[empty]=value;answers[current]=a;checkedQuestions.delete(current);saveSessionSoon();render();
+     };
+     bank.appendChild(chip);
+   });
+
+   wrap.appendChild(board);
+   if(bank.children.length){
+     const title=document.createElement("div");title.className="dragdrop-bank-title";title.textContent="Drag an item to its correct position";
+     wrap.append(title,bank);
+   }
+   opts.appendChild(wrap);
+   renderAllQuizMath(opts);
+   if(mode==="practice"){
+     const check=document.createElement("button");
+     check.type="button";check.className="btn primary match-check-btn";
+     check.textContent="✓ Check positions";
+     check.onclick=()=>{if(!answerIsPresent(answers[current],q)){toast("Complete every position first");return}checkedQuestions.add(current);render();saveSessionSoon()};
      opts.appendChild(check);
    }
  }else if(q.type==="ordering"){
@@ -3223,8 +4108,30 @@ function renderSessions(){
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
- sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);updateTimerUI();seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));mode=s.mode||settings.defaultMode;sections=s.sections||[];
- document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
+ sessionId=s.id;
+ examName=s.name;
+ questions=s.questions||[];
+ answers=s.answers||Array(questions.length).fill(null);
+ reviews=new Set(s.reviews||[]);
+ checkedQuestions=new Set(s.checkedQuestions||[]);
+ matchOrders=s.matchOrders||{};
+ current=Math.min(Number(s.current)||0,Math.max(0,questions.length-1));
+ seconds=Math.min(10*60,Math.max(1,Number(s.seconds)||5*60));
+ quizDurationMinutes=Math.min(10,Math.max(1,Number(s.quizDurationMinutes)||Math.ceil(seconds/60)));
+ mode=s.mode==="practice"?"practice":"exam";
+ timerState.examSeconds=Math.min(10*60,Math.max(0,Number(s.examTimerSeconds ?? seconds)||0));
+ timerState.practiceSeconds=Math.min(10*60,Math.max(0,Number(s.practiceTimerSeconds ?? 5*60)||0));
+ timerState.running=mode==="practice"?Boolean(s.practiceTimerRunning):false;
+ if(mode==="exam" && timerState.examSeconds<=0)timerState.examSeconds=quizDurationMinutes*60;
+ if(mode==="practice" && timerState.practiceSeconds<=0)timerState.practiceSeconds=5*60;
+ document.getElementById("examTitle").textContent=examName;
+ document.getElementById("headerQuizName").textContent=examName;
+ showView("exam");
+ updateModeUI();
+ render();
+ updateTimerUI();
+ renderQuestionProgress();
+ toast("Session restored ✓");
 }
 function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions()}
 
@@ -3481,6 +4388,7 @@ function saveResult(){
  const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs.slice(0,100));backupToPersistentStorage();return r
 }
 function renderDashboard(){
+ renderTodos();
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=rs.reduce((a,r)=>a+r.correct+r.wrong,0);
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b></div>`).join(""):'<div class="empty">No results yet.</div>';
@@ -3489,24 +4397,55 @@ function renderDashboard(){
  else ad.innerHTML=`<strong>Latest: ${latest.percent}%</strong><p style="color:var(--muted);font-size:12px;line-height:1.6">${latest.percent>=80?"Strong performance. Push consistency with timed Exam Mode.":latest.percent>=60?"Good foundation. Use Practice Mode on weak topics, then retest.":"Focus on concept breakdown first, then repeat the same quiz after revision."}</p>`;
  
 }
-function setGoalPreset(target){
- document.getElementById("goalTarget").value=target;
- if(!document.getElementById("goalInput").value.trim())document.getElementById("goalInput").value=`Reach ${target}% average in CBQ practice`;
- 
+function getTodos(){return get(K.todos,[])}
+function saveTodos(list){put(K.todos,list.slice(0,100));renderTodos()}
+function addTodo(e){
+  e.preventDefault();
+  const title=(document.getElementById("todoTitle")?.value||"").trim();
+  const deadline=document.getElementById("todoDeadline")?.value||"";
+  if(!title){toast("Add a goal first");return}
+  const list=getTodos();
+  list.unshift({id:id(),title,deadline,done:false,createdAt:new Date().toISOString()});
+  saveTodos(list);
+  document.getElementById("todoTitle").value="";
+  document.getElementById("todoDeadline").value="";
+  toast("Goal added ✓");
 }
-function saveGoal(){
- const text=document.getElementById("goalInput").value.trim()||"Improve my CBQ performance";
- const target=Math.max(1,Math.min(100,Number(document.getElementById("goalTarget").value||80)));
- put(K.goal,{text,target,updatedAt:new Date().toISOString()});renderGoal();toast("Goal saved ✓")
+function toggleTodo(todoId){
+  const list=getTodos();
+  const item=list.find(x=>x.id===todoId);
+  if(!item)return;
+  item.done=!item.done;
+  saveTodos(list);
 }
-function renderGoal(){
- const g=get(K.goal,{}),rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,target=Number(g.target||80),progress=Math.min(100,Math.round(avg/target*100));
- document.getElementById("goalInput").value=g.text||"";
- document.getElementById("goalTarget").value=target;
- document.getElementById("goalLabel").textContent=g.text?`${avg}% average · target ${target}%`:"Set a goal to track progress";
- document.getElementById("goalPercent").textContent=g.text?`${progress}% of goal`:"0%";
- document.getElementById("goalBar").style.width=(g.text?progress:0)+"%";
- document.querySelectorAll(".milestone").forEach(x=>x.classList.toggle("active",Number(x.textContent.match(/\d+/)?.[0])===target));
+function deleteTodo(todoId){
+  saveTodos(getTodos().filter(x=>x.id!==todoId));
+}
+function todoDateLabel(value){
+  if(!value)return "No deadline";
+  const d=new Date(value+"T12:00:00");
+  return Number.isNaN(d.getTime())?"No deadline":d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+}
+function renderTodos(){
+  const listEl=document.getElementById("todoList"),progressEl=document.getElementById("todoProgress");
+  if(!listEl)return;
+  const list=getTodos();
+  const done=list.filter(x=>x.done).length;
+  if(progressEl)progressEl.textContent=`${done} / ${list.length}`;
+  if(!list.length){
+    listEl.innerHTML='<div class="todo-empty">No goals yet. Add one concrete study task above.</div>';
+    return;
+  }
+  const today=new Date();today.setHours(0,0,0,0);
+  listEl.innerHTML=list.map(item=>{
+    const overdue=!item.done && item.deadline && new Date(item.deadline+"T23:59:59")<new Date();
+    return `<div class="todo-item${item.done?" done":""}">
+      <input class="todo-check" type="checkbox" ${item.done?"checked":""} onchange="toggleTodo('${item.id}')" aria-label="Complete ${esc(item.title)}">
+      <div class="todo-title">${esc(item.title)}</div>
+      <div class="todo-deadline${overdue?" overdue":""}">${overdue?"⚠ Overdue · ":"📅 "}${esc(todoDateLabel(item.deadline))}</div>
+      <button class="todo-delete" type="button" onclick="deleteTodo('${item.id}')" aria-label="Delete goal">×</button>
+    </div>`;
+  }).join("");
 }
 function clearResults(){if(confirm("Delete all saved results?")){localStorage.removeItem(K.results);renderDashboard();toast("Results cleared")}}
 
@@ -3595,16 +4534,12 @@ async function importDataFile(event){
 
     if(parsed.settings!==undefined)put(K.settings,parsed.settings);
     if(parsed.results!==undefined)put(K.results,Array.isArray(parsed.results)?parsed.results:[]);
-    if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
+    if(parsed.todos!==undefined)put(K.todos,Array.isArray(parsed.todos)?parsed.todos:[]);
     if(parsed.plans!==undefined)put(K.plans,Array.isArray(parsed.plans)?parsed.plans:[]);
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
-    if(parsed.examDeadline!==undefined){
-      if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
-      else localStorage.removeItem("examflow_exam_deadline");
-    }
 
     settings=loadSettings();
-    renderSessions();renderDashboard();renderPlans();renderHome();renderExamDeadline();applySettings();
+    renderSessions();renderDashboard();renderPlans();renderHome();applySettings();
     await savePersistentBackup();
     if(status){
       status.textContent="✓ Backup imported successfully.";
@@ -3623,7 +4558,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={settings,results:get(K.results,[]),todos:get(K.todos,[]),plans:get(K.plans,[]),sessions:get(K.sessions,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
@@ -3664,34 +4599,6 @@ async function pasteFromClipboard(targetId,statusId,buttonId){
   }
 }
 
-
-/* Final exam date countdown */
-function saveExamDeadline(){
-  const v=document.getElementById("examDeadlineInput")?.value;
-  if(!v){toast("Choose your final exam date");return}
-  localStorage.setItem("examflow_exam_deadline",v);
-  renderExamDeadline();
-  toast("Final exam date saved ✓");
-}
-function getSavedExamDeadline(){return localStorage.getItem("examflow_exam_deadline")||""}
-function renderExamDeadline(){
-  const v=getSavedExamDeadline();
-  const hero=document.getElementById("homeExamCountdown"),dash=document.getElementById("dashExamCountdown"),dashDate=document.getElementById("dashExamDate"),label=document.getElementById("examDeadlineLabel"),input=document.getElementById("examDeadlineInput");
-  if(input)input.value=v;
-  if(!v){
-    if(hero){hero.textContent="No date";hero.className="final-countdown"}
-    if(dash)dash.textContent="No exam date set";
-    if(dashDate)dashDate.textContent="Set a date in Settings.";
-    if(label)label.textContent="No final exam date set.";
-    return;
-  }
-  const target=new Date(v+"T23:59:59"),diff=target-new Date(),days=Math.max(0,Math.ceil(diff/86400000)),dateText=target.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}),text=diff<=0?"Exam date reached":`${days} day${days===1?"":"s"}`;
-  if(hero){hero.textContent=text;hero.className="final-countdown "+(days<=7?"urgent":days<=30?"soon":"safe")}
-  if(dash)dash.textContent=text;
-  if(dashDate)dashDate.textContent=diff<=0?"Your final exam date has arrived.":`Final exam · ${dateText}`;
-  if(label)label.textContent=diff<=0?"Your final exam date has arrived.":`${days} day${days===1?"":"s"} remaining · ${dateText}`;
-}
-if(!window.examflowDeadlineInterval)window.examflowDeadlineInterval=setInterval(renderExamDeadline,30000);
 
 /* Question progress drawer */
 
@@ -3798,35 +4705,126 @@ function shuffleArray(arr){
   return a;
 }
 function prepareShuffledQuiz(qs){
-  return qs.map(q=>{
-    const copy={...q};
-    if(!settings.shuffleOptions || !Array.isArray(copy.options) || copy.options.length<2) return copy;
+  /*
+   * Smart answer-position balancing.
+   *
+   * JSON authors often put the correct answer at A. A normal Fisher-Yates
+   * shuffle is unbiased over many sessions, but any individual short quiz
+   * can still look very A-heavy by chance. For an exam UI, we want both:
+   *   1) random-looking order, and
+   *   2) a near-even distribution of correct answer positions.
+   *
+   * We therefore balance positions separately for each option count:
+   *   2 choices -> counts differ by at most 1
+   *   3 choices -> counts differ by at most 1
+   *   4 choices -> counts differ by at most 1
+   * etc.
+   *
+   * A small adjacency penalty prevents runs such as A,A,A,A while retaining
+   * randomness. The JSON itself is never mutated; only the session copy is.
+   */
+  const copies=qs.map(q=>({...q}));
 
-    // Preserve the actual correct option before shuffling.
+  if(settings.shuffleOptions===false) return copies;
+
+  const groups=new Map();
+
+  copies.forEach((copy,index)=>{
+    if(!Array.isArray(copy.options)||copy.options.length<2)return;
+
     let correctIndex=-1;
     if(typeof copy.answer==="string"){
-      const letter=copy.answer.trim().match(/^([A-Z])$/i);
+      const s=copy.answer.trim();
+      const letter=s.match(/^([A-Z])$/i);
       if(letter){
-        correctIndex=letter[1].toUpperCase().charCodeAt(0)-65;
-      }else{
-        correctIndex=copy.options.findIndex(x=>String(x).trim()===copy.answer.trim());
+        const n=letter[1].toUpperCase().charCodeAt(0)-65;
+        if(n>=0&&n<copy.options.length)correctIndex=n;
+      }
+      if(correctIndex<0){
+        correctIndex=copy.options.findIndex(x=>String(x).trim()===s);
       }
     }else if(typeof copy.answer==="number"){
-      correctIndex=copy.answer;
+      if(copy.answer>=0&&copy.answer<copy.options.length)correctIndex=copy.answer;
     }
 
-    const correctValue=correctIndex>=0 ? copy.options[correctIndex] : null;
-    const shuffled=shuffleArray(copy.options);
-    copy.options=shuffled;
+    if(correctIndex<0)return;
 
-    if(correctValue!==null){
-      const newIndex=shuffled.findIndex(x=>String(x)===String(correctValue));
-      if(newIndex>=0) copy.answer=String.fromCharCode(65+newIndex);
-    }
-    return copy;
+    const key=copy.options.length;
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push({copy,index,correctIndex});
   });
-}
 
+  groups.forEach((items,k)=>{
+    /*
+     * Build a balanced multiset of target answer positions.
+     * Example: 8 four-option questions => [2,2,2,2].
+     * Example: 5 four-option questions => [2,1,1,1].
+     */
+    const base=Math.floor(items.length/k);
+    let remainder=items.length%k;
+    const targets=[];
+    for(let pos=0;pos<k;pos++){
+      const count=base+(remainder>0?1:0);
+      for(let j=0;j<count;j++)targets.push(pos);
+      remainder--;
+    }
+
+    // Randomize which positions receive the extra occurrences.
+    for(let i=targets.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [targets[i],targets[j]]=[targets[j],targets[i]];
+    }
+
+    /*
+     * Assign positions one question at a time. Prefer a target different
+     * from the previous two when possible. This prevents visually obvious
+     * patterns without forcing a deterministic A-B-C-D cycle.
+     */
+    const remaining=targets.slice();
+    const assigned=[];
+    items.forEach((item,qi)=>{
+      const candidates=[...new Set(remaining)];
+      let pool=candidates.filter(pos=>{
+        const a=assigned[qi-1],b=assigned[qi-2];
+        return pos!==a && pos!==b;
+      });
+      if(!pool.length)pool=candidates;
+
+      // Weight toward positions with more remaining capacity.
+      const maxCount=Math.max(...pool.map(pos=>remaining.filter(x=>x===pos).length));
+      pool=pool.filter(pos=>remaining.filter(x=>x===pos).length===maxCount);
+      const target=pool[Math.floor(Math.random()*pool.length)];
+
+      const ri=remaining.indexOf(target);
+      remaining.splice(ri,1);
+      assigned.push(target);
+    });
+
+    items.forEach((item,qi)=>{
+      const copy=item.copy;
+      const target=assigned[qi];
+      const correctValue=copy.options[item.correctIndex];
+
+      const wrong=copy.options.filter((_,i)=>i!==item.correctIndex);
+      for(let i=wrong.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [wrong[i],wrong[j]]=[wrong[j],wrong[i]];
+      }
+
+      const shuffled=[];
+      let wi=0;
+      for(let pos=0;pos<k;pos++){
+        shuffled[pos]=(pos===target)?correctValue:wrong[wi++];
+      }
+
+      copy.options=shuffled;
+      copy.answer=String.fromCharCode(65+target);
+      copy.__smartAnswerPosition=target;
+    });
+  });
+
+  return copies;
+}
 function startHomeQuiz(){
  const raw=document.getElementById("homeJson").value.trim();
  const status=document.getElementById("homeJsonStatus");
@@ -3884,7 +4882,7 @@ function showView(name){
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
  ["navHome","navExam","navDashboard","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  if(name!=="testResults")document.getElementById({home:"navHome",exam:"navExam",dashboard:"navDashboard",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
- if(name==="home")renderHome();if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
+ if(name==="home")renderHome();if(name==="dashboard"){renderDashboard();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){document.getElementById("instantFeedback").checked=!!settings.instantFeedback;
  document.getElementById("defaultDuration").value=String(settings.defaultDuration||30);
  document.getElementById("defaultMarks").value=settings.defaultMarks??1;
@@ -4153,7 +5151,13 @@ setInterval(()=>{
 
 window.addEventListener("beforeunload",saveSession);
 
-applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();
+applySettings();
+if(!questions.length){
+  timerState.examSeconds=Math.min(10*60,Math.max(1,seconds||5*60));
+  timerState.practiceSeconds=5*60;
+  timerState.running=false;
+}
+updateTimerUI();render();renderSessions();renderDashboard();renderTodos();renderPlans();renderHome();
 
 initPersistentBackup();
 </script>
