@@ -1817,6 +1817,25 @@ body.dark{
 <section id="homeView" class="view active">
 <div class="dashboard">
   <div class="home-hero">
+  <div class="dashhead dashboard-hero">
+    <div><div class="hero-kicker">YOUR STUDY COMMAND CENTER</div><h1>Progress, without the clutter.</h1></div>
+    <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:#fffdf8; color: var(--ink); border: 1px solid #ded5c5; box-shadow: 0 1px 2px rgba(60,45,25,0.05); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="showView('home')" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
+  </div>
+  <div class="dashboard-countdown card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding: 12px 16px; margin-top:20px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="dash-count-icon" style="font-size:20px; background:var(--paper2); padding:8px; border-radius:8px; height: 38px; width: 38px; display:flex; align-items:center; justify-content:center;">⏳</div>
+      <div class="dash-count-copy">
+        <small style="display:block; font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:2px;">FINAL EXAM COUNTDOWN</small>
+        <strong id="homeExamCountdown" style="display:block; font-size:15px; color:var(--ink);">No exam date set</strong>
+        <span id="dashExamDate" style="display:block; font-size:11px; color:var(--muted); margin-top:2px;">Set a date to track your goal.</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="date" id="examDeadlineInput" style="display:none;" onchange="saveExamDeadline()" />
+      <button style="background:transparent; border:none; cursor:pointer; font-size:22px; color:var(--ink); display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--ink);" onclick="document.getElementById('examDeadlineInput').showPicker()">⊕</button>
+      <button class="btn" style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600;" onclick="document.getElementById('examDeadlineInput').showPicker()">Set date</button>
+    </div>
+  </div>
     <section class="hero-copy card cbq-intro">
       <div class="hero-kicker">🧠 CONCEPT BREAKDOWN QUIZ</div>
       <h1>Master any topic, step by step.</h1>
@@ -1992,7 +2011,7 @@ body.dark{
 </section>
 <section class="question card">
   <div class="qtop">
-    <button id="questionShuffleBtn" class="exam-progress-btn" type="button" onclick="shuffleAllQuestions()">🔀 Shuffle Questions</button>
+
     <div id="examTimerControl" class="timer" style="margin:0;">⏱ <span id="timer">30:00</span></div>
     <div><span class="qnum">Question <span id="currentLabel">0</span></span> <span>of <span id="totalLabel">0</span></span></div>
     <div class="modepicker">
@@ -2029,13 +2048,23 @@ body.dark{
 <section id="dashboardView" class="view">
 <div class="dashboard beautiful-dashboard">
   <div class="dashhead dashboard-hero">
-    <div><div class="hero-kicker">YOUR STUDY COMMAND CENTER</div><h1>Progress, without the clutter.</h1><p>Track completed tests, spot weak areas and return to questions that need another attempt.</p></div>
-    <div class="dashactions"><button class="btn" onclick="showView('planner')">🗓 Future tests</button><button class="btn primary" onclick="showView('home')">＋ New CBQ</button></div>
+    <div><div class="hero-kicker">YOUR STUDY COMMAND CENTER</div><h1>Progress, without the clutter.</h1></div>
+    <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:#fffdf8; color: var(--ink); border: 1px solid #ded5c5; box-shadow: 0 1px 2px rgba(60,45,25,0.05); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="showView('home')" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
   </div>
-  <div class="dashboard-countdown card">
-    <div class="dash-count-icon">⏳</div>
-    <div class="dash-count-copy"><small>FINAL EXAM COUNTDOWN</small><strong id="dashExamCountdown">No exam date set</strong><span id="dashExamDate">Set a date in Settings.</span></div>
-    <button class="btn" onclick="showView('settings')">Set date</button>
+  <div class="dashboard-countdown card" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; padding: 12px 16px; margin-top:20px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div class="dash-count-icon" style="font-size:20px; background:var(--paper2); padding:8px; border-radius:8px; height: 38px; width: 38px; display:flex; align-items:center; justify-content:center;">⏳</div>
+      <div class="dash-count-copy">
+        <small style="display:block; font-size:10px; font-weight:700; color:var(--muted); letter-spacing:0.05em; text-transform:uppercase; margin-bottom:2px;">FINAL EXAM COUNTDOWN</small>
+        <strong id="dashExamCountdown" style="display:block; font-size:15px; color:var(--ink);">No exam date set</strong>
+        <span id="dashExamDate" style="display:block; font-size:11px; color:var(--muted); margin-top:2px;">Set a date to track your goal.</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <input type="date" id="examDeadlineInput" style="display:none;" onchange="saveExamDeadline()" />
+      <button style="background:transparent; border:none; cursor:pointer; font-size:22px; color:var(--ink); display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--ink);" onclick="document.getElementById('examDeadlineInput').showPicker()">⊕</button>
+      <button class="btn" style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600;" onclick="document.getElementById('examDeadlineInput').showPicker()">Set date</button>
+    </div>
   </div>
   <div class="metrics">
     <div class="metric card metric-tests"><span class="metric-icon">✓</span><small>Tests completed</small><b id="mTests">0</b></div>
@@ -2701,7 +2730,7 @@ function readFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader()
 function loadQuiz(){
  try{
    const parsed=parseQuiz(parseQuizInput(document.getElementById("jsonInput").value));
-   questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;quizDurationMinutes=Math.min(10,Math.max(1,parsed.durationMinutes||settings.defaultDuration||5));
+   questions=prepareShuffledQuiz(parsed.questions);questions=shuffleArray(questions);sections=parsed.sections;examName=parsed.name;
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
  quizDurationMinutes=Math.min(10,Math.max(1,quizDurationMinutes));seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;
    document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
@@ -3373,6 +3402,8 @@ function saveResult(){
  const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs.slice(0,100));backupToPersistentStorage();return r
 }
 function renderDashboard(){
+ const ss=get(K.sessions,[]);
+ const ssl = document.getElementById("homeSessionsList"); if (ssl) ssl.innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`).join(""):"<div class=\"empty\">No saved sessions. Add a CBQ to begin.</div>";
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=rs.reduce((a,r)=>a+r.correct+r.wrong,0);
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><div style="display:flex;align-items:center;gap:10px;"><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b><button class="session-delete" onclick="deleteResult('${r.id}')">×</button></div></div>`).join(""):'<div class="empty">No results yet.</div>';
@@ -3574,7 +3605,7 @@ function saveExamDeadline(){
 function getSavedExamDeadline(){return localStorage.getItem("examflow_exam_deadline")||""}
 function renderExamDeadline(){
   const v=getSavedExamDeadline();
-  const hero=document.getElementById("homeExamCountdown"),dash=document.getElementById("dashExamCountdown"),dashDate=document.getElementById("dashExamDate"),label=document.getElementById("examDeadlineLabel"),input=document.getElementById("examDeadlineInput");
+  const hero=document.getElementById("homeExamCountdown"),dash=document.getElementById("homeExamCountdown"),dashDate=document.getElementById("dashExamDate"),label=document.getElementById("examDeadlineLabel"),input=document.getElementById("examDeadlineInput");
   if(input)input.value=v;
   if(!v){
     if(hero){hero.textContent="No date";hero.className="final-countdown"}
@@ -3739,7 +3770,7 @@ function shuffleArray(arr){
 function prepareShuffledQuiz(qs){
   return qs.map(q=>{
     const copy={...q};
-    if(!settings.shuffleOptions || !Array.isArray(copy.options) || copy.options.length<2) return copy;
+    if(!Array.isArray(copy.options) || copy.options.length<2) return copy;
 
     // Preserve the actual correct option before shuffling.
     let correctIndex=-1;
@@ -3772,7 +3803,7 @@ function startHomeQuiz(){
  if(!raw){status.textContent="Paste your CBQ JSON first.";status.style.color="var(--bad)";return}
  try{
    const parsed=parseQuiz(parseQuizInput(raw));
-   questions=parsed.questions;sections=parsed.sections;examName=parsed.name;
+   questions=prepareShuffledQuiz(parsed.questions);questions=shuffleArray(questions);sections=parsed.sections;examName=parsed.name;
    quizDurationMinutes=parsed.durationMinutes||settings.defaultDuration||30;
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;sessionId=null;mode=settings.defaultMode;
    document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
@@ -3798,7 +3829,7 @@ function renderHome(){
  document.getElementById("homeSessions").textContent=ss.length;
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
- document.getElementById("homeSessionsList").innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession('${s.id}')">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession('${s.id}')">×</button></div></div>`).join(""):'<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
+
  document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
 
