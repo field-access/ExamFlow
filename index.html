@@ -2215,7 +2215,7 @@ body.dark{
 <div id="toast" class="toast"></div>
 
 <script>
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",todos:"examflow_todos_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -2268,6 +2268,7 @@ restoreFromPersistentStorage().then(()=>{
     renderDashboard();
     renderPlans();
     renderHome();
+    renderTodos();
   }catch(e){}
 }).finally(()=>requestPersistentStorage());
 
@@ -2344,7 +2345,7 @@ function id(){return Date.now().toString(36)+"-"+Math.random().toString(36).slic
 function renderTodos() {
   const container = document.getElementById("todoListContainer");
   if(!container) return;
-  const todos = get("examflow_todos_v1", []);
+  const todos = get(K.todos, []);
   if(!todos.length) {
     container.innerHTML = "<div class='empty'>No todos yet. Add one above!</div>";
     return;
@@ -2367,28 +2368,28 @@ function addTodo() {
   const input = document.getElementById("todoInput");
   const deadlineInput = document.getElementById("todoDeadline");
   if(!input || !input.value.trim()) return;
-  const todos = get("examflow_todos_v1", []);
+  const todos = get(K.todos, []);
   todos.push({ text: input.value.trim(), deadline: deadlineInput ? deadlineInput.value : "", done: false });
-  put("examflow_todos_v1", todos);
+  put(K.todos, todos);
   input.value = "";
   if(deadlineInput) deadlineInput.value = "";
   renderTodos();
 }
 
 function toggleTodo(i) {
-  const todos = get("examflow_todos_v1", []);
+  const todos = get(K.todos, []);
   if(todos[i]) {
     todos[i].done = !todos[i].done;
-    put("examflow_todos_v1", todos);
+    put(K.todos, todos);
     renderTodos();
   }
 }
 
 function deleteTodo(i) {
-  const todos = get("examflow_todos_v1", []);
+  const todos = get(K.todos, []);
   if(todos[i]) {
     todos.splice(i, 1);
-    put("examflow_todos_v1", todos);
+    put(K.todos, todos);
     renderTodos();
   }
 }
@@ -3497,13 +3498,13 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions"];
+    const allowed=["settings","results","goal","plans","sessions","todos"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
 
     const overwrite=confirm(
       "Import this ExamFlow backup?\\n\\n" +
-      "This will replace your current settings, results, goals, plans and saved sessions with the backup."
+      "This will replace your current settings, results, goals, plans, saved sessions and todos with the backup."
     );
     if(!overwrite){
       event.target.value="";
@@ -3515,6 +3516,7 @@ async function importDataFile(event){
     if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
     if(parsed.plans!==undefined)put(K.plans,Array.isArray(parsed.plans)?parsed.plans:[]);
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
+    if(parsed.todos!==undefined)put(K.todos,Array.isArray(parsed.todos)?parsed.todos:[]);
     if(parsed.examDeadline!==undefined){
       if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
       else localStorage.removeItem("examflow_exam_deadline");
@@ -3540,7 +3542,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),todos:get(K.todos,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
