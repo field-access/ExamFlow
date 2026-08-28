@@ -1304,6 +1304,11 @@ header{
   .option-text{font-size:14px}
 }
 
+
+body:not(.exam-active) #globalExamProgressBtn {
+  display: none !important;
+}
+
 /* Prevent wide controls/cards from pushing the viewport horizontally. */
 .view,.card,.panel,.question,.options,.actions,.dashboard,.planner-page,
 .home-hero,.schema-guide,.results-page,.settings-page{max-width:100%;min-width:0}
