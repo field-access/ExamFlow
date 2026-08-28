@@ -180,13 +180,11 @@ body.dark #explanation{background:#2b2922!important}
   letter-spacing: 0 !important;
 }
 .question h2{
-  white-space: pre-wrap;
   font-size:21px !important;
   line-height:1.65 !important;
   color:var(--text);
 }
 .option-text{
-  white-space: pre-wrap;
   font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-size:14px !important;
   font-weight:400 !important;
@@ -335,7 +333,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 }
 #examView .options{
   gap:14px !important;
-  max-width:100% !important;
+  max-width:800px !important;
   margin-left:auto !important;
   margin-right:auto !important;
 }
@@ -615,7 +613,9 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
   font-size:24px !important;
   line-height:1.68 !important;
   color:var(--text) !important;
-  max-width:100% !important;
+  max-width:800px !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
 }
 #examView .option-text{
   font-size:18px !important;
@@ -1523,8 +1523,7 @@ pre{overflow:auto}
 }
 /* Slightly narrower default question card */
 #examView .question{
-  width: 100%;
-  max-width: 980px;
+  width: min(800px, 100%);
   margin-left:auto;
   margin-right:auto;
 }
@@ -2741,7 +2740,7 @@ function protectQuizCodeAndMath(root){
 }
 function formatExplanationText(text){
   if(text==null)return "";
-  return String(text).replace(/\r\n?/g,"\n").trim();
+  return String(text).trim();
 }
 function renderAllQuizMath(root=document){
   if(!root||typeof renderMathInElement!=="function")return;
