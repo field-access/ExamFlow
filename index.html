@@ -3524,27 +3524,27 @@ function getQuestionSidebarState(){
 function setQuestionSidebarState(open){
   localStorage.setItem(QUESTION_SIDEBAR_KEY, open ? "true" : "false");
 }
-function applyQuestionSidebarState(){
+function updateQuestionSidebarDOM(open) {
   const d=document.getElementById("examProgressDrawer");
   const b=document.querySelector(".exam-progress-backdrop");
   if(!d)return;
-  const open=getQuestionSidebarState();
   d.classList.toggle("open",open);
-  const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
+  const main=document.querySelector("#examView .main");
+  if(main)main.classList.toggle("palette-shift",open);
   if(b)b.classList.toggle("open",open);
   if(open)renderQuestionProgress();
 }
 
+function applyQuestionSidebarState(){
+  updateQuestionSidebarDOM(getQuestionSidebarState());
+}
+
 function toggleQuestionProgress(){
   const d=document.getElementById("examProgressDrawer");
-  const b=document.querySelector(".exam-progress-backdrop");
   if(!d)return;
   const open=!d.classList.contains("open");
   setQuestionSidebarState(open);
-  d.classList.toggle("open",open);
-  const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
-  if(b)b.classList.toggle("open",open);
-  if(open)renderQuestionProgress();
+  updateQuestionSidebarDOM(open);
 }
 function renderQuestionProgress(){
   const grid=document.getElementById("examProgressGrid");
