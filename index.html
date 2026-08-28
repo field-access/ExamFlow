@@ -2227,14 +2227,23 @@ async function savePersistentBackup(){
   try{
     const db=await openExamFlowDB();
     const data={};
-    Object.values(K).forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)data[k]=JSON.parse(v)}catch(e){}});
+    Object.values(K).forEach(k=>{
+      try{
+        const v=localStorage.getItem(k);
+        if(v!==null)data[k]=JSON.parse(v);
+      }catch(e){
+        console.warn(`Failed to parse local storage key ${k}:`, e);
+      }
+    });
     data.examDeadline=localStorage.getItem("examflow_exam_deadline")||null;
     await new Promise((resolve,reject)=>{
       const tx=db.transaction("backup","readwrite");tx.objectStore("backup").put({data,savedAt:new Date().toISOString()},"latest");
       tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
     });
     db.close();
-  }catch(e){}
+  }catch(e){
+    console.error("Failed to save persistent backup:", e);
+  }
 }
 async function restorePersistentBackup(){
   try{
