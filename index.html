@@ -1665,7 +1665,7 @@ body.dark{
   line-height:1.62 !important;
 }
 #examView .options{
-  max-width:100%;
+  max-width:min(800px, 100%);
   margin-left:auto;
   margin-right:auto;
 }
@@ -1856,7 +1856,6 @@ body.dark{
   </div>
 
   <div class="dashcols">
-    <section class="panel card"><h3>Continue studying</h3><div id="homeSessionsList"></div></section>
     <section class="panel card">
       <h3>📋 Study Todo List</h3>
       <div style="display:flex;gap:7px;align-items:center;margin:10px 0">
@@ -2045,6 +2044,7 @@ body.dark{
     <div class="metric card metric-questions"><span class="metric-icon">#</span><small>Questions attempted</small><b id="mQuestions">0</b></div>
   </div>
   <div class="dashcols">
+    <section class="panel card"><h3>Continue studying</h3><div id="homeSessionsList"></div></section>
     <section class="panel card results-panel"><div class="panel-heading"><div><h3>Recent performance</h3><small>Your latest saved sessions</small></div><button class="text-btn" aria-label="Refresh dashboard" onclick="renderDashboard()">↻</button></div><div id="resultsList"></div></section>
     <section class="panel card advice-panel"><div class="panel-heading"><div><h3>Next improvement</h3><small>A simple direction for your next session</small></div><span class="advice-mark">↗</span></div><div id="advice" class="empty">Complete a test to unlock performance advice.</div></section>
   </div>
@@ -3118,7 +3118,7 @@ function restoreSession(sid){
  sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);updateTimerUI();seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));mode=s.mode||settings.defaultMode;sections=s.sections||[];
  document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
-function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderHome();}
+function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
 
 
 async function redirectQuestionToChatGPT(){
@@ -3797,8 +3797,8 @@ function renderHome(){
  document.getElementById("homeBest").textContent=best+"%";
  document.getElementById("homeSessions").textContent=ss.length;
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
- document.getElementById("homeStudyTip").textContent=tip;
- document.getElementById("homeSessionsList").innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession('${s.id}')">Continue</button><button type="button" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession('${s.id}')">×</button></div></div>`).join(""):'<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
+ const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
+ document.getElementById("homeSessionsList").innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession('${s.id}')">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession('${s.id}')">×</button></div></div>`).join(""):'<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
  document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
 
