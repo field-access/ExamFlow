@@ -2913,17 +2913,17 @@ function examflowKeyboardHandler(e){
     return;
   }
 
-  // Never hijack normal text editing.
-  if(typing)return;
-
-  const examActive=document.getElementById("examView")?.classList.contains("active");
-
   if(e.key==="Escape"){
     closeImporter();closeSubmit();closeSessions();
     const drawer=document.getElementById("examProgressDrawer");
     if(drawer?.classList.contains("open"))toggleQuestionProgress();
     return;
   }
+
+  // Never hijack normal text editing.
+  if(typing)return;
+
+  const examActive=document.getElementById("examView")?.classList.contains("active");
 
   if(lower==="k"){e.preventDefault();examflowToggleThemeFast();return}
   if(lower==="h"){e.preventDefault();showView("home");return}
