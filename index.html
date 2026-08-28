@@ -99,7 +99,7 @@ body.dark .option{background:var(--surface)}body.dark .option.selected{backgroun
 body.dark .exam-summary{background:var(--surface2)}
 /* Home landing */
 #homeView .dashboard{padding-top:34px}
-.home-hero{display:grid;grid-template-columns:1.35fr .65fr;gap:18px;margin-bottom:18px}
+.home-hero{display:grid;grid-template-columns:1fr;gap:18px;margin-bottom:18px}
 .hero-copy{padding:30px;position:relative;overflow:hidden}
 .hero-copy:after{content:"✦";position:absolute;right:28px;bottom:-22px;font-family:var(--serif);font-size:120px;color:rgba(183,138,60,.10)}
 .hero-kicker{color:var(--gold);font-size:10px;font-weight:850;text-transform:uppercase;letter-spacing:.18em}
@@ -1818,12 +1818,7 @@ body.dark{
       </div>
       <div class="cbq-flow"><span>Question</span><i>→</i><span>5 reasoning steps</span><i>→</i><span>Solution</span></div>
     </section>
-    <section class="quick-card card exam-countdown-card">
-      <div class="countdown-top"><span class="hero-kicker">FINAL EXAM</span><button class="icon-btn" aria-label="Open exam date settings" onclick="showView('settings')" title="Set exam date">⚙</button></div>
-      <div id="homeExamCountdown" class="final-countdown">No date</div>
-      <p id="homeStudyTip">Set your final exam date to keep the countdown here.</p>
-      <button class="btn countdown-set" onclick="showView('settings')">Set exam date →</button>
-    </section>
+
   </div>
 
 
