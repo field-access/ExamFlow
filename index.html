@@ -27,7 +27,7 @@ body.dark header{background:rgba(21,27,36,.92)}
 .timer{display:flex;align-items:center;gap:7px;color:var(--bad);background:#fff4f4;border:1px solid #ffdada;padding:9px 12px;border-radius:11px;font-weight:850}.timer span{font-size:19px;font-variant-numeric:tabular-nums}
 .question{padding:22px}.qtop{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-size:11px}.qnum{color:var(--text);font-weight:850}.bookmark{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:8px 10px;border-radius:9px;font-size:11px}.bookmark.saved{color:var(--warn)}
 .modepicker{display:flex;gap:5px}.modebtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:7px 9px;border-radius:8px;font-size:10px;font-weight:800}.modebtn.active{background:#eef0ff;color:var(--primary);border-color:#cdd0ff}body.dark .modebtn.active{background:#242744}
-.question h2{font-size:20px;line-height:1.55;margin:20px 0;overflow-wrap:anywhere}.options{display:grid;gap:9px}.option{width:100%;display:flex;gap:11px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--text);padding:14px;border-radius:12px}.option:hover{border-color:#aeb5ff}.option.selected{border-color:var(--primary);background:#f5f5ff}body.dark .option.selected{background:#22253f}.letter{width:27px;height:27px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;font-weight:850;flex:none;color:var(--muted)}.selected .letter{background:var(--primary);color:#fff;border-color:var(--primary)}.option-text{line-height:1.45;min-width:0;overflow-wrap:anywhere}.feedback{min-height:22px;margin-top:9px;font-size:12px;font-weight:800}.actions{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin:20px 0 0;padding-top:16px}
+.question h2{font-size:20px;line-height:1.55;margin:20px 0;overflow-wrap:anywhere}.options{display:grid;gap:9px;max-width:980px;margin-left:auto;margin-right:auto;}.option{width:100%;max-width:100%;display:flex;gap:11px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--text);padding:14px;border-radius:12px}.option:hover{border-color:#aeb5ff}.option.selected{border-color:var(--primary);background:#f5f5ff}body.dark .option.selected{background:#22253f}.letter{width:27px;height:27px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;font-weight:850;flex:none;color:var(--muted)}.selected .letter{background:var(--primary);color:#fff;border-color:var(--primary)}.option-text{line-height:1.45;min-width:0;overflow-wrap:anywhere}.feedback{min-height:22px;margin-top:9px;font-size:12px;font-weight:800}.actions{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin:20px 0 0;padding-top:16px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}.stat{background:var(--surface2);padding:11px;border-radius:11px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{font-size:18px}.qgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.qbtn{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:7px;font-size:11px}.qbtn.current{outline:2px solid var(--primary)}.qbtn.answered{background:#eaf8ef;border-color:#bce8ca;color:#16803a}.qbtn.review{background:#fff5dc;border-color:#f5d58a;color:#a16207}
 .dashboard{width:min(1180px,calc(100% - 36px));margin:25px auto}.dashhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:18px}.dashhead h1{margin:0 0 4px;font-size:27px}.dashhead p{margin:0;color:var(--muted);font-size:13px}.dashactions{display:flex;gap:7px}.metrics{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:16px}.metric{padding:17px}.metric small{color:var(--muted);font-size:11px}.metric b{display:block;font-size:25px;margin-top:4px}.dashcols{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px}.panel{padding:18px}.panel h3{margin:0 0 13px;font-size:14px}.resultrow,.planrow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);padding:11px;border-radius:11px;margin:7px 0}.resultmain,.planmain{min-width:0}.resultmain strong,.planmain strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.resultmain small,.planmain small{color:var(--muted);font-size:10px}.good{color:var(--good)}.mid{color:var(--warn)}.bad{color:var(--bad)}
 .goal{padding:17px;margin-bottom:16px}.goalhead{display:flex;justify-content:space-between;align-items:center}.goalhead h3{margin:0;font-size:14px}.goalinput,.planform input,.planform textarea,.setting select{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:10px;border-radius:9px;margin-top:9px}.goalbar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:10px 0 6px}.goalbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),#8b5cf6)}.goalmeta{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
@@ -180,11 +180,13 @@ body.dark #explanation{background:#2b2922!important}
   letter-spacing: 0 !important;
 }
 .question h2{
+  white-space: pre-wrap;
   font-size:21px !important;
   line-height:1.65 !important;
   color:var(--text);
 }
 .option-text{
+  white-space: pre-wrap;
   font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-size:14px !important;
   font-weight:400 !important;
@@ -212,7 +214,7 @@ body.dark #explanation{background:#2b2922!important}
   line-height:1.72 !important;
   font-weight:400 !important;
   letter-spacing:.005em !important;
-  max-width:980px !important;
+  max-width:100% !important;
   color:var(--text) !important;
 }
 .option-text{
@@ -333,6 +335,9 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 }
 #examView .options{
   gap:14px !important;
+  max-width:100% !important;
+  margin-left:auto !important;
+  margin-right:auto !important;
 }
 @media(max-width:700px){
   #examView .option{
@@ -610,7 +615,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
   font-size:24px !important;
   line-height:1.68 !important;
   color:var(--text) !important;
-  max-width:980px !important;
+  max-width:100% !important;
 }
 #examView .option-text{
   font-size:18px !important;
@@ -854,7 +859,7 @@ body.exam-active #examView .exam-head .eyebrow{
 #examView .main{
   display:block !important;
   width:min(980px,calc(100vw - 120px)) !important;
-  max-width:980px !important;
+  max-width:100% !important;
   margin:24px auto !important;
   box-sizing:border-box !important;
 }
@@ -1041,7 +1046,7 @@ body.practice-active .practice-answer-btn{display:inline-flex}
 }
 .katex-display{max-width:100%;overflow-x:auto;overflow-y:hidden}
 
-.explanation-content{font-size:16px;line-height:1.75;white-space:normal}
+.explanation-content{font-size:16px;line-height:1.75;white-space:pre-wrap;}
 .explanation-content br{content:"";display:block;margin-bottom:5px}
 .explanation-content .katex-display{margin:9px 0}
 
@@ -1518,7 +1523,8 @@ pre{overflow:auto}
 }
 /* Slightly narrower default question card */
 #examView .question{
-  width:min(820px,100%);
+  width: 100%;
+  max-width: 980px;
   margin-left:auto;
   margin-right:auto;
 }
@@ -1654,13 +1660,13 @@ body.dark{
   box-shadow:var(--ux-shadow-md) !important;
 }
 #examView .question h2{
-  max-width:740px;
+  max-width:100%;
   margin-left:auto;
   margin-right:auto;
   line-height:1.62 !important;
 }
 #examView .options{
-  max-width:740px;
+  max-width:100%;
   margin-left:auto;
   margin-right:auto;
 }
@@ -2735,43 +2741,7 @@ function protectQuizCodeAndMath(root){
 }
 function formatExplanationText(text){
   if(text==null)return "";
-  let s=String(text).replace(/\r\n?/g,"\n").trim();
-
-  // Protect LaTeX and code so punctuation inside them isn't treated as
-  // sentence/list punctuation.
-  const protectedParts=[];
-  const protect=(value)=>{
-    const id=`\uE100${protectedParts.length}\uE101`;
-    protectedParts.push(value);
-    return id;
-  };
-
-  s=s.replace(/```[\s\S]*?```/g,m=>protect(m));
-  s=s.replace(/`[^`\n]+`/g,m=>protect(m));
-  s=s.replace(/\$\$[\s\S]*?\$\$/g,m=>protect(m));
-  s=s.replace(/\\\[[\s\S]*?\\\]/g,m=>protect(m));
-  s=s.replace(/\\\([\s\S]*?\\\)/g,m=>protect(m));
-  s=s.replace(/\$[^$\n]+\$/g,m=>protect(m));
-
-  // Normalize numbered lists: "1. ... 2. ..." becomes separate lines.
-  s=s.replace(/(^|[ \t])(\d+)[.)][ \t]+/g,"$1\n$2. ");
-
-  // Normalize common bullet styles.
-  s=s.replace(/[ \t]+([•●▪◦‣])[ \t]+/g,"\n$1 ");
-  s=s.replace(/(^|\n)[ \t]*[-*][ \t]+/g,"$1• ");
-
-  // Add a line break after sentence-ending punctuation when another sentence
-  // follows on the same line. Avoid decimals, abbreviations, and LaTeX tokens.
-  s=s.replace(/([.!?])(?:["'”’)\]]*)[ \t]+(?=[A-Z0-9🧠🔹🔸➡️])/g,"$1\n");
-
-  // Clean excessive blank lines while retaining intentional paragraph breaks.
-  s=s.replace(/[ \t]+\n/g,"\n");
-  s=s.replace(/\n{3,}/g,"\n\n");
-
-  protectedParts.forEach((value,i)=>{
-    s=s.replace(`\uE100${i}\uE101`,value);
-  });
-  return s;
+  return String(text).replace(/\r\n?/g,"\n").trim();
 }
 function renderAllQuizMath(root=document){
   if(!root||typeof renderMathInElement!=="function")return;
@@ -3105,7 +3075,7 @@ function render(){
    fb.style.color=correct?"var(--good)":"var(--bad)";
    if(q.explanation){
      ex.style.display="block";
-     ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content'>"+esc(formatExplanationText(q.explanation)).replace(/\n/g,"<br>")+"</div>";
+     ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content' style='white-space:pre-wrap;'>"+esc(formatExplanationText(q.explanation))+"</div>";
      renderAllQuizMath(ex);
    }else ex.style.display="none";
  }else{fb.textContent="";ex.style.display="none";}
@@ -3149,7 +3119,7 @@ function restoreSession(sid){
  sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);updateTimerUI();seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));mode=s.mode||settings.defaultMode;sections=s.sections||[];
  document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
-function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions()}
+function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderHome();}
 
 
 async function redirectQuestionToChatGPT(){
@@ -3829,7 +3799,7 @@ function renderHome(){
  document.getElementById("homeSessions").textContent=ss.length;
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  document.getElementById("homeStudyTip").textContent=tip;
- document.getElementById("homeSessionsList").innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><button class="btn" onclick="restoreSession('${s.id}')">Continue</button></div>`).join(""):'<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
+ document.getElementById("homeSessionsList").innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession('${s.id}')">Continue</button><button type="button" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession('${s.id}')">×</button></div></div>`).join(""):'<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
  document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
 
@@ -3968,7 +3938,7 @@ function viewPracticeAnswer(){
   const ex=document.getElementById("explanation");
   if(ex&&q.explanation){
     ex.style.display="block";
-    ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content'>"+esc(q.explanation)+"</div>";
+    ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content' style='white-space:pre-wrap;'>"+esc(q.explanation)+"</div>";
     renderAllQuizMath(ex);
   }
   highlightCorrectAnswerForView(q);
@@ -4059,7 +4029,7 @@ function checkCurrentAnswer(){
  const ex=document.getElementById("explanation");
  if(q.explanation){
    ex.style.display="block";
-   ex.innerHTML="<strong>💡 Explanation</strong><div style='margin-top:6px;line-height:1.6'>"+esc(q.explanation)+"</div>";
+   ex.innerHTML="<strong>💡 Explanation</strong><div style='margin-top:6px;line-height:1.6;white-space:pre-wrap;'>"+esc(q.explanation)+"</div>";
    renderAllQuizMath(ex);
    renderAllQuizMath(document.getElementById("explanation"));
  }
