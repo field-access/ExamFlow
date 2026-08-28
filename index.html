@@ -29,7 +29,7 @@ body.dark header{background:rgba(21,27,36,.92)}
 .modepicker{display:flex;gap:5px}.modebtn{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:7px 9px;border-radius:8px;font-size:10px;font-weight:800}.modebtn.active{background:#eef0ff;color:var(--primary);border-color:#cdd0ff}body.dark .modebtn.active{background:#242744}
 .question h2{font-size:20px;line-height:1.55;margin:20px 0;overflow-wrap:anywhere}.options{display:grid;gap:9px}.option{width:100%;display:flex;gap:11px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--text);padding:14px;border-radius:12px}.option:hover{border-color:#aeb5ff}.option.selected{border-color:var(--primary);background:#f5f5ff}body.dark .option.selected{background:#22253f}.letter{width:27px;height:27px;display:grid;place-items:center;border:1px solid var(--line);border-radius:7px;font-weight:850;flex:none;color:var(--muted)}.selected .letter{background:var(--primary);color:#fff;border-color:var(--primary)}.option-text{line-height:1.45;min-width:0;overflow-wrap:anywhere}.feedback{min-height:22px;margin-top:9px;font-size:12px;font-weight:800}.actions{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);margin:20px 0 0;padding-top:16px}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:15px}.stat{background:var(--surface2);padding:11px;border-radius:11px}.stat small{display:block;color:var(--muted);font-size:10px}.stat b{font-size:18px}.qgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.qbtn{aspect-ratio:1;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:7px;font-size:11px}.qbtn.current{outline:2px solid var(--primary)}.qbtn.answered{background:#eaf8ef;border-color:#bce8ca;color:#16803a}.qbtn.review{background:#fff5dc;border-color:#f5d58a;color:#a16207}
-.dashboard{width:min(1180px,calc(100% - 36px));margin:25px auto}.dashhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:18px}.dashhead h1{margin:0 0 4px;font-size:27px}.dashhead p{margin:0;color:var(--muted);font-size:13px}.dashactions{display:flex;gap:7px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}.metric{padding:17px}.metric small{color:var(--muted);font-size:11px}.metric b{display:block;font-size:25px;margin-top:4px}.dashcols{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}.panel{padding:18px}.panel h3{margin:0 0 13px;font-size:14px}.resultrow,.planrow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);padding:11px;border-radius:11px;margin:7px 0}.resultmain,.planmain{min-width:0}.resultmain strong,.planmain strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.resultmain small,.planmain small{color:var(--muted);font-size:10px}.good{color:var(--good)}.mid{color:var(--warn)}.bad{color:var(--bad)}
+.dashboard{width:min(1180px,calc(100% - 36px));margin:25px auto}.dashhead{display:flex;justify-content:space-between;align-items:end;gap:15px;margin-bottom:18px}.dashhead h1{margin:0 0 4px;font-size:27px}.dashhead p{margin:0;color:var(--muted);font-size:13px}.dashactions{display:flex;gap:7px}.metrics{display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:12px;margin-bottom:16px}.metric{padding:17px}.metric small{color:var(--muted);font-size:11px}.metric b{display:block;font-size:25px;margin-top:4px}.dashcols{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:16px}.panel{padding:18px}.panel h3{margin:0 0 13px;font-size:14px}.resultrow,.planrow{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);padding:11px;border-radius:11px;margin:7px 0}.resultmain,.planmain{min-width:0}.resultmain strong,.planmain strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.resultmain small,.planmain small{color:var(--muted);font-size:10px}.good{color:var(--good)}.mid{color:var(--warn)}.bad{color:var(--bad)}
 .goal{padding:17px;margin-bottom:16px}.goalhead{display:flex;justify-content:space-between;align-items:center}.goalhead h3{margin:0;font-size:14px}.goalinput,.planform input,.planform textarea,.setting select{width:100%;border:1px solid var(--line);background:var(--surface);color:var(--text);padding:10px;border-radius:9px;margin-top:9px}.goalbar{height:8px;background:var(--surface2);border-radius:99px;overflow:hidden;margin:10px 0 6px}.goalbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--primary),#8b5cf6)}.goalmeta{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}
 .planner{display:grid;grid-template-columns:1fr 1fr;gap:16px}.planform{padding:18px}.planform label{display:block;color:var(--muted);font-size:11px;font-weight:750;margin-top:10px}.planform textarea{resize:vertical}.settings{display:grid;grid-template-columns:1fr 1fr;gap:15px}.setting{padding:18px}.setting h3{margin:0 0 5px;font-size:14px}.setting p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}.setting-actions{display:flex;gap:7px;margin-top:13px}.switch{display:flex;justify-content:space-between;align-items:center;margin-top:14px;font-size:12px}.switch input{width:40px;height:20px;accent-color:var(--primary)}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.5);display:none;place-items:center;z-index:60;padding:16px}.modal.show{display:grid}.modalbox{width:min(480px,100%);background:var(--surface);color:var(--text);border-radius:19px;padding:22px}.modalbox h2{margin:0 0 7px}.modalbox p{color:var(--muted);font-size:13px;line-height:1.5}.modalactions{display:flex;justify-content:flex-end;gap:7px;margin-top:17px}
@@ -37,7 +37,7 @@ body.dark header{background:rgba(21,27,36,.92)}
 .toast{position:fixed;right:18px;bottom:18px;background:#18212f;color:#fff;padding:11px 14px;border-radius:10px;z-index:100;opacity:0;transform:translateY(8px);transition:.2s;font-size:12px}.toast.show{opacity:1;transform:none}
 body.dark .timer{background:#2a1d22;border-color:#4b2930}body.dark .filelabel{color:var(--text)}
 @media(max-width:1080px){.main{grid-template-columns:210px minmax(0,1fr)}.right{display:none}.topnav{display:none}}
-@media(max-width:760px){.topnav{display:none}header{height:auto;min-height:62px;padding:9px 12px}.header-right .pill{display:none}.header-right .btn{padding:8px 9px}.main{display:block;width:100%;margin:0;padding:11px}.sidebar{display:none}.exam-head{padding:15px;display:block}.exam-head h1{font-size:18px}.timer{display:inline-flex;margin-top:11px}.question{padding:15px}.question h2{font-size:17px;margin:16px 0}.qtop{align-items:flex-start}.qtop .modepicker{margin-left:auto}.actions{position:sticky;bottom:0;background:var(--surface);margin-left:-15px;margin-right:-15px;margin-bottom:-15px;padding:11px 15px;z-index:5}.dashboard{width:calc(100% - 22px);margin:18px auto}.dashhead{display:block}.dashactions{margin-top:10px}.metrics{grid-template-columns:1fr 1fr}.dashcols,.planner,.settings{grid-template-columns:1fr}.panel,.goal,.setting,.planform{padding:15px}}
+@media(max-width:760px){.topnav{display:none}header{height:auto;min-height:62px;padding:9px 12px}.header-right .pill{display:none}.header-right .btn{padding:8px 9px}.main{display:block;width:100%;margin:0;padding:11px}.sidebar{display:none}.exam-head{padding:15px;display:block}.exam-head h1{font-size:18px}.timer{display:inline-flex;margin-top:11px}.question{padding:15px}.question h2{font-size:17px;margin:16px 0}.qtop{align-items:flex-start}.qtop .modepicker{margin-left:auto}.dashboard{width:calc(100% - 22px);margin:18px auto}.dashhead{display:block}.dashactions{margin-top:10px}.metrics{grid-template-columns:1fr 1fr}.dashcols,.planner,.settings{grid-template-columns:1fr}.panel,.goal,.setting,.planform{padding:15px}}
 @media(max-width:430px){.qtop .modepicker .modebtn:nth-child(3){display:inline-block}.brand{font-size:14px}.logo{width:32px;height:32px}.header-right .btn:nth-child(1){display:none}.question h2{font-size:16px}.modepicker{gap:3px}.modebtn{padding:6px 7px}.actions .btn{padding:9px 9px;font-size:11px}.importfoot{align-items:flex-end;flex-direction:column}.jsoninput{min-height:280px}}
 
 /* ---------- Classic Modern Quiz UI ---------- */
@@ -1784,9 +1784,10 @@ body.dark{
     <button id="navSettings" onclick="showView('settings')">Settings</button>
   </nav>
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
-  <div class="global-exam-controls">
+  <div class="global-exam-controls" style="display:flex;">
     <button id="globalExamProgressBtn" class="btn" type="button" onclick="toggleQuestionProgress()">☷ Questions</button>
-    <div class="global-exam-timer">⏱ <span id="globalTimer">00:00</span></div>
+    <button id="universalTimerToggleBtn" class="btn" type="button" onclick="toggleUniversalTimer()">⏸ Pause</button>
+    <div class="global-exam-timer">⏱ <span id="globalTimer">00:00:00</span></div>
   </div>
   <div class="header-right">
     <div class="pill" id="headerQuizName">CBQ Practice</div>
@@ -1802,8 +1803,8 @@ body.dark{
   <div class="home-hero">
     <section class="hero-copy card cbq-intro">
       <div class="hero-kicker">🧠 CONCEPT BREAKDOWN QUIZ</div>
-      <h1>Understand the problem<br>before you solve it.</h1>
-      <p>CBQ breaks one difficult question into 5 smaller reasoning steps, so you build the path to the answer instead of memorising it.</p>
+      <h1>Master any topic, step by step.</h1>
+      <p>Break down difficult concepts into simple, bite-sized questions. Build understanding instead of memorizing answers.</p>
       <div class="hero-actions">
         <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
         <button class="btn" onclick="showView('dashboard')">📊 Results</button>
@@ -1819,7 +1820,42 @@ body.dark{
     </section>
   </div>
 
-  <section class="card schema-guide">
+
+
+<section class="json-home card">
+    <div class="json-home-head">
+      <div><h3>Paste your CBQ</h3><small>Copy your quiz JSON → click the button → start.</small></div>
+      <div style="display:flex;gap:7px">
+        <button id="homePasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('homeJson','homeJsonStatus','homePasteBtn')">📋 Paste from Clipboard</button>
+        <button class="btn" type="button" onclick="document.getElementById('homeJson').value=''">Clear</button>
+      </div>
+    </div>
+    <textarea id="homeJson" class="home-json-input" spellcheck="false" placeholder='Paste your CBQ JSON directly here...'></textarea>
+    <div class="home-json-footer">
+      <div><div id="homeJsonStatus" class="paste-status">Supports flat lists, sections, aliases and LaTeX.</div><div class="question-types-hint"><b>Question types:</b> <code>mcq</code> · <code>fill_blank</code> · <code>true_false</code> · <code>match</code> · <code>drag_drop</code> · <code>ordering</code> · <code>image</code></div></div>
+      <div style="display:flex;gap:7px"><label class="filelabel">📄 JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
+    </div>
+  </section>
+
+  <div class="metrics" style="margin-top:18px">
+    <div class="metric card"><small>Tests completed</small><b id="homeTests">0</b></div>
+    <div class="metric card"><small>Average score</small><b id="homeAvg">0%</b></div>
+    <div class="metric card"><small>Best score</small><b id="homeBest">0%</b></div>
+    <div class="metric card"><small>Saved sessions</small><b id="homeSessions">0</b></div>
+  </div>
+
+  <div class="dashcols">
+    <section class="panel card"><h3>Continue studying</h3><div id="homeSessionsList"></div></section>
+    <section class="panel card"><h3>🎓 Final Exam Countdown</h3>
+            <div style="display:flex;gap:7px;align-items:center;margin:10px 0">
+              <input id="examDeadlineInput" type="date" class="goal-target">
+              <button class="btn primary" onclick="saveExamDeadline()">Set Date</button>
+            </div>
+            <div id="examDeadlineLabel" style="font-size:11px;color:var(--muted)">No final exam date set.</div>
+            </section>
+  </div>
+
+<section class="card schema-guide">
   <div class="schema-guide-head">
     <div>
       <div class="hero-kicker">BEGINNER GUIDE</div>
@@ -1905,39 +1941,6 @@ body.dark{
   ]
 }</textarea>
 </section>
-
-<section class="json-home card">
-    <div class="json-home-head">
-      <div><h3>Paste your CBQ</h3><small>Copy your quiz JSON → click the button → start.</small></div>
-      <div style="display:flex;gap:7px">
-        <button id="homePasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('homeJson','homeJsonStatus','homePasteBtn')">📋 Paste from Clipboard</button>
-        <button class="btn" type="button" onclick="document.getElementById('homeJson').value=''">Clear</button>
-      </div>
-    </div>
-    <textarea id="homeJson" class="home-json-input" spellcheck="false" placeholder='Paste your CBQ JSON directly here...'></textarea>
-    <div class="home-json-footer">
-      <div><div id="homeJsonStatus" class="paste-status">Supports flat lists, sections, aliases and LaTeX.</div><div class="question-types-hint"><b>Question types:</b> <code>mcq</code> · <code>fill_blank</code> · <code>true_false</code> · <code>match</code> · <code>drag_drop</code> · <code>ordering</code> · <code>image</code></div></div>
-      <div style="display:flex;gap:7px"><label class="filelabel">📄 JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
-    </div>
-  </section>
-
-  <div class="metrics" style="margin-top:18px">
-    <div class="metric card"><small>Tests completed</small><b id="homeTests">0</b></div>
-    <div class="metric card"><small>Average score</small><b id="homeAvg">0%</b></div>
-    <div class="metric card"><small>Best score</small><b id="homeBest">0%</b></div>
-    <div class="metric card"><small>Saved sessions</small><b id="homeSessions">0</b></div>
-  </div>
-
-  <div class="dashcols">
-    <section class="panel card"><h3>Continue studying</h3><div id="homeSessionsList"></div></section>
-    <section class="panel card"><h3>🎓 Final Exam Countdown</h3>
-            <div style="display:flex;gap:7px;align-items:center;margin:10px 0">
-              <input id="examDeadlineInput" type="date" class="goal-target">
-              <button class="btn primary" onclick="saveExamDeadline()">Set Date</button>
-            </div>
-            <div id="examDeadlineLabel" style="font-size:11px;color:var(--muted)">No final exam date set.</div>
-            </section>
-  </div>
 </div>
 </section>
 
@@ -1977,17 +1980,12 @@ body.dark{
 <div id="examTimerControl" class="timer">⏱ <span id="timer">30:00</span></div>
 </section>
 <section class="question card">
-  <div class="qtop"><button id="questionShuffleBtn" class="exam-progress-btn" type="button" onclick="shuffleCurrentOptions()">🔀 Shuffle Options</button>
+  <div class="qtop"><button id="questionShuffleBtn" class="exam-progress-btn" type="button" onclick="shuffleAllQuestions()">🔀 Shuffle Questions</button>
     <div><span class="qnum">Question <span id="currentLabel">0</span></span> <span>of <span id="totalLabel">0</span></span></div>
     <div class="modepicker">
       <button id="examMode" class="modebtn active" onclick="setMode('exam')">⏱ Exam</button>
       <button id="practiceMode" class="modebtn" onclick="setMode('practice')">🧠 Practice</button>
-      <div id="practiceTimerControls" class="practice-timer-controls" style="display:none">
-    <span class="practice-timer-label">⏱ Practice</span><button type="button" class="preset-btn" onclick="setPracticeTimer(5)">5 min</button>
-    <button type="button" class="preset-btn" onclick="setPracticeTimer(10)">10 min</button>
-    <button type="button" class="preset-btn" id="practiceTimerToggle" onclick="togglePracticeTimer()">▶ Start</button>
-    <div class="timer">⏱ <span id="practiceTimer">05:00</span></div>
-  </div>
+
       <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT with the minimal CBQ prompt">↗ GPT</button>
       <button id="bookmark" class="bookmark" onclick="toggleReview()">☆ Review</button>
     </div>
@@ -2188,6 +2186,26 @@ const sampleQuestions=[
 ];
 let questions=[],answers=[],reviews=new Set(),checkedQuestions=new Set(),current=0,seconds=5*60,quizDurationMinutes=5,mode="exam",sessionId=null,examName="No quiz loaded",sections=[];
 let timerState={examSeconds:5*60,practiceSeconds:5*60,running:false};
+let universalStudyTimerSeconds = 0;
+let universalStudyTimerRunning = true;
+
+function toggleUniversalTimer() {
+  universalStudyTimerRunning = !universalStudyTimerRunning;
+  const btn = document.getElementById("universalTimerToggleBtn");
+  if(btn) {
+    btn.textContent = universalStudyTimerRunning ? "⏸ Pause" : "▶ Resume";
+  }
+}
+
+function updateUniversalTimerUI() {
+  const gt = document.getElementById("globalTimer");
+  if(gt) {
+    const hrs = Math.floor(universalStudyTimerSeconds / 3600);
+    const mins = Math.floor((universalStudyTimerSeconds % 3600) / 60);
+    const secs = universalStudyTimerSeconds % 60;
+    gt.textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+}
 let matchOrders={};
 let settings=loadSettings();
 restoreFromPersistentStorage().then(()=>{
@@ -2383,22 +2401,11 @@ function setDefaultMode(x){settings.defaultMode=x;put(K.settings,settings);setMo
 function updateTheme(){document.getElementById("lightBtn").classList.toggle("active",settings.theme==="light");document.getElementById("darkBtn").classList.toggle("active",settings.theme==="dark")}
 function updateTimerUI(){
  const examEl=document.getElementById("timer");
- const practiceEl=document.getElementById("practiceTimer");
  const active=mode==="practice"?timerState.practiceSeconds:timerState.examSeconds;
- const toggle=document.getElementById("practiceTimerToggle");
- if(toggle)toggle.textContent=timerState.running?"Ⅱ Pause":"▶ Start";
- const text=formatGlobalTime(active);
  if(examEl)examEl.textContent=formatGlobalTime(timerState.examSeconds);
- if(practiceEl)practiceEl.textContent=formatGlobalTime(timerState.practiceSeconds);
  const examCtl=document.getElementById("examTimerControl");
- const practiceCtl=document.getElementById("practiceTimerControls");
  if(examCtl)examCtl.style.display=mode==="exam"?"flex":"none";
- if(practiceCtl){
-   practiceCtl.style.display=mode==="practice"?"flex":"none";
-   practiceCtl.setAttribute("aria-hidden",mode==="practice"?"false":"true");
- }
- const gt=document.getElementById("globalTimer");
- if(gt)gt.textContent=text;
+ updateUniversalTimerUI();
 }
 function formatGlobalTime(sec){
  sec=Math.max(0,Math.floor(Number(sec)||0));
@@ -2883,6 +2890,15 @@ function examflowSelectOptionByNumber(n){
 function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
 
+  if(e.key==="Escape"){
+    closeImporter();closeSubmit();closeSessions();
+    if(typeof closeCBQModal === "function") closeCBQModal();
+    const drawer=document.getElementById("examProgressDrawer");
+    if(drawer?.classList.contains("open"))toggleQuestionProgress();
+    if(document.activeElement) document.activeElement.blur();
+    return;
+  }
+
   // More-specific modifier combinations must be handled first.
   if(e.ctrlKey && e.shiftKey && e.key==="Enter"){
     if(document.getElementById("examView")?.classList.contains("active")){
@@ -2909,12 +2925,7 @@ function examflowKeyboardHandler(e){
 
   const examActive=document.getElementById("examView")?.classList.contains("active");
 
-  if(e.key==="Escape"){
-    closeImporter();closeSubmit();closeSessions();
-    const drawer=document.getElementById("examProgressDrawer");
-    if(drawer?.classList.contains("open"))toggleQuestionProgress();
-    return;
-  }
+
 
   if(lower==="k"){e.preventDefault();examflowToggleThemeFast();return}
   if(lower==="h"){e.preventDefault();showView("home");return}
@@ -3559,7 +3570,44 @@ function renderQuestionProgress(){
 }
 
 
-function shuffleCurrentOptions(){
+function shuffleAllQuestions(){
+  if(!questions.length){
+    toast("No questions to shuffle");
+    return;
+  }
+  let indices = questions.map((_, i) => i);
+  indices = shuffleArray(indices);
+  const newQuestions = indices.map(i => questions[i]);
+  const newAnswers = indices.map(i => answers[i]);
+  const newReviews = new Set();
+  reviews.forEach(oldIndex => {
+    const newIndex = indices.indexOf(oldIndex);
+    if (newIndex !== -1) newReviews.add(newIndex);
+  });
+  const newCheckedQuestions = new Set();
+  checkedQuestions.forEach(oldIndex => {
+    const newIndex = indices.indexOf(oldIndex);
+    if (newIndex !== -1) newCheckedQuestions.add(newIndex);
+  });
+  const newMatchOrders = {};
+  for(const [oldIdxStr, order] of Object.entries(matchOrders)) {
+    const oldIndex = parseInt(oldIdxStr, 10);
+    const newIndex = indices.indexOf(oldIndex);
+    if(newIndex !== -1) newMatchOrders[newIndex] = order;
+  }
+  questions = newQuestions;
+  answers = newAnswers;
+  reviews = newReviews;
+  checkedQuestions = newCheckedQuestions;
+  matchOrders = newMatchOrders;
+  current = 0;
+  render();
+  renderQuestionProgress();
+  saveSessionSoon();
+  toast("Questions shuffled ✓");
+}
+
+function _ignore_shuffleCurrentOptions(){
   const q=questions[current];
   if(!q || !Array.isArray(q.options) || q.options.length<2){
     toast("This question has no options to shuffle");
@@ -3939,18 +3987,14 @@ setTimeout(()=>{if(document.getElementById("examProgressDrawer")?.classList.cont
 setInterval(()=>{if(document.getElementById("examProgressDrawer")?.classList.contains("open"))renderQuestionProgress()},250);
 
 setInterval(()=>{
+  if(universalStudyTimerRunning){
+    universalStudyTimerSeconds++;
+    updateUniversalTimerUI();
+  }
+
   if(!timerState || !timerState.running)return;
   if(mode==="practice"){
-    if(timerState.practiceSeconds>0){
-      timerState.practiceSeconds--;
-      updateTimerUI();
-      if(timerState.practiceSeconds%10===0)saveSessionSoon();
-      if(timerState.practiceSeconds===0){
-        timerState.running=false;
-        updateTimerUI();
-        toast("Practice time is up");
-      }
-    }
+    // Practice timer logic removed, but keeping the block in case of future extensions
   }else{
     if(timerState.examSeconds>0){
       timerState.examSeconds--;
