@@ -175,7 +175,7 @@ body.dark #explanation{background:#2b2922!important}
 .question h2,
 .result-qtext,
 .explanation-content{
-  font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-weight: 400 !important;
   letter-spacing: 0 !important;
 }
@@ -185,7 +185,7 @@ body.dark #explanation{background:#2b2922!important}
   color:var(--text);
 }
 .option-text{
-  font-family: "Inter", "Segoe UI", Arial, sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-size:14px !important;
   font-weight:400 !important;
   line-height:1.55 !important;
@@ -201,13 +201,13 @@ body.dark #explanation{background:#2b2922!important}
 }
 /* Keep headings elegant without making the actual question heavy */
 .exam-head h1,.dashboard h1,.goalhead h3,.panel h3,.result-insight h3{
-  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-weight:650 !important;
 }
 
 /* Refined large academic typography */
 .question h2{
-  font-family:"Latin Modern Roman","Computer Modern","STIX Two Text","Times New Roman",serif !important;
+  font-family: var(--exam-font, "Latin Modern Roman", "Computer Modern", "STIX Two Text", "Times New Roman", serif) !important;
   font-size:25px !important;
   line-height:1.72 !important;
   font-weight:400 !important;
@@ -216,13 +216,13 @@ body.dark #explanation{background:#2b2922!important}
   color:var(--text) !important;
 }
 .option-text{
-  font-family:"Latin Modern Roman","Computer Modern","STIX Two Text","Times New Roman",serif !important;
+  font-family: var(--exam-font, "Latin Modern Roman", "Computer Modern", "STIX Two Text", "Times New Roman", serif) !important;
   font-size:17px !important;
   line-height:1.6 !important;
   font-weight:400 !important;
 }
 .explanation-content{
-  font-family:"Latin Modern Roman","Computer Modern","STIX Two Text","Times New Roman",serif !important;
+  font-family: var(--exam-font, "Latin Modern Roman", "Computer Modern", "STIX Two Text", "Times New Roman", serif) !important;
   font-size:16px !important;
   line-height:1.78 !important;
   font-weight:400 !important;
@@ -602,7 +602,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 #examView .option-text,
 #examView #explanation,
 #examView #explanation .explanation-content{
-  font-family:"Inter","Segoe UI",Roboto,Helvetica,Arial,sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif) !important;
   font-weight:400 !important;
   letter-spacing:-.01em !important;
 }
@@ -623,7 +623,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
   border-radius:12px !important;
 }
 #examView .letter{
-  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-size:14px !important;
   font-weight:500 !important;
 }
@@ -759,7 +759,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 #testResultsView .result-qno{width:29px;height:29px;font-size:11px}
 #testResultsView .result-qmeta{font-size:10px !important}
 #testResultsView .result-qtext{
-  font-family:"Inter","Segoe UI",Arial,sans-serif !important;
+  font-family: var(--exam-font, "Inter", "Segoe UI", Arial, sans-serif) !important;
   font-size:16px !important;
   line-height:1.65 !important;
   font-weight:400 !important;
@@ -2127,6 +2127,12 @@ body.dark{
     <section class="setting card"><h3>🌙 Appearance</h3><p>Switch between light and dark mode.</p><div id="persistentStorageStatus" class="paste-status" style="margin-top:10px">💾 Automatic persistent backup enabled</div>
 <div class="setting-actions"><button id="lightBtn" class="modebtn" onclick="setTheme('light')">☀️ Light</button><button id="darkBtn" class="modebtn" onclick="setTheme('dark')">🌙 Dark</button></div></section>
     <section class="setting card"><h3>🧠 Default mode</h3><p>New quizzes start in this mode.</p><div class="setting-actions"><button id="defaultPractice" class="modebtn" onclick="setDefaultMode('practice')">Practice</button><button id="defaultExam" class="modebtn" onclick="setDefaultMode('exam')">Exam</button></div></section>
+    <section class="setting card"><h3>🔤 Font Selection</h3><p>Choose a beautiful font for questions and options.</p><div class="setting-control"><select id="fontSelect" onchange="saveSettings()">
+<option value="System Default">System Default (Inter)</option>
+<option value="Serif Elegant">Serif Elegant (Georgia)</option>
+<option value="Modern Rounded">Modern Rounded (Quicksand)</option>
+<option value="Monospace">Monospace (Cascadia Code)</option>
+</select></div></section>
     <section class="setting card"><h3>⏱️ Default duration</h3><p>Used for quizzes without an explicit duration. Maximum test time is 10 minutes.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
 <option value="5">5 minutes</option><option value="10">10 minutes</option>
 <option value="15">15 minutes</option><option value="20">20 minutes</option>
@@ -2456,7 +2462,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -2466,12 +2472,19 @@ function saveSettings(){
   settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(document.getElementById("defaultDuration").value))?Number(document.getElementById("defaultDuration").value):5;
   settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
+  const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
+ const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"System Default";
+ let fstr = "'Inter', 'Segoe UI', Arial, sans-serif";
+ if(settings.fontFamily==="Serif Elegant") fstr = "'Latin Modern Roman', 'Computer Modern', 'STIX Two Text', 'Times New Roman', serif";
+ if(settings.fontFamily==="Modern Rounded") fstr = "'Nunito', 'Quicksand', 'Arial Rounded MT Bold', sans-serif";
+ if(settings.fontFamily==="Monospace") fstr = "'Cascadia Code', 'SFMono-Regular', Consolas, monospace";
+ document.body.style.setProperty('--exam-font', fstr);
  mode=settings.defaultMode;updateModeUI()
 }
 function setTheme(x){settings.theme=x;put(K.settings,settings);applySettings()}
