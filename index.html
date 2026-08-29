@@ -10,7 +10,7 @@
 <style>
 :root{--bg:#f5f7fb;--surface:#fff;--surface2:#f0f3f8;--text:#18212f;--muted:#697386;--line:#e2e7ef;--primary:#4f46e5;--good:#16a34a;--warn:#d97706;--bad:#dc2626;--shadow:0 12px 35px rgba(24,33,47,.08);--radius:18px}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
-body.dark{--bg:#ffffff;--ink:#edf2f7;--paper:#151b24;--paper2:#1d2530;--cream:#2a3442;--surface:#151b24;--surface2:#1d2530;--text:#000000;--muted:#98a3b3;--line:#2a3442;--primary:#818cf8;--good:#4ade80;--warn:#fbbf24;--bad:#f87171;--shadow:0 14px 38px rgba(0,0,0,.28)}
+body.dark{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--text:#f8fafc;--muted:#94a3b8;--line:#475569;--primary:#818cf8;--good:#34d399;--warn:#fbbf24;--bad:#f87171;--shadow:0 14px 38px rgba(0,0,0,.28)}
 button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}
 header{height:68px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:18px;position:sticky;top:0;z-index:30}
 body.dark header{background:rgba(21,27,36,.92)}
@@ -1775,76 +1775,32 @@ body.dark{
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
 }
-body.dark .sidebar, body.dark .right {background: var(--surface2);}
-body.dark .qbtn {background: var(--surface);}
-body.dark .dashboard .metric {background: var(--surface2); border-color: var(--line);}
-body.dark .goal {background: var(--surface2); border-color: var(--line);}
-body.dark .goalinput, body.dark .planform input, body.dark .planform textarea, body.dark .setting select, body.dark .jsoninput {border-color: var(--line); background: var(--surface); color: var(--text);}
-body.dark .timer {background: var(--surface2); border-color: var(--line); color: var(--text);}
-body.dark .stats .stat {background: var(--surface2);}
-body.dark .qbtn.answered {background: #143524; border-color: #1e5235; color: #a7f3d0;}
-body.dark .qbtn.review {background: #422d19; border-color: #634326; color: #fde68a;}
-body.dark .result-status {background: #3f1a1a; border-color: #5c2626; color: #fca5a5;}
-body.dark .result-status.good {background: #143524; border-color: #1e5235; color: #a7f3d0;}
-body.dark .result-stat-icon {background: var(--surface); color: var(--primary);}
-body.dark .result-stat.correct .result-stat-icon {background: #143524; color: #10b981;}
-body.dark .result-stat.wrong .result-stat-icon {background: #3f1a1a; color: #ef4444;}
-body.dark .result-stat.skip .result-stat-icon {background: var(--surface); color: var(--muted);}
-body.dark .result-question.correct .result-qno {background: #143524; color: #10b981;}
-body.dark .result-question.wrong .result-qno {background: #3f1a1a; color: #ef4444;}
-body.dark .match-row.match-wrong .match-select {border-color: #ef4444; background: #3f1a1a;}
-body.dark .cbq-option.correct {border-color: #10b981; background: #143524;}
-body.dark .cbq-option.wrong {border-color: #ef4444; background: #3f1a1a;}
-body.dark .match-correct .match-trigger {border-color: #10b981; background: #143524;}
-body.dark .match-wrong .match-trigger {border-color: #ef4444; background: #3f1a1a;}
+</style></style>
+<style>
+.practice-timer-controls{display:none;align-items:center;gap:5px;flex-wrap:wrap}
+.preset-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:7px 9px;font:700 10px system-ui;cursor:pointer}
+.preset-btn:hover,.preset-btn.active{border-color:var(--primary);color:var(--primary);background:var(--primary-soft,#eef1ff)}
+@media(max-width:600px){.practice-timer-controls{gap:4px}.preset-btn{padding:6px 7px;font-size:9px}}
 
-body.dark .card { background: var(--surface); color: var(--text); border-color: var(--line); }
-body.dark .btn { background: var(--surface2); color: var(--text); border-color: var(--line); }
-body.dark .btn.primary { background: var(--primary); color: #fff; }
-body.dark .goalinput, body.dark .planform input, body.dark .planform textarea, body.dark .setting select, body.dark .jsoninput { background: var(--surface2); color: var(--text); border-color: var(--line); }
-body.dark input, body.dark textarea, body.dark select { background: var(--surface2); color: var(--text); border-color: var(--line); }
-body.dark .metric, body.dark .metric.card { background: var(--surface2) !important; border-color: var(--line) !important; color: var(--text) !important; }
-body.dark .metric-icon { background: var(--surface) !important; }
-body.dark .timer, body.dark .global-exam-timer { background: #2a1d22 !important; border-color: #4b2930 !important; color: #fca5a5 !important; }
-body.dark .session-item button { color: var(--text); }
-body.dark .goal { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .qbtn { background: var(--surface) !important; color: var(--text) !important; border-color: var(--line) !important; }
-body.dark .qbtn.answered { background: #143524 !important; border-color: #1e5235 !important; color: #a7f3d0 !important; }
-body.dark .qbtn.review { background: #422d19 !important; border-color: #634326 !important; color: #fde68a !important; }
-body.dark .sidebar, body.dark .right { background: var(--surface) !important; }
-body.dark .dash-count-icon { background: var(--surface2) !important; color: var(--text) !important; }
-body.dark .dashboard-countdown { background: linear-gradient(110deg, color-mix(in srgb, var(--primary) 15%, var(--surface)), var(--surface)) !important; }
-body.dark .result-status { background: #3f1a1a !important; border-color: #5c2626 !important; color: #fca5a5 !important; }
-body.dark .result-status.good { background: #143524 !important; border-color: #1e5235 !important; color: #a7f3d0 !important; }
-body.dark .schema-guide { background: var(--surface) !important; border-color: var(--line) !important; }
-body.dark .schema-code { background: var(--surface2) !important; color: var(--text) !important; border-color: var(--line) !important; }
-body.dark .progress-mini { background: var(--surface2) !important; }
-body.dark .match-left, body.dark .match-trigger { background: var(--surface2) !important; color: var(--text) !important; border-color: var(--line) !important; }
-body.dark .match-menu { background: var(--surface) !important; border-color: var(--line) !important; }
-body.dark .match-menu-item:hover, body.dark .match-menu-item.selected { background: var(--surface2) !important; }
-body.dark .fill-answer { background: var(--surface2) !important; color: var(--text) !important; border-color: var(--line) !important; }
-body.dark .cbq-original { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .cbq-explanation { background: var(--surface2) !important; }
-body.dark .practice-answer-panel { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .quiz-code-block, body.dark .quiz-inline-code { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .shortcut-grid > div { background: var(--surface2) !important; }
-body.dark kbd { background: var(--surface) !important; border-color: var(--line) !important; color: var(--text) !important; }
-body.dark .schema-mini { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .hero-copy:after { opacity: 0.05; }
-body.dark .result-stat { background: var(--surface2) !important; border-color: var(--line) !important; }
-body.dark .result-stat-icon { background: var(--surface) !important; }
-body.dark .result-stat.correct .result-stat-icon { background: #143524 !important; color: #10b981 !important; }
-body.dark .result-stat.wrong .result-stat-icon { background: #3f1a1a !important; color: #ef4444 !important; }
-body.dark .result-stat.skip .result-stat-icon { background: var(--surface) !important; color: var(--muted) !important; }
-body.dark .result-question { background: var(--surface) !important; border-color: var(--line) !important; }
-body.dark .result-question:hover { background: var(--surface2) !important; }
-body.dark .result-detail { background: var(--surface2) !important; color: var(--muted) !important; }
-body.dark .result-qno { background: var(--surface2) !important; color: var(--muted) !important; }
-body.dark .result-question.correct .result-qno { background: #143524 !important; color: #10b981 !important; }
-body.dark .result-question.wrong .result-qno { background: #3f1a1a !important; color: #ef4444 !important; }
-body.dark .planrow, body.dark .resultrow { border-color: var(--line) !important; background: var(--surface) !important; }
-body.dark .quick-plan { background: var(--surface) !important; border-color: var(--line) !important; }
-body.dark .panel { background: var(--surface) !important; border-color: var(--line) !important; }
+/* Dark mode readable overrides */
+body.dark .schema-code, body.dark .quiz-code-block, body.dark .quiz-inline-code, body.dark kbd, body.dark button.qbtn, body.dark .preset-btn {
+  color: var(--text) !important;
+  background: var(--surface2) !important;
+  border-color: var(--line) !important;
+}
+
+/* Native resize for main views */
+.main, .dashboard {
+  resize: horizontal;
+  overflow: auto;
+  min-width: 600px;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+@media(max-width: 760px) {
+  .main, .dashboard { resize: none; min-width: auto; }
+}
 
 </style></head>
 <body>
@@ -1884,7 +1840,7 @@ body.dark .panel { background: var(--surface) !important; border-color: var(--li
   <div class="home-hero">
   <div class="dashhead dashboard-hero">
     <div><div class="hero-kicker">YOUR STUDY COMMAND CENTER</div><h1>Progress, without the clutter.</h1></div>
-    <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:var(--paper); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 1px 2px var(--shadow); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="openImporter()" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
+    <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:#fffdf8; color: var(--ink); border: 1px solid #ded5c5; box-shadow: 0 1px 2px rgba(60,45,25,0.05); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="openImporter()" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
   </div>
     <section class="hero-copy card cbq-intro">
       <div class="hero-kicker">🧠 CONCEPT BREAKDOWN QUIZ</div>
@@ -2190,7 +2146,7 @@ body.dark .panel { background: var(--surface) !important; border-color: var(--li
     <div style="display:flex;align-items:center;gap:10px;">
       <input type="date" id="planExamDeadlineInput" style="display:none;" onchange="saveExamDeadline()" />
       <button style="background:transparent; border:none; cursor:pointer; font-size:22px; color:var(--ink); display:flex; align-items:center; justify-content:center; width:34px; height:34px; border-radius:50%; border:1px solid var(--ink);" onclick="document.getElementById('planExamDeadlineInput').showPicker()">⊕</button>
-      <button class="btn" style="background:var(--paper); color: var(--ink); border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600;" onclick="document.getElementById('planExamDeadlineInput').showPicker()">Set date</button>
+      <button class="btn" style="background:#fff; border:1px solid var(--line); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600;" onclick="document.getElementById('planExamDeadlineInput').showPicker()">Set date</button>
     </div>
   </div>
 
@@ -3876,8 +3832,7 @@ function renderHome(){
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
 
- const hpl=document.getElementById("homePlansList");
- if(hpl) hpl.innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
+ document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
 
 
@@ -3905,7 +3860,7 @@ function showView(name){
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
  ["navHome","navExam","navDashboard","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  if(name!=="testResults")document.getElementById({home:"navHome",exam:"navExam",dashboard:"navDashboard",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
- if(name==="home"){renderHome();if(typeof renderTodos==="function")renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
+ if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){document.getElementById("instantFeedback").checked=!!settings.instantFeedback;
  document.getElementById("defaultDuration").value=String(settings.defaultDuration||30);
  document.getElementById("defaultMarks").value=settings.defaultMarks??1;
