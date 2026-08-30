@@ -1790,3 +1790,14 @@ body.dark .schema-code, body.dark .quiz-code-block, body.dark .quiz-inline-code,
 @media(max-width: 760px) {
   .main, .dashboard { resize: none; min-width: auto; }
 }
+
+
+/* Fix missing nav and topnav visibility in dark mode */
+body.dark .nav button, body.dark .topnav button {
+  color: var(--muted) !important;
+}
+body.dark .nav button.active, body.dark .nav button:hover,
+body.dark .topnav button.active, body.dark .topnav button:hover {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+}
