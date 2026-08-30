@@ -1820,3 +1820,50 @@ body.dark .header-right .btn.primary {
   overflow: auto;
   max-width: 100%;
 }
+
+
+/* Fix missing visibility for remaining buttons (like Home, View Answer, Clear) in dark mode */
+body.dark .btn {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--line);
+}
+body.dark .btn.primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+body.dark .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+/* Improve resize handle visibility and functionality for question cards */
+.question.card {
+  resize: horizontal !important;
+  overflow: auto !important;
+  min-width: 300px !important;
+  max-width: 100% !important;
+  display: block; /* Ensure it's block-level for resize to work */
+}
+
+/* Also ensure .main can resize smoothly */
+.main {
+  resize: horizontal !important;
+  overflow: auto !important;
+  min-width: 50% !important;
+}
+
+
+/* Additional fixes for specific buttons in dark mode that were missed */
+body.dark #prevBtn, body.dark #nextBtn, body.dark #viewAnswerBtn, body.dark button[onclick="clearAnswer()"] {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+body.dark #nextBtn {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
