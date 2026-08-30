@@ -497,12 +497,8 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
   overflow-x:hidden;
 }
 #examProgressGrid{min-width:0}
-@media(min-width:1100px){
-  #examView .main{width:min(900px,calc(100% - 360px)) !important;margin-left:80px !important;margin-right:300px !important}
-  #examProgressDrawer.open{width:285px !important}
-}
+
 @media(min-width:801px) and (max-width:1099px){
-  #examView .main{width:min(820px,calc(100% - 24px)) !important;margin:12px auto !important}
   #examProgressDrawer.open{width:285px !important}
 }
 @media(max-width:800px){
@@ -1841,19 +1837,14 @@ body.dark .btn:disabled {
 
 /* Improve resize handle visibility and functionality for question cards */
 .question.card {
-  resize: horizontal !important;
-  overflow: auto !important;
-  min-width: 300px !important;
-  max-width: 100% !important;
-  display: block; /* Ensure it's block-level for resize to work */
+  resize: horizontal;
+  overflow: auto;
+  min-width: 300px;
+  max-width: 100%;
+  display: block;
 }
 
-/* Also ensure .main can resize smoothly */
-.main {
-  resize: horizontal !important;
-  overflow: auto !important;
-  min-width: 50% !important;
-}
+
 
 
 /* Additional fixes for specific buttons in dark mode that were missed */
@@ -1874,18 +1865,29 @@ body.dark #nextBtn {
 #examView .main {
   resize: horizontal !important;
   overflow: auto !important;
-  width: min(850px, calc(100% - 24px)) !important;
+  width: min(1000px, calc(100% - 24px)) !important; /* Make it slightly smaller by default, but not too small */
   max-width: 100% !important;
   min-width: 400px !important;
   display: block !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  transition: width 0.3s ease, margin 0.3s ease;
+}
+
+/* When the drawer is open (app-level state, typically handled by body class but let's assume media queries or drawer open state handles it) */
+/* Actually, ExamFlow uses `body:has(#examProgressDrawer.open)` or similar, but the existing code has `.exam-progress-drawer.open` */
+body:has(.exam-progress-drawer.open) #examView .main {
+  width: min(900px, calc(100% - 360px)) !important;
+  margin-left: 80px !important;
+  margin-right: 320px !important;
 }
 
 @media(max-width: 800px) {
-  #examView .main {
+  #examView .main, body:has(.exam-progress-drawer.open) #examView .main {
     resize: none !important;
     width: calc(100% - 14px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
   }
 }
 
