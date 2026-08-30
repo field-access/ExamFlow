@@ -1801,3 +1801,22 @@ body.dark .topnav button.active, body.dark .topnav button:hover {
   background: var(--surface2) !important;
   color: var(--text) !important;
 }
+
+/* Make all UI buttons clearly readable in dark mode */
+body.dark .topnav button, body.dark .nav button, body.dark .header-right .btn, body.dark select {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+  border-color: var(--line) !important;
+}
+
+body.dark .header-right .btn.primary {
+  background: var(--primary) !important;
+  color: #fff !important;
+}
+
+/* Let the inner question card resize instead if the user prefers that */
+.question.card {
+  resize: horizontal;
+  overflow: auto;
+  max-width: 100%;
+}
