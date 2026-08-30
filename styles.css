@@ -984,7 +984,6 @@ body.practice-active .practice-answer-btn{display:inline-flex}
 @media(max-width:760px){.match-row{grid-template-columns:1fr;gap:7px}.match-menu{position:fixed;left:12px;right:12px;top:auto;bottom:12px;max-height:45vh}.match-result-label{margin-top:-2px}}
 /* Shift the question area left when the question palette opens */
 #examView .main{transition:padding-right .22s ease}
-@media(min-width:1050px){#examView .main.palette-shift{padding-right:350px}}
 
 /* Answer reveal + explanation math */
 .answer-correct-reveal{box-shadow:0 0 0 2px var(--good)!important;border-color:var(--good)!important;background:color-mix(in srgb,var(--good) 10%,var(--surface))!important}
@@ -1872,23 +1871,6 @@ body.dark #nextBtn {
   margin-left: auto !important;
   margin-right: auto !important;
   transition: width 0.3s ease, margin 0.3s ease;
-}
-
-/* When the drawer is open (app-level state, typically handled by body class but let's assume media queries or drawer open state handles it) */
-/* Actually, ExamFlow uses `body:has(#examProgressDrawer.open)` or similar, but the existing code has `.exam-progress-drawer.open` */
-body:has(.exam-progress-drawer.open) #examView .main {
-  width: min(900px, calc(100% - 360px)) !important;
-  margin-left: 80px !important;
-  margin-right: 320px !important;
-}
-
-@media(max-width: 800px) {
-  #examView .main, body:has(.exam-progress-drawer.open) #examView .main {
-    resize: none !important;
-    width: calc(100% - 14px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
 }
 
 /* Improve header title bar responsiveness */
