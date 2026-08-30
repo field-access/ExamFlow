@@ -3297,12 +3297,12 @@ function renderDashboard(){
  const latest=rs[0],ad=document.getElementById("advice");
  if(!latest)ad.innerHTML='<div class="empty">Complete a test to unlock performance advice.</div>';
  else ad.innerHTML=`<strong>Latest: ${latest.percent}%</strong><p style="color:var(--muted);font-size:12px;line-height:1.6">${latest.percent>=80?"Strong performance. Push consistency with timed Exam Mode.":latest.percent>=60?"Good foundation. Use Practice Mode on weak topics, then retest.":"Focus on concept breakdown first, then repeat the same quiz after revision."}</p>`;
- 
+
 }
 function setGoalPreset(target){
  document.getElementById("goalTarget").value=target;
  if(!document.getElementById("goalInput").value.trim())document.getElementById("goalInput").value=`Reach ${target}% average in CBQ practice`;
- 
+
 }
 function saveGoal(){
  const text=document.getElementById("goalInput").value.trim()||"Improve my CBQ performance";
