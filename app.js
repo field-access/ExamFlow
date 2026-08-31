@@ -1405,6 +1405,7 @@ function applyQuestionSidebarState(){
   if(!d)return;
   const open=getQuestionSidebarState();
   d.classList.toggle("open",open);
+  const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
   if(b)b.classList.toggle("open",open);
   if(open)renderQuestionProgress();
 }
@@ -1416,6 +1417,7 @@ function toggleQuestionProgress(){
   const open=!d.classList.contains("open");
   setQuestionSidebarState(open);
   d.classList.toggle("open",open);
+  const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
   if(b)b.classList.toggle("open",open);
   if(open)renderQuestionProgress();
 }
