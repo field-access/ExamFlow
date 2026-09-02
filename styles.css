@@ -1980,7 +1980,7 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
 .home-stage .hero-copy{height:calc(100% - 52px);min-height:390px;padding:38px 40px;display:flex;flex-direction:column;justify-content:center}
 .home-stage .hero-copy h1{max-width:650px;font-size:clamp(38px,4.1vw,62px);line-height:1.02;letter-spacing:-.035em}
 .home-stage .hero-copy p{max-width:600px;font-size:17px;line-height:1.7}
-.home-stage .json-home{margin:52px 0 0;padding:25px;display:flex;flex-direction:column;justify-content:center;min-width:0;background:rgba(255,253,248,.86);border-color:#d9cfbd}
+.home-stage .json-home{margin:0;padding:25px;display:flex;flex-direction:column;justify-content:center;min-width:0;background:rgba(255,253,248,.86);border-color:#d9cfbd}
 .home-stage .json-home-head{display:block}
 .home-stage .json-home h3{font-size:24px;margin-bottom:7px}
 .home-stage .json-home small{font-family:system-ui,sans-serif;line-height:1.5;display:block}
