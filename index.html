@@ -10,6 +10,9 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
 
 <link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -50,20 +53,21 @@
 <!-- HOME / CENTRAL DASHBOARD -->
 <section id="homeView" class="view active">
 <div class="dashboard">
+  <div class="home-stage">
   <div class="home-hero">
   <div class="dashhead dashboard-hero" style="justify-content: flex-end;">
     <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:#fffdf8; color: var(--ink); border: 1px solid #ded5c5; box-shadow: 0 1px 2px rgba(60,45,25,0.05); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="openImporter()" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
   </div>
     <section class="hero-copy card cbq-intro">
       <div class="hero-kicker">🧠 CONCEPT BREAKDOWN QUIZ</div>
-      <h1>Master any topic, step by step.</h1>
-      <p>Break down difficult concepts into simple, bite-sized questions. Build understanding instead of memorizing answers.</p>
+      <h1>Turn difficult ideas into clear reasoning.</h1>
+      <p>A Concept Breakdown Quiz takes one complex topic and walks you through five small questions, each building the next step of understanding until the solution makes sense.</p>
       <div class="hero-actions">
         <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
         <button class="btn" onclick="showView('dashboard')">📊 Results</button>
         <button class="btn" onclick="showView('planner')">🗓 Future tests</button>
       </div>
-      <div class="cbq-flow"><span>Question</span><i>→</i><span>5 reasoning steps</span><i>→</i><span>Solution</span></div>
+      <div class="cbq-flow"><span>One concept</span><i>→</i><span>Small reasoning steps</span><i>→</i><span>Confident solution</span></div>
     </section>
 
   </div>
@@ -84,6 +88,7 @@
       <div style="display:flex;gap:7px"><label class="filelabel">📄 JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
     </div>
   </section>
+  </div>
 
   <div class="metrics" style="margin-top:18px">
     <div class="metric card"><small>Tests completed</small><b id="homeTests">0</b></div>

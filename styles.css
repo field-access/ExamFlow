@@ -1965,6 +1965,40 @@ body.exam-active #examView .question:has(.exam-finished){border-color:var(--good
   #examView .actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 }
 
+/* Home landing: explain the method beside the place where users start. */
+:root{--serif:'Source Serif 4',Georgia,'Times New Roman',serif}
+body{font-family:'Source Serif 4',Georgia,'Times New Roman',serif;background:
+  radial-gradient(circle at 8% 18%,rgba(183,138,60,.13),transparent 25%),
+  radial-gradient(circle at 92% 75%,rgba(63,79,143,.12),transparent 29%),
+  linear-gradient(135deg,#f8f4ec 0%,#f3f5f8 52%,#eef1f6 100%)}
+body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;height:48vw;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(183,138,60,.13),transparent 64%);pointer-events:none;z-index:-1}
+.home-stage{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(330px,.82fr);gap:18px;align-items:stretch;margin-bottom:18px}
+.home-stage .home-hero{display:block;margin:0}
+.home-stage .dashboard-hero{margin-bottom:12px}
+.home-stage .hero-copy{height:calc(100% - 52px);min-height:390px;padding:38px 40px;display:flex;flex-direction:column;justify-content:center}
+.home-stage .hero-copy h1{max-width:650px;font-size:clamp(38px,4.1vw,62px);line-height:1.02;letter-spacing:-.035em}
+.home-stage .hero-copy p{max-width:600px;font-size:17px;line-height:1.7}
+.home-stage .json-home{margin:52px 0 0;padding:25px;display:flex;flex-direction:column;justify-content:center;min-width:0;background:rgba(255,253,248,.86);border-color:#d9cfbd}
+.home-stage .json-home-head{display:block}
+.home-stage .json-home h3{font-size:24px;margin-bottom:7px}
+.home-stage .json-home small{font-family:system-ui,sans-serif;line-height:1.5;display:block}
+.home-stage .home-json-input{min-height:205px;font-family:ui-monospace,monospace}
+.home-stage .home-json-footer{display:grid;gap:12px}
+.home-stage .home-json-footer>div:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end}
+.hero-copy .hero-actions .btn,.json-home .btn{font-family:system-ui,sans-serif}
+@media(max-width:850px){
+  .home-stage{grid-template-columns:1fr}
+  .home-stage .json-home{margin-top:0}
+  .home-stage .hero-copy{height:auto;min-height:0;padding:30px 26px}
+}
+@media(max-width:600px){
+  .home-stage .hero-copy h1{font-size:38px}
+  .home-stage .hero-copy p{font-size:15px}
+  .home-stage .json-home{padding:19px}
+  .home-stage .home-json-footer>div:last-child{justify-content:stretch}
+  .home-stage .home-json-footer>div:last-child>*{flex:1 1 100%}
+}
+
 /* Keep the mobile navigation completely out of the desktop layout. */
 @media(min-width:601px){
   body #mobileNav,
