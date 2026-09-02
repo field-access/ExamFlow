@@ -2009,6 +2009,10 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
   body.mobile-nav-open #mobileNav{display:grid !important}
 }
 
+/* Respect intentional hidden states even when a later layout rule sets display. */
+*[hidden]{display:none !important}
+#homeView .hero-actions .btn:nth-child(3){display:none}
+
 /* Saved result reviews keep supporting detail readable without expanding the card. */
 .result-review-meta{font-size:9px;color:var(--muted);margin-top:4px}
 .result-review-meta strong{color:var(--text)}
