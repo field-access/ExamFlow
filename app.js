@@ -5,10 +5,13 @@ const sampleQuestions=[
 {text:"Which data structure naturally implements BFS?",options:["Queue","Stack"],answer:"A"}
 ];
 let questions=[],answers=[],reviews=new Set(),checkedQuestions=new Set(),current=0,seconds=5*60,quizDurationMinutes=5,mode="exam",sessionId=null,examName="No quiz loaded",sections=[];
+let examFinished=false;
 let timerState={examSeconds:5*60,practiceSeconds:5*60,running:false};
 let universalStudyTimerSeconds = 0;
 let universalStudyTimerRunning = true;
 let universalStudyTimerMode = 'stopwatch'; // 'stopwatch' or 'countdown'
+let pomodoroCycle = 0;
+let pomodoroPhase = 'focus';
 
 function setPomodoro(val) {
   if(val === 'stopwatch') {
@@ -19,6 +22,7 @@ function setPomodoro(val) {
     universalStudyTimerSeconds = parseInt(val, 10) * 60;
   }
   universalStudyTimerRunning = true;
+  pomodoroPhase = val === 'stopwatch' ? 'stopwatch' : (val === '5' || val === '15' ? 'break' : 'focus');
   const btn = document.getElementById("universalTimerToggleBtn");
   if(btn) btn.textContent = "⏸ Pause";
   updateUniversalTimerUI();
@@ -41,6 +45,9 @@ function updateUniversalTimerUI() {
     const sign = universalStudyTimerSeconds < 0 ? "-" : "";
     gt.textContent = `${sign}${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
+  const phase=document.getElementById("pomodoroPhase");
+  if(phase)phase.textContent=universalStudyTimerMode==='stopwatch'?'Open study timer':(pomodoroPhase==='break'?'Break':'Focus');
+  document.querySelectorAll("#pomodoroDots i").forEach((dot,i)=>dot.classList.toggle("active",i<=pomodoroCycle%4));
 }
 let matchOrders={};
 let settings=loadSettings();
@@ -503,7 +510,7 @@ function loadQuiz(){
    const parsed=parseQuiz(parseQuizInput(document.getElementById("jsonInput").value));
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
- quizDurationMinutes=Math.min(10,Math.max(1,quizDurationMinutes));seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;
+   quizDurationMinutes=Math.min(10,Math.max(1,parsed.durationMinutes||settings.defaultDuration||5));seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
    closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
@@ -576,7 +583,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 const __examflowRenderWithMath=render;
 render=function(){
   __examflowRenderWithMath();
-  refreshRenderedMath();
+  renderAllQuizMath(document.getElementById("examView")||document);
 };
 
 function renderQuestionImage(q){
@@ -884,27 +891,33 @@ function render(){
  document.getElementById("progressText").textContent=`${count} / ${questions.length}`;document.getElementById("progressBar").style.width=(count/questions.length*100)+"%";
  const grid=document.getElementById("qgrid");grid.innerHTML="";
  questions.forEach((_,i)=>{let b=document.createElement("button");b.className="qbtn"+(i===current?" current":"")+(answerIsPresent(answers[i],questions[i])?" answered":"")+(reviews.has(i)?" review":"");b.textContent=i+1;b.onclick=()=>{current=i;render();saveSessionSoon()};grid.appendChild(b)});
+ document.getElementById("options").querySelectorAll("button,input,select").forEach(el=>el.disabled=examFinished);
+ ["prevBtn","viewAnswerBtn","nextBtn","bookmark"].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=examFinished});
+ document.getElementById("questionText").classList.toggle("exam-finished",examFinished);
 }
-function choose(letter){answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
-function clearAnswer(){answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
-function toggleReview(){reviews.has(current)?reviews.delete(current):reviews.add(current);render();renderQuestionProgress();saveSessionSoon()}
-function nextQuestion(){if(current<questions.length-1){current++;render();saveSessionSoon()}else submitExam()}
-function previousQuestion(){if(current>0){current--;render();saveSessionSoon()}}
+function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
+function clearAnswer(){if(examFinished)return;answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
+function toggleReview(){if(examFinished)return;reviews.has(current)?reviews.delete(current):reviews.add(current);render();renderQuestionProgress();saveSessionSoon()}
+function nextQuestion(){if(examFinished)return;if(current<questions.length-1){current++;render();saveSessionSoon()}else submitExam()}
+function previousQuestion(){if(examFinished)return;if(current>0){current--;render();saveSessionSoon()}}
 function submitExam(){
+ if(examFinished)return;
  if(!questions.length){toast("Load a quiz first");return}
  const unanswered=answers.filter(x=>!x).length;
  document.getElementById("submitText").textContent=unanswered?`You have ${unanswered} unanswered question${unanswered>1?"s":""}. Submit anyway?`:"All questions are answered. Submit and save your result?";
  document.getElementById("submitModal").classList.add("show")
 }
 function closeSubmit(){document.getElementById("submitModal").classList.remove("show")}
-function finishTest(){
- closeSubmit();const r=saveResult();saveSession();openDetailedResults(r);toast(`Result saved · ${r.percent}% ✓`)
+function finishTest(automatic=false){
+ if(examFinished)return;
+ examFinished=true;timerState.running=false;closeSubmit();render();
+ const r=saveResult();saveSession();openDetailedResults(r);toast(automatic?"Time is up. Exam submitted.":`Result saved · ${r.percent}% ✓`)
 }
 
 function saveSession(){
  if(!questions.length)return;
  const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
- const item={id:sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
+ const item={id:sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
  const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
  put(K.sessions,sessions.slice(0,100));renderSessions()
 }
@@ -915,7 +928,7 @@ function renderSessions(){
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
- sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);updateTimerUI();seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));mode=s.mode||settings.defaultMode;sections=s.sections||[];
+ sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
 function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
@@ -1157,7 +1170,7 @@ function retakeLastTest(){
  answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
  seconds=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5))*60;
  quizDurationMinutes=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5));
- sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;
+ sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;examFinished=false;
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
  showView("exam");render();saveSession();toast("Retake ready ✓")
 }
@@ -1266,7 +1279,7 @@ function renderPlans(){
 }
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
- const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;quizDurationMinutes=Math.min(10,Math.max(1,q.durationMinutes||settings.defaultDuration||5));answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;
+ const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;quizDurationMinutes=Math.min(10,Math.max(1,q.durationMinutes||settings.defaultDuration||5));answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();setTimeout(applyQuestionSidebarState,50);saveSession();toast("Planned test loaded ✓")
 }
 function deletePlan(pid){put(K.plans,get(K.plans,[]).filter(x=>x.id!==pid));renderPlans()}
@@ -1572,7 +1585,7 @@ function startHomeQuiz(){
    const parsed=parseQuiz(parseQuizInput(raw));
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;
    quizDurationMinutes=parsed.durationMinutes||settings.defaultDuration||30;
-   answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;sessionId=null;mode=settings.defaultMode;
+   answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;sessionId=null;mode=settings.defaultMode;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
    saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
@@ -1590,12 +1603,11 @@ function readHomeFile(e){
 function renderHome(){
  const rs=get(K.results,[]),ss=get(K.sessions,[]),ps=get(K.plans,[]);
  const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
- document.getElementById("homeTests").textContent=rs.length;
- document.getElementById("homeAvg").textContent=avg+"%";
- document.getElementById("homeBest").textContent=best+"%";
- document.getElementById("homeSessions").textContent=ss.length;
+ const homeMetrics={homeTests:rs.length,homeAvg:avg+"%",homeBest:best+"%",homeSessions:ss.length};
+ Object.entries(homeMetrics).forEach(([key,value])=>{const el=document.getElementById(key);if(el)el.textContent=value});
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
+ if(!document.getElementById("homePlansList"))return;
 
  document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
@@ -1614,6 +1626,7 @@ function syncExamTitleBar(){
 }
 
 function showView(name){
+ closeMobileNav();
  if(name==="exam" && (!questions || questions.length===0)){
   toast("No quiz loaded. Please open a CBQ first.");
   name="home";
@@ -1625,12 +1638,14 @@ function showView(name){
  ["navHome","navExam","navDashboard","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  if(name!=="testResults")document.getElementById({home:"navHome",exam:"navExam",dashboard:"navDashboard",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
- if(name==="settings"){document.getElementById("instantFeedback").checked=!!settings.instantFeedback;
- document.getElementById("defaultDuration").value=String(settings.defaultDuration||30);
- document.getElementById("defaultMarks").value=settings.defaultMarks??1;
- document.getElementById("defaultNegative").value=settings.defaultNegative??0;
+ if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
+ const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
+ const marks=document.getElementById("defaultMarks");if(marks)marks.value=settings.defaultMarks??1;
+ const negative=document.getElementById("defaultNegative");if(negative)negative.value=settings.defaultNegative??0;
  updateTheme();updateModeUI()}
 }
+function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
+function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
 
@@ -1873,16 +1888,16 @@ setInterval(()=>{
     updateUniversalTimerUI();
   }
 
-  if(!timerState || !timerState.running)return;
+  if(!timerState || !timerState.running || examFinished)return;
   if(mode==="practice"){
     // Practice timer logic removed, but keeping the block in case of future extensions
   }else{
     if(timerState.examSeconds>0){
-      timerState.examSeconds--;
+      timerState.examSeconds=Math.max(0,timerState.examSeconds-1);
       seconds=timerState.examSeconds;
       updateTimerUI();
       if(timerState.examSeconds%10===0)saveSessionSoon();
-      if(timerState.examSeconds===0)submitExam();
+      if(timerState.examSeconds<=0)finishTest(true);
     }
   }
 },1000);

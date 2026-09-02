@@ -16,6 +16,7 @@
 <div class="app">
 <header>
   <button class="brand home-brand" onclick="showView('home')" aria-label="Go to ExamFlow home"><div class="logo">🧠</div><span>ExamFlow</span></button>
+  <button class="mobile-menu-toggle" type="button" onclick="toggleMobileNav()" aria-label="Open navigation" aria-controls="mobileNav">Menu</button>
   <nav class="topnav">
     <button id="navHome" class="active" onclick="showView('home')">⌂ Home</button>
     <button id="navExam" onclick="showView('exam')">Exam</button>
@@ -26,12 +27,12 @@
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
   <div class="global-exam-controls" style="display:flex; align-items: center; gap: 5px;">
     <button id="globalExamProgressBtn" class="btn" type="button" onclick="toggleQuestionProgress()">☷ Questions</button>
-    <select id="pomodoroSelect" class="btn" onchange="setPomodoro(this.value)" style="padding: 7px; font-size: 11px;">
+    <div class="pomodoro-widget" id="pomodoroWidget" aria-label="Pomodoro study timer"><div class="pomodoro-meta"><span id="pomodoroPhase">Open study timer</span><span id="pomodoroDots" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></span></div><select id="pomodoroSelect" class="btn" onchange="setPomodoro(this.value)" aria-label="Pomodoro duration">
       <option value="stopwatch">Stopwatch</option>
       <option value="25">25m Focus</option>
       <option value="5">5m Break</option>
       <option value="15">15m Break</option>
-    </select>
+    </select></div>
     <button id="universalTimerToggleBtn" class="btn" type="button" onclick="toggleUniversalTimer()">⏸ Pause</button>
     <div class="global-exam-timer">⏱ <span id="globalTimer">00:00:00</span></div>
   </div>
@@ -41,6 +42,9 @@
     <button class="btn primary" onclick="submitExam()">Submit</button>
   </div>
 </header>
+<nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
+  <button onclick="showView('home')">Home</button><button onclick="showView('exam')">Exam</button><button onclick="showView('dashboard')">Results</button><button onclick="showView('planner')">Plan</button><button onclick="showView('settings')">Settings</button>
+</nav>
 
 
 <!-- HOME / CENTRAL DASHBOARD -->

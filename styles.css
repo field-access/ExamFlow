@@ -1932,3 +1932,35 @@ header {
     text-align: left;
   }
 }
+
+/* System polish: keep the active question readable and the controls predictable. */
+#examView .question{width:min(720px,calc(100% - 24px));margin-left:auto;margin-right:auto}
+#examView .question h2,#examView .options,#examView #explanation{max-width:680px;margin-left:auto;margin-right:auto}
+#examView .question h2{line-height:1.58 !important}
+#examView #explanation{width:100%;font-size:16px !important;line-height:1.72 !important}
+#examView #explanation .explanation-content{max-width:68ch;margin-left:auto;margin-right:auto;line-height:1.78 !important}
+#examView .actions{max-width:680px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch}
+#examView .actions>div{display:contents}
+#examView .actions .btn{width:100%;min-width:0}
+#examView .actions .btn:disabled{opacity:.5;cursor:not-allowed}
+.mobile-menu-toggle,.mobile-nav{display:none}
+.pomodoro-widget{display:flex;align-items:center;gap:7px}
+.pomodoro-meta{display:grid;gap:3px;justify-items:end;color:var(--muted);font:800 9px/1 system-ui;text-transform:uppercase;letter-spacing:.06em}
+#pomodoroDots{display:flex;gap:3px}
+#pomodoroDots i{display:block;width:6px;height:6px;border-radius:50%;background:var(--line)}
+#pomodoroDots i.active{background:var(--primary)}
+body.exam-active #examView .question:has(.exam-finished){border-color:var(--good)}
+@media(max-width:600px){
+  .mobile-menu-toggle{display:block;order:2;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:9px;padding:9px 11px;font-weight:800;font-size:11px}
+  header .topnav{display:none}
+  header .brand{order:1}
+  header .global-exam-title{order:3}
+  header .global-exam-controls{order:4;overflow-x:auto}
+  header .header-right{order:5}
+  .mobile-nav{position:fixed;inset:62px 10px auto 10px;z-index:10002;display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+  body.mobile-nav-open .mobile-nav{display:grid}
+  .mobile-nav button{border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:9px;padding:11px;text-align:left;font-weight:800}
+  .pomodoro-widget{min-width:max-content}
+  #examView .question{width:100%;padding:18px 14px !important}
+  #examView .actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+}
