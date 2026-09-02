@@ -876,8 +876,34 @@ document.addEventListener("pointerdown",e=>{
 function copyBeginnerSchema(){
   const source=document.getElementById("beginnerSchema");
   if(!source)return;
-  const text=source.value||source.textContent||"";
-  const done=()=>toast("Complete schema copied ✓");
+  const schema=source.value||source.textContent||"";
+  const text=`Create a Concept Breakdown Quiz (CBQ) about: [TOPIC]
+
+What a CBQ means:
+A CBQ breaks one difficult topic into a sequence of small, connected questions. Each question should build the reasoning needed for the next step, moving from core ideas to application and finally to a clear solution. Do not make a list of unrelated recall questions.
+
+Your task:
+- Replace [TOPIC] with the topic or source material I provide.
+- Create a coherent quiz that tests understanding and step-by-step reasoning.
+- Include useful explanations for every question.
+- Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.
+- Give every question a correct answer and marks. Use negativeMarks only when appropriate.
+- Keep all question and answer text inside the JSON values.
+
+Math and LaTeX:
+- Use inline LaTeX such as $E=mc^2$ inside JSON strings when helpful.
+- Use display LaTeX such as $$\\int_0^1 x^2 dx$$ when a separate equation is needed.
+- ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.
+- Escape backslashes correctly for JSON strings.
+
+Output rules:
+- Return only valid JSON. Do not return Markdown fences, commentary, or headings outside the JSON.
+- Follow the complete ExamFlow schema below.
+- Make the JSON directly usable by pasting it into ExamFlow's CBQ loader.
+
+ExamFlow CBQ schema:
+${schema}`;
+  const done=()=>toast("AI CBQ prompt and schema copied ✓");
   if(navigator.clipboard?.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>{
       const ta=document.createElement("textarea");
