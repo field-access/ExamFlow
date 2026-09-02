@@ -834,7 +834,8 @@ function examflowKeyboardHandler(e){
   // Alt+number navigation avoids conflicts with answer selection and browser tabs.
   if(e.altKey && /^[1-5]$/.test(e.key)){
     e.preventDefault();
-    ["home","exam","dashboard","planner","settings"][Number(e.key)-1] && showView(["home","exam","dashboard","planner","settings"][Number(e.key)-1]);
+    const page=["home","exam","dashboard","planner","settings"][Number(e.key)-1];
+    if(page)showView(page);
     return;
   }
   if(e.altKey && lower==="m"){e.preventDefault();toggleMobileNav();return}
@@ -859,6 +860,11 @@ function examflowKeyboardHandler(e){
   if(lower==="k"){e.preventDefault();examflowToggleThemeFast();return}
   if(lower==="h"){e.preventDefault();showView("home");return}
   if(!examActive)return;
+
+  if(lower==="e"){e.preventDefault();setMode("exam");return}
+  if(lower==="m"){e.preventDefault();setMode("practice");return}
+  if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
+  if(e.shiftKey && lower==="s"){e.preventDefault();submitExam();return}
 
   if(e.key==="ArrowRight" || lower==="n"){
     e.preventDefault();
