@@ -396,20 +396,19 @@
 </select></div></section>
 
     <section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
-    <section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. Shortcuts are ignored while you are typing in an input, textarea or select.</p>
+<section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. ExamFlow avoids browser-reserved Ctrl/Cmd shortcuts and ignores app shortcuts while you are typing.</p>
 <div class="shortcut-grid">
 <div><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>5</kbd><span>Home / Exam / Results / Plan / Settings</span></div>
 <div><kbd>Alt</kbd> + <kbd>M</kbd><span>Toggle mobile navigation</span></div>
-<div><kbd>Alt</kbd> + <kbd>L</kbd> / <kbd>D</kbd><span>Light / dark theme</span></div>
-<div><kbd>Ctrl</kbd> + <kbd>Enter</kbd><span>Paste clipboard JSON and start quiz</span></div>
-<div><kbd>Ctrl</kbd> + <kbd>O</kbd><span>Import ExamFlow data backup</span></div>
-<div><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>E</kbd><span>Export ExamFlow data backup</span></div>
-<div><kbd>Ctrl</kbd> + <kbd>S</kbd><span>Save current session</span></div>
-<div><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd><span>Submit current test</span></div>
-<div><kbd>Shift</kbd> + <kbd>S</kbd><span>Submit current test</span></div>
+<div><kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>D</kbd><span>Light / dark theme</span></div>
+<div><kbd>Alt</kbd> + <kbd>I</kbd><span>Open quiz importer</span></div>
+<div><kbd>Alt</kbd> + <kbd>X</kbd><span>Export ExamFlow data backup</span></div>
+<div><kbd>Alt</kbd> + <kbd>S</kbd><span>Save current session</span></div>
 <div><kbd>T</kbd><span>Pause / resume study timer</span></div>
 <div><kbd>E</kbd> / <kbd>M</kbd><span>Exam / Practice mode</span></div>
 <div><kbd>G</kbd><span>Open current question in GPT</span></div>
+<div><kbd>Shift</kbd> + <kbd>S</kbd><span>Submit current test</span></div>
+<div><kbd>Shift</kbd> + <kbd>Q</kbd><span>Open / close question palette</span></div>
 <div><kbd>1</kbd>–<kbd>4</kbd><span>Select option 1–4</span></div>
 <div><kbd>Enter</kbd><span>Check / reveal current answer</span></div>
 <div><kbd>←</kbd> / <kbd>→</kbd><span>Previous / next question</span></div>

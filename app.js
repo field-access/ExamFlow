@@ -807,43 +807,30 @@ function examflowKeyboardHandler(e){
     return;
   }
 
-  // More-specific modifier combinations must be handled first.
-  if(e.ctrlKey && e.shiftKey && e.key==="Enter"){
-    if(!typing && document.getElementById("examView")?.classList.contains("active")){
-      e.preventDefault();
-      submitExam();
-    }
-    return;
-  }
-  if(e.ctrlKey && e.key==="Enter"){
-    e.preventDefault();examflowCtrlEnter();return;
-  }
-  if(e.ctrlKey && lower==="o"){
-    if(!typing){e.preventDefault();document.getElementById("dataImportFile")?.click()}return;
-  }
-  if(e.ctrlKey && lower==="s"){
-    if(!typing && document.getElementById("examView")?.classList.contains("active")){
-      e.preventDefault();saveSession();toast("Session saved ✓");
-    }
-    return;
-  }
+  // Never capture browser-reserved Ctrl/Cmd shortcuts such as Save or Open.
+  if(e.ctrlKey||e.metaKey)return;
 
   // Never hijack normal text editing.
   if(typing)return;
 
-  // Alt+number navigation avoids conflicts with answer selection and browser tabs.
-  if(e.altKey && /^[1-5]$/.test(e.key)){
+  // Alt+number navigation stays separate from quiz answer keys and browser tabs.
+  if(e.altKey && !e.shiftKey && /^[1-5]$/.test(e.key)){
     e.preventDefault();
     const page=["home","exam","dashboard","planner","settings"][Number(e.key)-1];
     if(page)showView(page);
     return;
   }
   if(e.altKey && lower==="m"){e.preventDefault();toggleMobileNav();return}
-  if(e.altKey && lower==="l"){e.preventDefault();setTheme("light");return}
-  if(e.altKey && lower==="d"){e.preventDefault();setTheme("dark");return}
-  if(e.ctrlKey && e.shiftKey && lower==="e"){e.preventDefault();exportData();return}
+  if(e.altKey && lower==="i"){e.preventDefault();openImporter();return}
+  if(e.altKey && lower==="x"){e.preventDefault();exportData();return}
+  if(e.altKey && lower==="s"){
+    if(document.getElementById("examView")?.classList.contains("active")){e.preventDefault();saveSession();toast("Session saved ✓")}
+    return;
+  }
 
   if(lower==="t"){e.preventDefault();toggleUniversalTimer();return}
+  if(e.shiftKey && !e.altKey && lower==="l"){e.preventDefault();setTheme("light");return}
+  if(e.shiftKey && !e.altKey && lower==="d"){e.preventDefault();setTheme("dark");return}
 
   const resultsActive=document.getElementById("testResultsView")?.classList.contains("active");
   if(resultsActive){
@@ -861,10 +848,16 @@ function examflowKeyboardHandler(e){
   if(lower==="h"){e.preventDefault();showView("home");return}
   if(!examActive)return;
 
+  if(e.shiftKey && lower==="p"){e.preventDefault();setMode("practice");return}
+  if(e.shiftKey && lower==="e"){e.preventDefault();setMode("exam");return}
+  if(e.shiftKey && lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
+  if(e.shiftKey && lower==="q"){e.preventDefault();toggleQuestionProgress();return}
+  if(e.shiftKey && lower==="t"){e.preventDefault();toggleUniversalTimer();return}
+  if(e.shiftKey && lower==="s"){e.preventDefault();submitExam();return}
+
   if(lower==="e"){e.preventDefault();setMode("exam");return}
   if(lower==="m"){e.preventDefault();setMode("practice");return}
   if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
-  if(e.shiftKey && lower==="s"){e.preventDefault();submitExam();return}
 
   if(e.key==="ArrowRight" || lower==="n"){
     e.preventDefault();
@@ -887,7 +880,7 @@ function examflowKeyboardHandler(e){
 }
 
 /* Single keyboard router: all app shortcuts live here. */
-document.addEventListener("keydown",examflowKeyboardHandler);
+document.addEventListener("keydown",examflowKeyboardHandler,true);
 
 
 /* Lightweight click pulse: visual confirmation for every interactive button */
