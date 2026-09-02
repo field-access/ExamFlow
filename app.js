@@ -809,7 +809,7 @@ function examflowKeyboardHandler(e){
 
   // More-specific modifier combinations must be handled first.
   if(e.ctrlKey && e.shiftKey && e.key==="Enter"){
-    if(document.getElementById("examView")?.classList.contains("active")){
+    if(!typing && document.getElementById("examView")?.classList.contains("active")){
       e.preventDefault();
       submitExam();
     }
@@ -819,7 +819,7 @@ function examflowKeyboardHandler(e){
     e.preventDefault();examflowCtrlEnter();return;
   }
   if(e.ctrlKey && lower==="o"){
-    e.preventDefault();document.getElementById("dataImportFile")?.click();return;
+    if(!typing){e.preventDefault();document.getElementById("dataImportFile")?.click()}return;
   }
   if(e.ctrlKey && lower==="s"){
     if(!typing && document.getElementById("examView")?.classList.contains("active")){
@@ -830,6 +830,27 @@ function examflowKeyboardHandler(e){
 
   // Never hijack normal text editing.
   if(typing)return;
+
+  // Alt+number navigation avoids conflicts with answer selection and browser tabs.
+  if(e.altKey && /^[1-5]$/.test(e.key)){
+    e.preventDefault();
+    ["home","exam","dashboard","planner","settings"][Number(e.key)-1] && showView(["home","exam","dashboard","planner","settings"][Number(e.key)-1]);
+    return;
+  }
+  if(e.altKey && lower==="m"){e.preventDefault();toggleMobileNav();return}
+  if(e.altKey && lower==="l"){e.preventDefault();setTheme("light");return}
+  if(e.altKey && lower==="d"){e.preventDefault();setTheme("dark");return}
+  if(e.ctrlKey && e.shiftKey && lower==="e"){e.preventDefault();exportData();return}
+
+  if(lower==="t"){e.preventDefault();toggleUniversalTimer();return}
+
+  const resultsActive=document.getElementById("testResultsView")?.classList.contains("active");
+  if(resultsActive){
+    if(lower==="r"){e.preventDefault();retakeLastTest();return}
+    if(lower==="s"){e.preventDefault();saveResultCopy();return}
+    if(lower==="c"){e.preventDefault();showView("home");return}
+    return;
+  }
 
   const examActive=document.getElementById("examView")?.classList.contains("active");
 
