@@ -2008,3 +2008,10 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
   body #mobileNav{display:none}
   body.mobile-nav-open #mobileNav{display:grid !important}
 }
+
+/* Saved result reviews keep supporting detail readable without expanding the card. */
+.result-review-meta{font-size:9px;color:var(--muted);margin-top:4px}
+.result-review-meta strong{color:var(--text)}
+.result-question-image{display:block;max-width:min(100%,420px);max-height:220px;object-fit:contain;margin:0 auto 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.recent-quiz-row{align-items:center;gap:12px}
+.recent-quiz-row .btn{flex:0 0 auto}

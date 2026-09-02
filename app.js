@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -6,6 +6,7 @@ const sampleQuestions=[
 ];
 let questions=[],answers=[],reviews=new Set(),checkedQuestions=new Set(),current=0,seconds=5*60,quizDurationMinutes=5,mode="exam",sessionId=null,examName="No quiz loaded",sections=[];
 let examFinished=false;
+let examId=null;
 let timerState={examSeconds:5*60,practiceSeconds:5*60,running:false};
 let universalStudyTimerSeconds = 0;
 let universalStudyTimerRunning = true;
@@ -108,7 +109,7 @@ async function restorePersistentBackup(){
     if(!record?.data)return false;
     let restored=false;
     Object.entries(record.data).forEach(([k,v])=>{
-      if(k===K.settings||k===K.results||k===K.goal||k===K.plans||k===K.sessions){
+      if(Object.values(K).includes(k)){
         if(localStorage.getItem(k)===null){try{localStorage.setItem(k,JSON.stringify(v));restored=true}catch(e){}}
       }
     });
@@ -130,6 +131,44 @@ function initPersistentBackup(){
   setTimeout(savePersistentBackup,500);
 }
 function id(){return Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8)}
+
+function cloneData(value){try{return JSON.parse(JSON.stringify(value))}catch(e){return value}}
+function saveExamRecord(record){
+  if(!record?.id)return;
+  const exams=get(K.exams,[]),next={...record,questions:cloneData(record.questions||[]),updatedAt:new Date().toISOString()};
+  const old=exams.find(x=>x.id===record.id);
+  if(old)Object.assign(old,next);else exams.unshift(next);
+  put(K.exams,exams.slice(0,100));
+}
+function registerRecentQuiz(record,metadata={}){
+  if(!record?.id)return;
+  const recent=get(K.recent,[]),now=new Date().toISOString();
+  const old=recent.find(x=>x.id===record.id);
+  const next={id:record.id,name:metadata.name||record.name||"Untitled quiz",lastOpenedAt:now,createdAt:old?.createdAt||now,plannedDate:metadata.plannedDate||old?.plannedDate||"",plannedTime:metadata.plannedTime||old?.plannedTime||"",source:metadata.source||old?.source||"quiz"};
+  if(old)Object.assign(old,next);else recent.unshift(next);
+  recent.sort((a,b)=>String(b.lastOpenedAt||"").localeCompare(String(a.lastOpenedAt||"")));
+  put(K.recent,recent.slice(0,100));
+}
+function getExamRecord(idValue){return get(K.exams,[]).find(x=>x.id===idValue)||null}
+function registerActiveExam(metadata={}){
+  if(!examId)examId=id();
+  saveExamRecord({id:examId,name:examName,questions,sections,durationMinutes:quizDurationMinutes});
+  registerRecentQuiz({id:examId,name:examName},{...metadata,name:metadata.name||examName});
+}
+function renderRecentQuizzes(){
+  const el=document.getElementById("recentQuizzesList");if(!el)return;
+  const recent=get(K.recent,[]),exams=get(K.exams,[]);
+  el.innerHTML=recent.length?recent.slice(0,50).map(item=>{
+    const exam=exams.find(x=>x.id===item.id),count=exam?.questions?.length||0;
+    return `<div class="resultrow recent-quiz-row"><div class="resultmain"><strong>${esc(item.name)}</strong><small>${count} question${count===1?"":"s"}${item.plannedDate?` · Planned ${esc(item.plannedDate)}`:""} · Opened ${new Date(item.lastOpenedAt).toLocaleString()}</small></div><button class="btn" onclick="openRecentQuiz('${item.id}')">Open</button></div>`;
+  }).join(""):'<div class="empty">Open a quiz to build your recent list.</div>';
+}
+function openRecentQuiz(idValue){
+  const session=get(K.sessions,[]).find(x=>x.examId===idValue);
+  if(session){restoreSession(session.id);return}
+  const exam=getExamRecord(idValue);if(!exam)return;
+  examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=(exam.durationMinutes||settings.defaultDuration||5)*60;quizDurationMinutes=seconds/60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
+}
 
 function renderTodos() {
   const container = document.getElementById("todoListContainer");
@@ -508,12 +547,12 @@ function readFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader()
 function loadQuiz(){
  try{
    const parsed=parseQuiz(parseQuizInput(document.getElementById("jsonInput").value));
-   questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;
+   questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
    quizDurationMinutes=Math.min(10,Math.max(1,parsed.durationMinutes||settings.defaultDuration||5));seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
-   closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
+   registerActiveExam();closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
  }catch(e){document.getElementById("jsonStatus").className="status err";document.getElementById("jsonStatus").textContent="✕ "+e.message}
 }
 
@@ -917,7 +956,7 @@ function finishTest(automatic=false){
 function saveSession(){
  if(!questions.length)return;
  const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
- const item={id:sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
+ const item={id:sid,examId:examId||sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
  const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
  put(K.sessions,sessions.slice(0,100));renderSessions()
 }
@@ -928,7 +967,7 @@ function renderSessions(){
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
- sessionId=s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(seconds/60)));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];
+ sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60)));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
 function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
@@ -1027,7 +1066,27 @@ function closeCBQModal(){const m=document.getElementById("cbqModal");if(m)m.remo
 
 let lastResultSnapshot=null,resultFilter="all",lastTestStartedAt=0;
 
+function hydrateResult(saved){
+  const result={...saved};
+  let source=Array.isArray(saved.questions)?saved.questions:null;
+  if(!source&&saved.examId)source=getExamRecord(saved.examId)?.questions||null;
+  if(!source&&saved.examId){
+    const session=get(K.sessions,[]).find(x=>x.examId===saved.examId);
+    source=session?.questions||null;
+  }
+  source=Array.isArray(source)?cloneData(source):[];
+  const savedAnswers=Array.isArray(saved.answers)?saved.answers:[];
+  result.questions=source.map((q,i)=>({...q,selected:savedAnswers[i]!==undefined?savedAnswers[i]:(q.selected??null)}));
+  return result;
+}
+
+function openSavedResult(resultId){
+  const saved=get(K.results,[]).find(x=>x.id===resultId);if(!saved)return;
+  openDetailedResults(saved);
+}
+
 function openDetailedResults(result){
+ result=hydrateResult(result);
  lastResultSnapshot=result;
  document.getElementById("resultSubtitle").textContent=`${result.name} · ${result.mode==="practice"?"Practice Mode":"Exam Mode"}`;
  document.getElementById("resultScore").textContent=Number(result.score).toFixed(result.score%1?1:0);
@@ -1145,8 +1204,10 @@ function renderResultQuestions(){
      <div>
        <div class="result-qmeta">SECTION ${esc(q.section||"GENERAL")} <span style="margin-left:5px">· ${status==="correct"?"✓ Correct +"+q.marks:status==="wrong"?"× Wrong":"Skipped"}</span></div>
        <div class="result-qtext">${esc(q.text)}</div>
+       <div class="result-review-meta">Type: <strong>${esc(q.type||"mcq")}</strong> Â· Marks: <strong>${status==="correct"?"+"+Number(q.marks||0):status==="wrong"?"-"+Number(q.negativeMarks||0):"0"}</strong></div>
        <div class="result-answer">Your answer: <strong>${selected}</strong>${status!=="correct"?` · Correct: <strong>${correct}</strong>`:""}</div>
        <div class="result-detail">
+         ${q.image?`<img class="result-question-image" src="${esc(q.image)}" alt="Question image">`:""}
          <strong>Options / Items</strong>
          <div style="margin-top:5px">${optionsHtml(q)}</div>
          ${q.explanation?`<div class="result-explanation"><strong>💡 Explanation</strong><br>${esc(q.explanation)}</div>`:""}
@@ -1170,27 +1231,42 @@ function retakeLastTest(){
  answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
  seconds=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5))*60;
  quizDurationMinutes=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5));
- sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;examFinished=false;
+ sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;examFinished=false;examId=lastResultSnapshot.examId||id();
+ timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;
+ registerActiveExam({name:examName});
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
  showView("exam");render();saveSession();toast("Retake ready ✓")
 }
 function saveResult(){
  let correct=0,wrong=0,unanswered=0,score=0,max=0;
  questions.forEach((q,i)=>{max+=Number(q.marks||1);if(!answerIsPresent(answers[i],q))unanswered++;else if(isQuestionCorrect(q,answers[i])){correct++;score+=Number(q.marks||1)}else{wrong++;score-=Number(q.negativeMarks||0)}});
- const percent=Math.max(0,Math.round(score/Math.max(max,1)*100)),r={
-  id:id(),name:examName,mode,date:new Date().toISOString(),total:questions.length,
+ const percent=Math.max(0,Math.round(score/Math.max(max,1)*100)),timestamp=new Date().toISOString(),r={
+  id:id(),name:examName,mode,date:timestamp,timestamp,total:questions.length,
   correct,wrong,unanswered,score,max,percent,durationMinutes:quizDurationMinutes,
   timeTaken:Math.max(0,(quizDurationMinutes*60)-seconds),
-  questions:questions.map((q,i)=>({...q,selected:answers[i]||null}))
+  examId:examId||null,
+  answers:cloneData(answers),
+  matchOrders:cloneData(matchOrders),
+  reviews:[...reviews],
+  checkedQuestions:[...checkedQuestions]
  };
+ if(!examId)registerActiveExam();
+ r.examId=examId;
  const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs.slice(0,100));backupToPersistentStorage();return r
 }
 function renderDashboard(){
+ renderRecentQuizzes();
  const ss=get(K.sessions,[]);
  const ssl = document.getElementById("homeSessionsList"); if (ssl) ssl.innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`).join(""):"<div class=\"empty\">No saved sessions. Add a CBQ to begin.</div>";
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=rs.reduce((a,r)=>a+r.correct+r.wrong,0);
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><div style="display:flex;align-items:center;gap:10px;"><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b><button class="session-delete" onclick="deleteResult('${r.id}')">×</button></div></div>`).join(""):'<div class="empty">No results yet.</div>';
+ document.querySelectorAll("#resultsList .resultrow").forEach((row,i)=>{
+   const result=rs[i];if(!result)return;
+   row.classList.add("result-history-item");
+   row.addEventListener("click",()=>openSavedResult(result.id));
+   row.querySelectorAll(".session-delete").forEach(button=>button.addEventListener("click",event=>event.stopPropagation()));
+ });
  const latest=rs[0],ad=document.getElementById("advice");
  if(!latest)ad.innerHTML='<div class="empty">Complete a test to unlock performance advice.</div>';
  else ad.innerHTML=`<strong>Latest: ${latest.percent}%</strong><p style="color:var(--muted);font-size:12px;line-height:1.6">${latest.percent>=80?"Strong performance. Push consistency with timed Exam Mode.":latest.percent>=60?"Good foundation. Use Practice Mode on weak topics, then retest.":"Focus on concept breakdown first, then repeat the same quiz after revision."}</p>`;
@@ -1279,7 +1355,8 @@ function renderPlans(){
 }
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
- const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;quizDurationMinutes=Math.min(10,Math.max(1,q.durationMinutes||settings.defaultDuration||5));answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
+ const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;examId=p.examId||p.id;quizDurationMinutes=Math.min(10,Math.max(1,q.durationMinutes||settings.defaultDuration||5));answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
+ registerActiveExam({source:"planned",plannedDate:p.date,plannedTime:p.time,name:p.name});
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();setTimeout(applyQuestionSidebarState,50);saveSession();toast("Planned test loaded ✓")
 }
 function deletePlan(pid){put(K.plans,get(K.plans,[]).filter(x=>x.id!==pid));renderPlans()}
@@ -1293,13 +1370,13 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
 
     const overwrite=confirm(
       "Import this ExamFlow backup?\\n\\n" +
-      "This will replace your current settings, results, goals, plans and saved sessions with the backup."
+      "This will replace your current settings, results, goals, plans, saved sessions and quiz history with the backup."
     );
     if(!overwrite){
       event.target.value="";
@@ -1311,6 +1388,8 @@ async function importDataFile(event){
     if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
     if(parsed.plans!==undefined)put(K.plans,Array.isArray(parsed.plans)?parsed.plans:[]);
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
+    if(parsed.exams!==undefined)put(K.exams,Array.isArray(parsed.exams)?parsed.exams:[]);
+    if(parsed.recent!==undefined)put(K.recent,Array.isArray(parsed.recent)?parsed.recent:[]);
     if(parsed.examDeadline!==undefined){
       if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
       else localStorage.removeItem("examflow_exam_deadline");
@@ -1336,7 +1415,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
@@ -1583,12 +1662,12 @@ function startHomeQuiz(){
  if(!raw){status.textContent="Paste your CBQ JSON first.";status.style.color="var(--bad)";return}
  try{
    const parsed=parseQuiz(parseQuizInput(raw));
-   questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;
+   questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
    quizDurationMinutes=parsed.durationMinutes||settings.defaultDuration||30;
-   answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;sessionId=null;mode=settings.defaultMode;examFinished=false;
+   answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
-   saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
+   registerActiveExam();saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
  }catch(e){status.textContent="✕ "+e.message;status.style.color="var(--bad)"}
 }
 function pasteAndStart(){
@@ -1601,6 +1680,7 @@ function readHomeFile(e){
 }
 
 function renderHome(){
+ renderRecentQuizzes();
  const rs=get(K.results,[]),ss=get(K.sessions,[]),ps=get(K.plans,[]);
  const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const homeMetrics={homeTests:rs.length,homeAvg:avg+"%",homeBest:best+"%",homeSessions:ss.length};
