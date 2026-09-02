@@ -164,7 +164,9 @@ function renderRecentQuizzes(){
   }).join(""):'<div class="empty">Open a quiz to build your recent list.</div>';
 }
 function openRecentQuiz(idValue){
-  const session=get(K.sessions,[]).find(x=>x.examId===idValue);
+  // Resume only unfinished work. A completed session should start a fresh attempt
+  // instead of reopening the locked exam canvas.
+  const session=get(K.sessions,[]).find(x=>x.examId===idValue&&!x.examFinished);
   if(session){restoreSession(session.id);return}
   const exam=getExamRecord(idValue);if(!exam)return;
   examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=(exam.durationMinutes||settings.defaultDuration||5)*60;quizDurationMinutes=seconds/60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
