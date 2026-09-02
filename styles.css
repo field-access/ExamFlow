@@ -1964,3 +1964,13 @@ body.exam-active #examView .question:has(.exam-finished){border-color:var(--good
   #examView .question{width:100%;padding:18px 14px !important}
   #examView .actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 }
+
+/* Keep the mobile navigation completely out of the desktop layout. */
+@media(min-width:601px){
+  body #mobileNav,
+  body .mobile-menu-toggle{display:none !important}
+}
+@media(max-width:600px){
+  body #mobileNav{display:none}
+  body.mobile-nav-open #mobileNav{display:grid !important}
+}
