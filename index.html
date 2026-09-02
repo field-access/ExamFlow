@@ -39,7 +39,7 @@
     <button id="universalTimerToggleBtn" class="btn" type="button" onclick="toggleUniversalTimer()">⏸ Pause</button>
     <div class="global-exam-timer">⏱ <span id="globalTimer">00:00:00</span></div>
   </div>
-  <div class="header-right">
+  <div class="header-right" hidden>
     <div class="pill" id="headerQuizName">CBQ Practice</div>
     <button class="btn" onclick="openImporter()">＋ Add Quiz</button>
     <button class="btn primary" onclick="submitExam()">Submit</button>
@@ -55,7 +55,7 @@
 <div class="dashboard">
   <div class="home-stage">
   <div class="home-hero">
-  <div class="dashhead dashboard-hero" style="justify-content: flex-end;">
+  <div class="dashhead dashboard-hero" hidden style="justify-content: flex-end;">
     <div class="dashactions"><button class="btn" onclick="showView('planner')" style="background:#fffdf8; color: var(--ink); border: 1px solid #ded5c5; box-shadow: 0 1px 2px rgba(60,45,25,0.05); font-weight:600;"><span style="margin-right:4px;">🗓</span> Future tests</button><button class="btn primary" onclick="openImporter()" style="background:var(--accent); color:#fff; font-weight:600; border:none; box-shadow:0 4px 10px rgba(63,79,143,0.3);">＋ New CBQ</button></div>
   </div>
     <section class="hero-copy card cbq-intro">
