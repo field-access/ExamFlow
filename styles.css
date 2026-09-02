@@ -2019,3 +2019,22 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
 .result-question-image{display:block;max-width:min(100%,420px);max-height:220px;object-fit:contain;margin:0 auto 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .recent-quiz-row{align-items:center;gap:12px}
 .recent-quiz-row .btn{flex:0 0 auto}
+
+/* The question palette is an overlay, not a second exam column. */
+@media(min-width:801px){
+  #examView{position:relative}
+  #examView .main,
+  body:has(.exam-progress-drawer.open) #examView .main{
+    width:min(920px,calc(100% - 24px)) !important;
+    max-width:920px !important;
+    margin:12px auto !important;
+    padding-right:0 !important;
+  }
+  #examView .exam-progress-drawer{
+    position:absolute !important;
+    top:0 !important;
+    right:-340px !important;
+    height:calc(100vh - 68px) !important;
+  }
+  #examView .exam-progress-drawer.open{right:0 !important}
+}
