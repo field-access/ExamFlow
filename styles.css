@@ -2137,3 +2137,29 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   .home-stage .hero-copy{height:auto;min-height:0;flex:1;box-sizing:border-box}
   .home-stage .json-home{height:100%;box-sizing:border-box}
 }
+
+/* Alternate light palettes keep the existing component system intact. */
+body:not(.dark).scheme-ocean{
+  --bg:#edf7f8;--surface:#fbffff;--surface2:#e2f0f2;--text:#17343d;--muted:#607980;--line:#c9dfe3;
+  --primary:#167b8d;--primary2:#35a6b5;--good:#26805d;--warn:#b87924;--bad:#c45454;
+  --ink:#17343d;--paper:#fbffff;--paper2:#e2f0f2;--accent:#167b8d;--accent2:#35a6b5;--gold:#b87924;--green:#26805d;
+  --ux-primary:#167b8d;--ux-primary-2:#35a6b5;background:radial-gradient(circle at 10% 0%,#d8eff1 0,transparent 34%),var(--bg)
+}
+body:not(.dark).scheme-forest{
+  --bg:#f0f6ef;--surface:#fffefa;--surface2:#e5efe3;--text:#20352a;--muted:#687a6b;--line:#d0dfcf;
+  --primary:#31734e;--primary2:#5a9b67;--good:#287a55;--warn:#b47b27;--bad:#bb5550;
+  --ink:#20352a;--paper:#fffefa;--paper2:#e5efe3;--accent:#31734e;--accent2:#5a9b67;--gold:#b47b27;--green:#287a55;
+  --ux-primary:#31734e;--ux-primary-2:#5a9b67;background:radial-gradient(circle at 90% 5%,#dcebd9 0,transparent 35%),var(--bg)
+}
+body:not(.dark).scheme-sunset{
+  --bg:#fff5ed;--surface:#fffdfa;--surface2:#f8e8dc;--text:#402b2a;--muted:#866e68;--line:#ead5c8;
+  --primary:#c65d4e;--primary2:#e48a57;--good:#36815d;--warn:#bd7926;--bad:#b84a4a;
+  --ink:#402b2a;--paper:#fffdfa;--paper2:#f8e8dc;--accent:#c65d4e;--accent2:#e48a57;--gold:#bd7926;--green:#36815d;
+  --ux-primary:#c65d4e;--ux-primary-2:#e48a57;background:radial-gradient(circle at 8% 5%,#f8dfc7 0,transparent 35%),var(--bg)
+}
+body:not(.dark).scheme-slate{
+  --bg:#eef1f5;--surface:#fcfdff;--surface2:#e3e8ef;--text:#202a38;--muted:#687486;--line:#cfd7e2;
+  --primary:#405d86;--primary2:#6788b4;--good:#287b65;--warn:#b57d2c;--bad:#bb565b;
+  --ink:#202a38;--paper:#fcfdff;--paper2:#e3e8ef;--accent:#405d86;--accent2:#6788b4;--gold:#b57d2c;--green:#287b65;
+  --ux-primary:#405d86;--ux-primary-2:#6788b4;background:radial-gradient(circle at 85% 0%,#dce4ef 0,transparent 35%),var(--bg)
+}

@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 </head>
 <body>
@@ -382,7 +382,21 @@
 <option value="Serif Elegant">Serif Elegant (Georgia)</option>
 <option value="Modern Rounded">Modern Rounded (Quicksand)</option>
 <option value="Monospace">Monospace (Cascadia Code)</option>
+<option value="Source Serif">Source Serif 4</option>
+<option value="Libre Baskerville">Libre Baskerville</option>
+<option value="Lora">Lora</option>
+<option value="DM Sans">DM Sans</option>
+<option value="Nunito Sans">Nunito Sans</option>
+<option value="IBM Plex Mono">IBM Plex Mono</option>
 </select></div></section>
+    <section class="setting card"><h3>🎨 Color scheme</h3><p>Choose the accent and surface colors used across ExamFlow.</p><div class="setting-control"><select id="colorSchemeSelect" onchange="saveSettings()">
+<option value="classic">ExamFlow Classic</option>
+<option value="ocean">Ocean Blue</option>
+<option value="forest">Forest Study</option>
+<option value="sunset">Warm Sunset</option>
+<option value="slate">Slate Ink</option>
+</select></div></section>
+    <section class="setting card"><h3>🔊 Interface sounds</h3><p>Play clear, energetic sounds for button feedback and answer results.</p><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)">🔊 Sounds on</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">🔇 Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test sound</button></div></section>
     <section class="setting card"><h3>⏱️ Default duration</h3><p>Used for quizzes without an explicit duration. Maximum test time is 10 minutes.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
 <option value="5">5 minutes</option><option value="10">10 minutes</option>
 <option value="15">15 minutes</option><option value="20">20 minutes</option>

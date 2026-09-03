@@ -315,7 +315,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",colorScheme:"classic",soundEnabled:true,instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -326,6 +326,7 @@ function saveSettings(){
   settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
   const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
+  const cs=document.getElementById("colorSchemeSelect");if(cs)settings.colorScheme=cs.value;
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
@@ -333,14 +334,31 @@ function applySettings(){
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
  const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"System Default";
+ const schemes=["classic","ocean","forest","sunset","slate"];
+ document.body.classList.remove(...schemes.map(x=>`scheme-${x}`));
+ const scheme=schemes.includes(settings.colorScheme)?settings.colorScheme:"classic";
+ settings.colorScheme=scheme;
+ document.body.classList.add(`scheme-${scheme}`);
+ const cs=document.getElementById("colorSchemeSelect");if(cs)cs.value=scheme;
+ const soundOn=settings.soundEnabled!==false;
+ const soundToggle=document.getElementById("soundOnBtn"),soundMute=document.getElementById("soundOffBtn");
+ if(soundToggle)soundToggle.classList.toggle("active",soundOn);
+ if(soundMute)soundMute.classList.toggle("active",!soundOn);
  let fstr = "'Inter', 'Segoe UI', Arial, sans-serif";
  if(settings.fontFamily==="Serif Elegant") fstr = "'Latin Modern Roman', 'Computer Modern', 'STIX Two Text', 'Times New Roman', serif";
  if(settings.fontFamily==="Modern Rounded") fstr = "'Nunito', 'Quicksand', 'Arial Rounded MT Bold', sans-serif";
  if(settings.fontFamily==="Monospace") fstr = "'Cascadia Code', 'SFMono-Regular', Consolas, monospace";
+ if(settings.fontFamily==="Source Serif") fstr = "'Source Serif 4', Georgia, serif";
+ if(settings.fontFamily==="Libre Baskerville") fstr = "'Libre Baskerville', Georgia, serif";
+ if(settings.fontFamily==="Lora") fstr = "'Lora', Georgia, serif";
+ if(settings.fontFamily==="DM Sans") fstr = "'DM Sans', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Nunito Sans") fstr = "'Nunito Sans', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="IBM Plex Mono") fstr = "'IBM Plex Mono', Consolas, monospace";
  document.body.style.setProperty('--exam-font', fstr);
  mode=settings.defaultMode;updateModeUI()
 }
 function setTheme(x){settings.theme=x;put(K.settings,settings);applySettings()}
+function setSoundEnabled(enabled){settings.soundEnabled=!!enabled;put(K.settings,settings);applySettings();toast(enabled?"Interface sounds on":"Interface sounds muted")}
 function setDefaultMode(x){settings.defaultMode=x;put(K.settings,settings);setMode(x)}
 function updateTheme(){document.getElementById("lightBtn").classList.toggle("active",settings.theme==="light");document.getElementById("darkBtn").classList.toggle("active",settings.theme==="dark")}
 function updateTimerUI(){
@@ -907,6 +925,7 @@ document.addEventListener("keydown",examflowKeyboardHandler,true);
 document.addEventListener("pointerdown",e=>{
   const b=e.target.closest("button,.btn,.modebtn,.preset-btn,.bookmark,.qbtn");
   if(!b||b.disabled)return;
+  if(b.id!=="soundOffBtn")playButtonSound();
   b.classList.remove("click-pulse");
   void b.offsetWidth;
   b.classList.add("click-pulse");
@@ -1869,35 +1888,30 @@ function playExamTone(frequency,duration,volume=0.07,when=0){
     return true;
   }catch(e){return false}
 }
+function playButtonSound(){
+  if(settings.soundEnabled===false)return;
+  playExamTone(560,.075,.13,0);
+}
 function playAnswerSound(correct){
   if(settings.soundEnabled===false)return;
   const ctx=ensureExamAudio();
   if(!ctx)return;
   if(correct){
-    playExamTone(660,.13,.08,0);
-    playExamTone(880,.16,.07,.12);
+    playExamTone(660,.15,.16,0);
+    playExamTone(880,.2,.14,.13);
   }else{
-    playExamTone(260,.15,.08,0);
-    playExamTone(180,.19,.07,.13);
+    playExamTone(260,.17,.15,0);
+    playExamTone(180,.22,.13,.14);
   }
 }
 function testAnswerSound(){
   if(settings.soundEnabled===false){
-    toast("Enable answer sounds first, then press Test sound");
+    toast("Enable interface sounds first");
     return;
   }
-  const ok=playExamTone(660,.13,.08,0);
-  playExamTone(880,.16,.07,.12);
+  const ok=playExamTone(660,.15,.16,0);
+  playExamTone(880,.2,.14,.13);
   if(!ok)toast("This browser is blocking audio. Click the page once, then try again.");
-}
-
-function testAnswerSound(){
-  if(settings.soundEnabled===false){
-    toast("Enable answer sounds first");
-    return;
-  }
-  unlockSound();
-  setTimeout(()=>playAnswerSound(true),40);
 }
 
 
