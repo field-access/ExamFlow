@@ -1776,20 +1776,6 @@ body.dark .schema-code, body.dark .quiz-code-block, body.dark .quiz-inline-code,
   border-color: var(--line) !important;
 }
 
-/* Native resize for main views */
-.main, .dashboard {
-  resize: horizontal;
-  overflow: auto;
-  min-width: 600px;
-  max-width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-@media(max-width: 760px) {
-  .main, .dashboard { resize: none; min-width: auto; }
-}
-
-
 /* Fix missing nav and topnav visibility in dark mode */
 body.dark .nav button, body.dark .topnav button {
   color: var(--muted) !important;
@@ -1812,14 +1798,6 @@ body.dark .header-right .btn.primary {
   color: #fff !important;
 }
 
-/* Let the inner question card resize instead if the user prefers that */
-.question.card {
-  resize: horizontal;
-  overflow: auto;
-  max-width: 100%;
-}
-
-
 /* Fix missing visibility for remaining buttons (like Home, View Answer, Clear) in dark mode */
 body.dark .btn {
   background: var(--surface2);
@@ -1837,18 +1815,6 @@ body.dark .btn:disabled {
 }
 
 
-/* Improve resize handle visibility and functionality for question cards */
-.question.card {
-  resize: horizontal;
-  overflow: auto;
-  min-width: 300px;
-  max-width: 100%;
-  display: block;
-}
-
-
-
-
 /* Additional fixes for specific buttons in dark mode that were missed */
 body.dark #prevBtn, body.dark #nextBtn, body.dark #viewAnswerBtn, body.dark button[onclick="clearAnswer()"] {
   background: var(--surface2) !important;
@@ -1862,36 +1828,6 @@ body.dark #nextBtn {
 }
 
 
-
-/* Override width locks for the exam view so the user can resize it */
-#examView .main {
-  resize: horizontal !important;
-  overflow: auto !important;
-  width: min(1000px, calc(100% - 24px)) !important; /* Make it slightly smaller by default, but not too small */
-  max-width: 100% !important;
-  min-width: 400px !important;
-  display: block !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-  transition: width 0.3s ease, margin 0.3s ease;
-}
-
-/* When the drawer is open (app-level state, typically handled by body class but let's assume media queries or drawer open state handles it) */
-/* Actually, ExamFlow uses `body:has(#examProgressDrawer.open)` or similar, but the existing code has `.exam-progress-drawer.open` */
-body:has(.exam-progress-drawer.open) #examView .main {
-  width: min(900px, calc(100% - 360px)) !important;
-  margin-left: 80px !important;
-  margin-right: 320px !important;
-}
-
-@media(max-width: 800px) {
-  #examView .main, body:has(.exam-progress-drawer.open) #examView .main {
-    resize: none !important;
-    width: calc(100% - 14px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-}
 
 /* Improve header title bar responsiveness */
 header {
