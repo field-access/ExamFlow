@@ -2128,3 +2128,11 @@ body.exam-active #globalExamProgressBtn{display:none !important}
 @media(max-width:600px){
   .stacked-list{grid-template-columns:1fr;gap:7px}
 }
+
+/* Keep the Home hero and paste card equal-height after the old action row was removed. */
+@media(min-width:851px){
+  .home-stage{align-items:stretch}
+  .home-stage .home-hero{display:flex;flex-direction:column;height:100%}
+  .home-stage .hero-copy{height:auto;min-height:0;flex:1;box-sizing:border-box}
+  .home-stage .json-home{height:100%;box-sizing:border-box}
+}
