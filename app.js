@@ -1005,8 +1005,8 @@ function render(){
 function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
 function clearAnswer(){if(examFinished)return;answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
 function toggleReview(){if(examFinished)return;reviews.has(current)?reviews.delete(current):reviews.add(current);render();renderQuestionProgress();saveSessionSoon()}
-function nextQuestion(){if(examFinished)return;if(current<questions.length-1){current++;render();saveSessionSoon()}else submitExam()}
-function previousQuestion(){if(examFinished)return;if(current>0){current--;render();saveSessionSoon()}}
+function nextQuestion(){if(current<questions.length-1){current++;render();if(!examFinished)saveSessionSoon()}else if(!examFinished)submitExam()}
+function previousQuestion(){if(current>0){current--;render();if(!examFinished)saveSessionSoon()}}
 function submitExam(){
  if(examFinished)return;
  if(!questions.length){toast("Load a quiz first");return}
