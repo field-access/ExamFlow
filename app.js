@@ -805,6 +805,13 @@ function examflowKeyboardHandler(e){
     return;
   }
 
+  // Confirm submission from the open dialog without affecting answer checking.
+  if(e.key==="Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey && document.getElementById("submitModal")?.classList.contains("show")){
+    e.preventDefault();
+    finishTest();
+    return;
+  }
+
   // Ctrl/Cmd+Enter is the single intentional exception to the browser guard.
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
     e.preventDefault();
