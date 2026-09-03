@@ -138,7 +138,7 @@ function saveExamRecord(record){
   const exams=get(K.exams,[]),next={...record,questions:cloneData(record.questions||[]),updatedAt:new Date().toISOString()};
   const old=exams.find(x=>x.id===record.id);
   if(old)Object.assign(old,next);else exams.unshift(next);
-  put(K.exams,exams.slice(0,100));
+  put(K.exams,exams);
 }
 function registerRecentQuiz(record,metadata={}){
   if(!record?.id)return;
@@ -147,7 +147,7 @@ function registerRecentQuiz(record,metadata={}){
   const next={id:record.id,name:metadata.name||record.name||"Untitled quiz",lastOpenedAt:now,createdAt:old?.createdAt||now,plannedDate:metadata.plannedDate||old?.plannedDate||"",plannedTime:metadata.plannedTime||old?.plannedTime||"",source:metadata.source||old?.source||"quiz"};
   if(old)Object.assign(old,next);else recent.unshift(next);
   recent.sort((a,b)=>String(b.lastOpenedAt||"").localeCompare(String(a.lastOpenedAt||"")));
-  put(K.recent,recent.slice(0,100));
+  put(K.recent,recent);
 }
 function getExamRecord(idValue){return get(K.exams,[]).find(x=>x.id===idValue)||null}
 function registerActiveExam(metadata={}){
@@ -1023,7 +1023,7 @@ function saveSession(){
  const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
  const item={id:sid,examId:examId||sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
  const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
- put(K.sessions,sessions.slice(0,100));renderSessions()
+ put(K.sessions,sessions);renderSessions()
 }
 let saveTimer;function saveSessionSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(saveSession,120)}
 function renderSessions(){
@@ -1317,7 +1317,7 @@ function saveResult(){
  };
  if(!examId)registerActiveExam();
  r.examId=examId;
- const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs.slice(0,100));backupToPersistentStorage();return r
+ const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs);backupToPersistentStorage();return r
 }
 function renderStackedRows(items,renderRow,emptyMessage){
  const list=Array.isArray(items)?items:[];
