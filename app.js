@@ -438,6 +438,11 @@ function setMode(x){
  saveSessionSoon();
 }
 
+function normalizeImageSource(value){
+ if(typeof value==="string")return value.trim();
+ if(value&&typeof value==="object")return String(value.src??value.url??value.data??"").trim();
+ return "";
+}
 function normalize(q,defaults={}){
  const text=q.question??q.text??"";
  const type=String(q.type??q.questionType??"mcq").toLowerCase().replace(/[\s-]+/g,"_");
@@ -445,6 +450,7 @@ function normalize(q,defaults={}){
  const marks=Number(q.marks??q.points??defaults.marks??settings.defaultMarks??1);
  const negativeMarks=Number(q.negativeMarks??q.negative??defaults.negativeMarks??settings.defaultNegative??0);
  const section=q.section??q.category??q.topic??defaults.name??"General";
+ const image=normalizeImageSource(q.image??q.picture);
 
  if(typeof text!=="string")throw Error("Each question needs question/text.");
 
@@ -455,7 +461,7 @@ function normalize(q,defaults={}){
    const accepted=q.acceptedAnswers??q.accepted??q.answers??q.answer;
    const vals=Array.isArray(accepted)?accepted.map(String):[String(accepted??"")];
    if(!vals[0])throw Error("Fill-in-the-blank needs answer/acceptedAnswers.");
-   return {type:"fill_blank",text,options:[],answer:vals[0],acceptedAnswers:vals,explanation,marks,negativeMarks,section,image:q.image??q.picture??""};
+   return {type:"fill_blank",text,options:[],answer:vals[0],acceptedAnswers:vals,explanation,marks,negativeMarks,section,image};
  }
 
  if(type==="match"||type==="matching"||type==="drag_drop"||type==="drag_and_drop"){
@@ -467,7 +473,7 @@ function normalize(q,defaults={}){
      throw Error(`Invalid matching pair ${i+1}.`);
    });
    if(normalizedPairs.some(p=>!p.left||!p.right))throw Error("Every matching pair needs left and right values.");
-   return {type:type.includes("drag")?"drag_drop":"match",text,options:[],answer:normalizedPairs.map(p=>p.right),pairs:normalizedPairs,explanation,marks,negativeMarks,section,image:q.image??q.picture??""};
+   return {type:type.includes("drag")?"drag_drop":"match",text,options:[],answer:normalizedPairs.map(p=>p.right),pairs:normalizedPairs,explanation,marks,negativeMarks,section,image};
  }
 
  if(type==="ordering"){
@@ -476,7 +482,7 @@ function normalize(q,defaults={}){
    if(!Array.isArray(items)||items.length<2)throw Error("Ordering questions need an items array.");
    const order=Array.isArray(raw)?raw.map(String):[];
    if(order.length!==items.length)throw Error("Ordering answer must contain every item in order.");
-   return {type:"ordering",text,options:items.map(String),answer:order,explanation,marks,negativeMarks,section,image:q.image??q.picture??""};
+   return {type:"ordering",text,options:items.map(String),answer:order,explanation,marks,negativeMarks,section,image};
  }
 
  const options=q.options??q.choices;
@@ -484,7 +490,7 @@ function normalize(q,defaults={}){
    const opts=["True","False"];
    const raw=q.answer??q.correct;
    const answer=String(raw).toLowerCase().startsWith("t")?"A":"B";
-   return {type:"true_false",text,options:opts,answer,explanation,marks,negativeMarks,section,image:q.image??q.picture??""};
+   return {type:"true_false",text,options:opts,answer,explanation,marks,negativeMarks,section,image};
  }
  if(!Array.isArray(options)||options.length<2)throw Error("Each choice question needs at least 2 options/choices.");
  const raw=q.answer??q.correct;
@@ -496,7 +502,7 @@ function normalize(q,defaults={}){
    if(!answer){let i=options.findIndex(x=>String(x).trim()===s);if(i>=0)answer=String.fromCharCode(65+i)}
  }
  if(!answer)throw Error("Could not resolve answer for: "+text.slice(0,55));
- return {type:type==="image_choice"?"image_choice":type==="image"?"image":"mcq",text,options:options.map(String),answer,explanation,marks,negativeMarks,section,image:q.image??q.picture??""};
+ return {type:type==="image_choice"?"image_choice":type==="image"?"image":"mcq",text,options:options.map(String),answer,explanation,marks,negativeMarks,section,image};
 }
 
 function parseQuizInput(raw){
@@ -666,6 +672,7 @@ function renderQuestionImage(q){
  if(!q.image)return;
  const img=document.createElement("img");
  img.id="questionImage";img.src=q.image;img.alt="Question image";
+ img.addEventListener("error",()=>{img.replaceWith(Object.assign(document.createElement("div"),{id:"questionImage",className:"question-image-error",textContent:"Image could not be loaded. Check that the URL or embedded data is valid."}))},{once:true});
  img.style.cssText="display:block;max-width:100%;max-height:360px;object-fit:contain;margin:10px auto 18px;border-radius:10px;border:1px solid var(--line);";
  const qt=document.getElementById("questionText");
  qt.parentNode.insertBefore(img,qt.nextSibling);
@@ -1133,6 +1140,7 @@ SUPPORTED QUESTION TYPES:
 - match: question, pairs, optional explanation
 - drag_drop: question, pairs, optional explanation
 - ordering: question, items, answer, optional explanation
+- image: question, image, options, answer, optional explanation (image may be an https URL, a repo-relative path, or a data:image/...;base64,... URL)
 - image_choice: question, image, options, answer, optional explanation
 
 ALIASES MAY INCLUDE:

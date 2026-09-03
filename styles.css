@@ -2039,6 +2039,7 @@ body.exam-active #globalExamProgressBtn{display:none !important}
 #examView .question h2{max-width:680px !important}
 #examView .options{max-width:680px !important}
 #examView .actions{max-width:680px !important}
+.question-image-error{max-width:680px;margin:10px auto 18px;padding:14px 16px;border:1px dashed var(--bad);border-radius:10px;background:color-mix(in srgb,var(--bad) 7%,var(--surface));color:var(--bad);font-size:12px;line-height:1.5}
 @media(max-width:800px){
   #examView .question{width:100% !important}
   #examView .question h2,
