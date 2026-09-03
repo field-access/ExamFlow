@@ -323,7 +323,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",colorScheme:"classic",soundEnabled:true,instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -335,6 +335,7 @@ function saveSettings(){
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
   const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
   const cs=document.getElementById("colorSchemeSelect");if(cs)settings.colorScheme=cs.value;
+  const cw=document.getElementById("examCardWidthSelect");if(cw)settings.examCardWidth=cw.value;
   put(K.settings,settings);applySettings();
 }
 function applySettings(){
@@ -348,6 +349,12 @@ function applySettings(){
  settings.colorScheme=scheme;
  document.body.classList.add(`scheme-${scheme}`);
  const cs=document.getElementById("colorSchemeSelect");if(cs)cs.value=scheme;
+ const widths=["compact","balanced","spacious"];
+ const width=widths.includes(settings.examCardWidth)?settings.examCardWidth:"balanced";
+ settings.examCardWidth=width;
+ document.body.classList.remove(...widths.map(x=>`exam-card-${x}`));
+ document.body.classList.add(`exam-card-${width}`);
+ const cw=document.getElementById("examCardWidthSelect");if(cw)cw.value=width;
  const soundOn=settings.soundEnabled!==false;
  const soundToggle=document.getElementById("soundOnBtn"),soundMute=document.getElementById("soundOffBtn");
  if(soundToggle)soundToggle.classList.toggle("active",soundOn);

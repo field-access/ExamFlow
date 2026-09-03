@@ -2130,6 +2130,13 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   .stacked-list{grid-template-columns:1fr;gap:7px}
 }
 
+/* The Settings width control changes the desktop card without affecting mobile. */
+@media(min-width:801px){
+  body.exam-card-compact #examView .question{width:min(640px,calc(100% - 24px)) !important}
+  body.exam-card-balanced #examView .question{width:min(748px,calc(100% - 24px)) !important}
+  body.exam-card-spacious #examView .question{width:min(900px,calc(100% - 24px)) !important}
+}
+
 /* Keep the Home hero and paste card equal-height after the old action row was removed. */
 @media(min-width:851px){
   .home-stage{align-items:stretch}
