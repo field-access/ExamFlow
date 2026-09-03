@@ -2111,9 +2111,11 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   #examView .actions{max-width:100% !important}
 }
 
-/* Keep all four question controls equal instead of stretching one beside a stack. */
-#examView .actions{grid-template-columns:repeat(4,minmax(0,1fr)) !important;align-items:stretch !important}
-#examView .actions .btn{min-width:0 !important;white-space:nowrap !important}
+/* Flatten the nested action group so all four controls share one row. */
+#examView .actions{display:flex !important;align-items:stretch !important;gap:8px !important}
+#examView .actions>div{display:contents !important}
+#examView .actions>.btn,
+#examView .actions>div>.btn{flex:1 1 0 !important;width:auto !important;min-width:0 !important;white-space:nowrap !important}
 @media(max-width:430px){
   #examView .actions{gap:5px !important}
   #examView .actions .btn{padding-left:4px !important;padding-right:4px !important;font-size:10px !important}
