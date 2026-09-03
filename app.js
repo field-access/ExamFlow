@@ -765,17 +765,15 @@ async function examflowCtrlEnter(){
   const input=document.getElementById("jsonInput");
   const importer=document.getElementById("importer");
   if(importer?.classList.contains("show") && input){
-    // Ctrl+Enter = paste current clipboard JSON, then immediately start.
+    // Ctrl+Enter starts the JSON already pasted into the importer.
     if(examflowKeyboardShortcuts.busy)return;
     examflowKeyboardShortcuts.busy=true;
     try{
       const before=input.value.trim();
-      try{
-        await pasteFromClipboard("jsonInput","jsonStatus","importPasteBtn");
-      }catch(e){}
-      // If clipboard permission is unavailable, preserve already-pasted text.
-      if(!input.value.trim() && before)input.value=before;
-      loadQuiz();
+      if(!before){
+        try{await pasteFromClipboard("jsonInput","jsonStatus","importPasteBtn")}catch(e){}
+      }
+      if(input.value.trim())loadQuiz();else toast("Paste quiz JSON first");
     }finally{examflowKeyboardShortcuts.busy=false}
     return;
   }
@@ -804,6 +802,13 @@ function examflowKeyboardHandler(e){
     const drawer=document.getElementById("examProgressDrawer");
     if(drawer?.classList.contains("open"))toggleQuestionProgress();
     if(document.activeElement) document.activeElement.blur();
+    return;
+  }
+
+  // Ctrl/Cmd+Enter is the single intentional exception to the browser guard.
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
+    e.preventDefault();
+    examflowCtrlEnter();
     return;
   }
 
