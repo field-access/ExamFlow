@@ -2084,9 +2084,9 @@ body.exam-active #globalExamProgressBtn{display:none !important}
 .deadline-eyebrow{font:800 9px/1 system-ui,sans-serif;letter-spacing:.1em;color:var(--muted)}
 .deadline-copy strong{font-family:var(--serif);font-size:18px;line-height:1.2}
 .deadline-copy span:last-child{font-size:11px;color:var(--muted)}
-.deadline-picker{display:inline-flex;align-items:center;gap:7px;position:relative;min-height:40px;cursor:pointer;white-space:nowrap}
+.deadline-picker{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;cursor:pointer;white-space:nowrap}
 .deadline-picker svg{width:16px;height:16px}
-.deadline-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.deadline-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .dashboard-deadline-card{margin-top:0}
 @media(max-width:600px){
   .deadline-card{grid-template-columns:auto minmax(0,1fr);gap:11px;padding:14px}
