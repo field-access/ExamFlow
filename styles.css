@@ -2093,3 +2093,20 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   .deadline-picker{grid-column:1/-1;width:100%;justify-content:center}
   .deadline-copy strong{font-size:16px}
 }
+
+/* Keep the question, answers, explanation, and controls on one readable grid. */
+#examView .question{width:min(748px,calc(100% - 24px)) !important;box-sizing:border-box !important}
+#examView .question h2,
+#examView .options,
+#examView #explanation,
+#examView .actions{width:100% !important;max-width:680px !important;margin-left:auto !important;margin-right:auto !important;box-sizing:border-box}
+#examView .question h2{max-width:680px !important}
+#examView .options{max-width:680px !important}
+#examView .actions{max-width:680px !important}
+@media(max-width:800px){
+  #examView .question{width:100% !important}
+  #examView .question h2,
+  #examView .options,
+  #examView #explanation,
+  #examView .actions{max-width:100% !important}
+}
