@@ -851,6 +851,11 @@ function examflowKeyboardHandler(e){
 
   const resultsActive=document.getElementById("testResultsView")?.classList.contains("active");
   if(resultsActive){
+    if(e.key==="ArrowRight"||e.key==="ArrowLeft"){
+      e.preventDefault();
+      moveResultQuestion(e.key==="ArrowRight"?1:-1);
+      return;
+    }
     if(lower==="r"){e.preventDefault();retakeLastTest();return}
     if(lower==="s"){e.preventDefault();saveResultCopy();return}
     if(lower==="c"){e.preventDefault();showView("home");return}
@@ -878,13 +883,11 @@ function examflowKeyboardHandler(e){
 
   if(e.key==="ArrowRight" || lower==="n"){
     e.preventDefault();
-    if(e.repeat)return;
     nextQuestion();
     return;
   }
   if(e.key==="ArrowLeft" || lower==="b"){
     e.preventDefault();
-    if(e.repeat)return;
     previousQuestion();
     return;
   }
@@ -1206,6 +1209,17 @@ function setResultFilter(f){
  resultFilter=f;
  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.filter===f));
  renderResultQuestions();
+}
+function moveResultQuestion(direction){
+ const items=[...document.querySelectorAll("#resultQuestions .result-question")];
+ if(!items.length)return;
+ const active=document.querySelector("#resultQuestions .result-question.keyboard-current");
+ let index=active?items.indexOf(active):(direction>0?-1:items.length);
+ index=Math.max(0,Math.min(items.length-1,index+direction));
+ items.forEach(item=>item.classList.remove("keyboard-current"));
+ const target=items[index];
+ target.classList.add("keyboard-current");
+ target.scrollIntoView({behavior:"smooth",block:"center"});
 }
 function resultValueText(q,value){
  if(value==null)return "Not answered";
