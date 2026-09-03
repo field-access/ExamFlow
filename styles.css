@@ -2075,3 +2075,21 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   #examView .actions{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:7px !important}
   #examView .actions .btn{width:100% !important;min-height:42px}
 }
+
+/* Shared calendar-style deadline card for Planner and Dashboard. */
+.deadline-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:14px;margin:18px 0;padding:16px 18px;border-radius:16px;background:linear-gradient(120deg,color-mix(in srgb,#5865f2 8%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,#5865f2 18%,var(--line))}
+.deadline-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:color-mix(in srgb,#5865f2 12%,var(--surface));color:#5865f2}
+.deadline-icon svg{width:24px;height:24px}
+.deadline-copy{display:grid;gap:3px;min-width:0}
+.deadline-eyebrow{font:800 9px/1 system-ui,sans-serif;letter-spacing:.1em;color:var(--muted)}
+.deadline-copy strong{font-family:var(--serif);font-size:18px;line-height:1.2}
+.deadline-copy span:last-child{font-size:11px;color:var(--muted)}
+.deadline-picker{display:inline-flex;align-items:center;gap:7px;position:relative;min-height:40px;cursor:pointer;white-space:nowrap}
+.deadline-picker svg{width:16px;height:16px}
+.deadline-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.dashboard-deadline-card{margin-top:0}
+@media(max-width:600px){
+  .deadline-card{grid-template-columns:auto minmax(0,1fr);gap:11px;padding:14px}
+  .deadline-picker{grid-column:1/-1;width:100%;justify-content:center}
+  .deadline-copy strong{font-size:16px}
+}

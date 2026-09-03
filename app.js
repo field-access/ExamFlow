@@ -1506,26 +1506,47 @@ async function pasteFromClipboard(targetId,statusId,buttonId){
 
 
 /* Final exam date countdown */
-function saveExamDeadline(){
-  const v=document.getElementById("planExamDeadlineInput")?.value;
+function saveExamDeadline(sourceId="planExamDeadlineInput"){
+  const v=document.getElementById(sourceId)?.value;
   if(!v){toast("Choose your final exam date");return}
   localStorage.setItem("examflow_exam_deadline",v);
   renderExamDeadline();
   toast("Final exam date saved ✓");
 }
 function getSavedExamDeadline(){return localStorage.getItem("examflow_exam_deadline")||""}
+function setDeadlineInputValue(v){
+  ["planExamDeadlineInput","dashboardExamDeadlineInput"].forEach(id=>{
+    const input=document.getElementById(id);if(input)input.value=v;
+  });
+}
+function openDeadlinePicker(idValue){
+  const input=document.getElementById(idValue);
+  if(!input)return;
+  if(typeof input.showPicker==="function")input.showPicker();else input.click();
+}
 function renderExamDeadline(){
   const v=getSavedExamDeadline();
-  const dash=document.getElementById("planExamCountdown"),dashDate=document.getElementById("planExamDate"),input=document.getElementById("planExamDeadlineInput");
-  if(input)input.value=v;
+  const targets=[
+    [document.getElementById("planExamCountdown"),document.getElementById("planExamDate")],
+    [document.getElementById("dashboardExamCountdown"),document.getElementById("dashboardExamDate")]
+  ];
+  setDeadlineInputValue(v);
   if(!v){
-    if(dash)dash.textContent="No exam date set";
-    if(dashDate)dashDate.textContent="Set a date in Planner.";
+    targets.forEach(([count,date])=>{
+      if(count)count.textContent="No exam date set";
+      if(date)date.textContent="Choose a target date to start your countdown.";
+    });
     return;
   }
-  const target=new Date(v+"T23:59:59"),diff=target-new Date(),days=Math.max(0,Math.ceil(diff/86400000)),dateText=target.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}),text=diff<=0?"Exam date reached":`${days} day${days===1?"":"s"} remaining`;
-  if(dash)dash.textContent=text;
-  if(dashDate)dashDate.textContent=diff<=0?"Your final exam date has arrived.":`Target: ${dateText}`;
+  const parts=v.split("-").map(Number),targetUtc=Date.UTC(parts[0],parts[1]-1,parts[2]);
+  const now=new Date(),todayUtc=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+  const days=Math.round((targetUtc-todayUtc)/86400000);
+  const target=new Date(targetUtc),dateText=target.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"});
+  const text=days<0?"Exam date passed":days===0?"Exam day":`${days} day${days===1?"":"s"} remaining`;
+  targets.forEach(([count,date])=>{
+    if(count)count.textContent=text;
+    if(date)date.textContent=days<0?`Target was ${dateText}`:`Target: ${dateText}`;
+  });
 }
 if(!window.examflowDeadlineInterval)window.examflowDeadlineInterval=setInterval(renderExamDeadline,30000);
 
