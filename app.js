@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",pomodoroStats:"examflow_pomodoro_stats_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -13,6 +13,13 @@ let universalStudyTimerRunning = true;
 let universalStudyTimerMode = 'stopwatch'; // 'stopwatch' or 'countdown'
 let pomodoroCycle = 0;
 let pomodoroPhase = 'focus';
+let pomodoroStats = {sessions:0,minutes:0};
+
+function loadPomodoroStats(){
+  const saved=get(K.pomodoroStats,{});
+  return {sessions:Math.max(0,Number(saved.sessions)||0),minutes:Math.max(0,Number(saved.minutes)||0)};
+}
+function savePomodoroStats(){put(K.pomodoroStats,pomodoroStats)}
 
 function setPomodoro(val) {
   if(val === 'stopwatch') {
@@ -69,6 +76,7 @@ function put(k,v){
   }
   schedulePersistentBackup();
 }
+pomodoroStats=loadPomodoroStats();
 
 /* Persistent data backup: IndexedDB is substantially larger than localStorage.
    localStorage remains the fast synchronous cache, while IndexedDB protects
@@ -1370,7 +1378,9 @@ function renderDashboard(){
  const ssl = document.getElementById("homeSessionsList");
  if(ssl)ssl.innerHTML=renderStackedRows(ss,s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`,`No saved sessions. Add a CBQ to begin.`);
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
- document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=rs.reduce((a,r)=>a+r.correct+r.wrong,0);
+ const attempted=rs.reduce((a,r)=>a+(Number(r.correct)||0)+(Number(r.wrong)||0),0),solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
+ document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=attempted;
+ document.getElementById("mSolved").textContent=solved;document.getElementById("mPomodoro").textContent=pomodoroStats.sessions;document.getElementById("mStudyMinutes").textContent=pomodoroStats.minutes;
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><div style="display:flex;align-items:center;gap:10px;"><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b><button class="session-delete" onclick="deleteResult('${r.id}')">×</button></div></div>`).join(""):'<div class="empty">No results yet.</div>';
  document.querySelectorAll("#resultsList .resultrow").forEach((row,i)=>{
    const result=rs[i];if(!result)return;
@@ -1481,7 +1491,7 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions","exams","recent"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent","pomodoroStats"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
 
@@ -1501,12 +1511,13 @@ async function importDataFile(event){
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
     if(parsed.exams!==undefined)put(K.exams,Array.isArray(parsed.exams)?parsed.exams:[]);
     if(parsed.recent!==undefined)put(K.recent,Array.isArray(parsed.recent)?parsed.recent:[]);
+    if(parsed.pomodoroStats!==undefined)put(K.pomodoroStats,parsed.pomodoroStats||{});
     if(parsed.examDeadline!==undefined){
       if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
       else localStorage.removeItem("examflow_exam_deadline");
     }
 
-    settings=loadSettings();
+    settings=loadSettings();pomodoroStats=loadPomodoroStats();
     renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();
     await savePersistentBackup();
     if(status){
@@ -1526,7 +1537,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[]),pomodoroStats},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
@@ -1815,7 +1826,8 @@ function renderHome(){
  renderRecentQuizzes();
  const rs=get(K.results,[]),ss=get(K.sessions,[]),ps=get(K.plans,[]);
  const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
- const homeMetrics={homeTests:rs.length,homeAvg:avg+"%",homeBest:best+"%",homeSessions:ss.length};
+ const solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
+ const homeMetrics={homeTests:rs.length,homeQuestions:solved,homePomodoro:pomodoroStats.sessions,homeStudyMinutes:pomodoroStats.minutes};
  Object.entries(homeMetrics).forEach(([key,value])=>{const el=document.getElementById(key);if(el)el.textContent=value});
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
@@ -2085,8 +2097,17 @@ setInterval(()=>{
       universalStudyTimerSeconds++;
     } else {
       universalStudyTimerSeconds--;
-      if(universalStudyTimerSeconds === 0) {
-         toast("Pomodoro session complete!");
+      if(universalStudyTimerSeconds <= 0) {
+         universalStudyTimerSeconds=0;
+         if(pomodoroPhase==='focus'){
+           pomodoroStats.sessions++;
+           pomodoroStats.minutes+=25;
+           savePomodoroStats();
+           pomodoroCycle++;
+           toast("Focus session complete. Take a 5-minute break.");
+         }else{
+           toast("Break complete. Ready for another focus session.");
+         }
          universalStudyTimerRunning = false;
          const btn = document.getElementById("universalTimerToggleBtn");
          if(btn) btn.textContent = "▶ Resume";
