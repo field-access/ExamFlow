@@ -158,10 +158,10 @@ function registerActiveExam(metadata={}){
 function renderRecentQuizzes(){
   const el=document.getElementById("recentQuizzesList");if(!el)return;
   const recent=get(K.recent,[]),exams=get(K.exams,[]);
-  el.innerHTML=recent.length?recent.slice(0,50).map(item=>{
+  el.innerHTML=renderStackedRows(recent,item=>{
     const exam=exams.find(x=>x.id===item.id),count=exam?.questions?.length||0;
     return `<div class="resultrow recent-quiz-row"><div class="resultmain"><strong>${esc(item.name)}</strong><small>${count} question${count===1?"":"s"}${item.plannedDate?` · Planned ${esc(item.plannedDate)}`:""} · Opened ${new Date(item.lastOpenedAt).toLocaleString()}</small></div><button class="btn" onclick="openRecentQuiz('${item.id}')">Open</button></div>`;
-  }).join(""):'<div class="empty">Open a quiz to build your recent list.</div>';
+  },"Open a quiz to build your recent list.");
 }
 function openRecentQuiz(idValue){
   // Resume only unfinished work. A completed session should start a fresh attempt
@@ -762,8 +762,13 @@ function isTypingTarget(el){
   return tag==="input"||tag==="textarea"||tag==="select"||el.isContentEditable;
 }
 async function examflowCtrlEnter(){
-  const input=document.getElementById("jsonInput");
   const importer=document.getElementById("importer");
+  const homeInput=document.getElementById("homeJson");
+  if(!importer?.classList.contains("show") && document.getElementById("homeView")?.classList.contains("active") && homeInput?.value.trim()){
+    startHomeQuiz();
+    return;
+  }
+  const input=document.getElementById("jsonInput");
   if(importer?.classList.contains("show") && input){
     // Ctrl+Enter starts the JSON already pasted into the importer.
     if(examflowKeyboardShortcuts.busy)return;
@@ -813,13 +818,6 @@ function examflowKeyboardHandler(e){
   }
 
   // Ctrl/Cmd+Enter is the single intentional exception to the browser guard.
-  if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
-    e.preventDefault();
-    examflowCtrlEnter();
-    return;
-  }
-
-  // Allow the intentional import shortcut before preserving browser Ctrl/Cmd keys.
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
     e.preventDefault();
     examflowCtrlEnter();
@@ -1321,10 +1319,23 @@ function saveResult(){
  r.examId=examId;
  const rs=get(K.results,[]);rs.unshift(r);put(K.results,rs.slice(0,100));backupToPersistentStorage();return r
 }
+function renderStackedRows(items,renderRow,emptyMessage){
+ const list=Array.isArray(items)?items:[];
+ if(!list.length)return `<div class="empty">${emptyMessage}</div>`;
+ const columns=[];
+ for(let i=0;i<list.length;i+=10)columns.push(list.slice(i,i+10));
+ return `<div class="stacked-list">${columns.map(column=>`<div class="stack-column">${column.map(renderRow).join("")}</div>`).join("")}</div>`;
+}
+function planSortNewestFirst(a,b){
+ const created=String(b.createdAt||"").localeCompare(String(a.createdAt||""));
+ if(created)return created;
+ return (String(b.date||"")+" "+String(b.time||"")).localeCompare(String(a.date||"")+" "+String(a.time||""));
+}
 function renderDashboard(){
  renderRecentQuizzes();
- const ss=get(K.sessions,[]);
- const ssl = document.getElementById("homeSessionsList"); if (ssl) ssl.innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`).join(""):"<div class=\"empty\">No saved sessions. Add a CBQ to begin.</div>";
+ const ss=get(K.sessions,[]).slice().sort((a,b)=>String(b.updatedAt||b.createdAt||"").localeCompare(String(a.updatedAt||a.createdAt||"")));
+ const ssl = document.getElementById("homeSessionsList");
+ if(ssl)ssl.innerHTML=renderStackedRows(ss,s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`,`No saved sessions. Add a CBQ to begin.`);
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=rs.reduce((a,r)=>a+r.correct+r.wrong,0);
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><div style="display:flex;align-items:center;gap:10px;"><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b><button class="session-delete" onclick="deleteResult('${r.id}')">×</button></div></div>`).join(""):'<div class="empty">No results yet.</div>';
@@ -1389,8 +1400,8 @@ function saveQuickPlan(){
     const date=planDateFromSource(source);
     const time=planTimeFromSource(source);
     const ps=get(K.plans,[]);
-    ps.push({id:id(),name,date,time,notes:"",json:JSON.stringify(quizSource)});
-    ps.sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));
+    ps.push({id:id(),name,date,time,notes:"",json:JSON.stringify(quizSource),createdAt:new Date().toISOString()});
+    ps.sort(planSortNewestFirst);
     put(K.plans,ps);
     box.value="";
     if(status){status.textContent=`✓ Planned: ${name} · ${date}`;status.style.color="var(--good)"}
@@ -1412,13 +1423,13 @@ function savePlan(){
      json=JSON.stringify(source);
    }catch(e){toast("Invalid quiz JSON: "+e.message);return}
  }
- const ps=get(K.plans,[]);ps.push({id:id(),name,date,time,notes,json});ps.sort((a,b)=>(a.date+" "+a.time).localeCompare(b.date+" "+b.time));put(K.plans,ps);
+ const ps=get(K.plans,[]);ps.push({id:id(),name,date,time,notes,json,createdAt:new Date().toISOString()});ps.sort(planSortNewestFirst);put(K.plans,ps);
  ["planName","planDate","planTime","planNotes","planJson"].forEach(x=>document.getElementById(x).value="");renderPlans();toast("Future test saved ✓")
 }
 function renderPlans(){
- const ps=get(K.plans,[]),el=document.getElementById("plansList");
+ const ps=get(K.plans,[]).slice().sort(planSortNewestFirst),el=document.getElementById("plansList");
  const pc=document.getElementById("plannerCount");if(pc)pc.textContent=String(ps.length);
- el.innerHTML=ps.length?ps.map(p=>`<div class="planrow"><div class="planmain"><strong>${esc(p.name)}</strong><small>${p.date}${p.time?" · "+p.time:""}${p.notes?" · "+esc(p.notes):""}</small></div><div style="display:flex;gap:5px"><button class="btn primary" onclick="startPlan('${p.id}')">▶ Start</button><button class="btn" onclick="deletePlan('${p.id}')">×</button></div></div>`).join(""):'<div class="empty">No upcoming tests.</div>'
+ el.innerHTML=renderStackedRows(ps,p=>`<div class="planrow"><div class="planmain"><strong>${esc(p.name)}</strong><small>${p.date}${p.time?" · "+p.time:""}${p.notes?" · "+esc(p.notes):""}</small></div><div style="display:flex;gap:5px"><button class="btn primary" onclick="startPlan('${p.id}')">▶ Start</button><button class="btn" onclick="deletePlan('${p.id}')">×</button></div></div>`,`No upcoming tests.`);
 }
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
@@ -1777,7 +1788,7 @@ function renderHome(){
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
  if(!document.getElementById("homePlansList"))return;
 
- document.getElementById("homePlansList").innerHTML=ps.length?ps.slice(0,8).map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
+ document.getElementById("homePlansList").innerHTML=ps.length?ps.map(x=>`<div class="planrow"><div class="planmain"><strong>${esc(x.name)}</strong><small>${x.date}${x.time?" · "+x.time:""}</small></div><button class="btn" onclick="startPlan('${x.id}')">Start</button></div>`).join(""):'<div class="empty">No future tests planned.</div>';
 }
 
 

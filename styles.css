@@ -2120,3 +2120,11 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   #examView .actions{gap:5px !important}
   #examView .actions .btn{padding-left:4px !important;padding-right:4px !important;font-size:10px !important}
 }
+
+/* Render long quiz histories as compact columns of ten rows. */
+.stacked-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;align-items:start}
+.stack-column{display:grid;gap:7px;align-content:start;min-width:0}
+.stack-column .resultrow,.stack-column .planrow{margin:0;min-width:0}
+@media(max-width:600px){
+  .stacked-list{grid-template-columns:1fr;gap:7px}
+}
