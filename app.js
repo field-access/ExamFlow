@@ -819,6 +819,13 @@ function examflowKeyboardHandler(e){
     return;
   }
 
+  // Allow the intentional import shortcut before preserving browser Ctrl/Cmd keys.
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
+    e.preventDefault();
+    examflowCtrlEnter();
+    return;
+  }
+
   // Never capture browser-reserved Ctrl/Cmd shortcuts such as Save or Open.
   if(e.ctrlKey||e.metaKey)return;
 
