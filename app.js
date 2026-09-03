@@ -977,6 +977,10 @@ Math and LaTeX:
 - ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.
 - Escape backslashes correctly for JSON strings.
 
+Images:
+- For image questions, use a publicly accessible HTTPS image URL in the "image" field.
+- Do not use a local computer path. Example: "image": "https://your-site.example/diagram.png".
+
 Output rules:
 - Return only valid JSON. Do not return Markdown fences, commentary, or headings outside the JSON.
 - Follow the complete ExamFlow schema below.
@@ -1140,7 +1144,7 @@ SUPPORTED QUESTION TYPES:
 - match: question, pairs, optional explanation
 - drag_drop: question, pairs, optional explanation
 - ordering: question, items, answer, optional explanation
-- image: question, image, options, answer, optional explanation (image may be an https URL, a repo-relative path, or a data:image/...;base64,... URL)
+- image: question, image (prefer a publicly accessible HTTPS URL), options, answer, optional explanation
 - image_choice: question, image, options, answer, optional explanation
 
 ALIASES MAY INCLUDE:
