@@ -358,18 +358,33 @@
 <div class="planner-page">
   <div class="planner-hero"><div><div class="hero-kicker">TEST PLANNER</div><h1>Upcoming tests, one place.</h1><p>Paste the CBQ JSON and ExamFlow keeps your planned tests separate from your performance dashboard.</p></div><button class="btn" onclick="showView('home')">⌂ Home</button></div>
 
-  <section class="deadline-card card" aria-label="Final exam countdown">
-    <div class="deadline-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M7.5 3.5v3M16.5 3.5v3M3.5 9h17M8 13h.01M12 13h.01M16 13h.01M8 16.5h.01M12 16.5h.01" stroke-linecap="round"/></svg></div>
-    <div class="deadline-copy"><span class="deadline-eyebrow">FINAL EXAM COUNTDOWN</span><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate">Choose a target date to start your countdown.</span></div>
-    <button type="button" class="deadline-picker btn" onclick="openDeadlinePicker('planExamDeadlineInput')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5.5h16v14H4zM7.5 3.5v4M16.5 3.5v4M4 10h16" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Choose date</span></button><input class="deadline-input" type="date" id="planExamDeadlineInput" onchange="saveExamDeadline('planExamDeadlineInput')" />
+  <div class="planner-workspace">
+  <div class="planner-column">
+  <section class="card planner-calendar-card" aria-label="Study calendar">
+    <div class="planner-card-head"><div><div class="hero-kicker">STUDY CALENDAR</div><h2>Mark the dates that matter.</h2><p>Choose a day, then save it as your exam date or an important study date.</p></div></div>
+    <div class="calendar-toolbar"><button class="btn" type="button" onclick="shiftPlannerCalendar(-1)" aria-label="Previous month">←</button><strong id="plannerCalendarTitle"></strong><button class="btn" type="button" onclick="shiftPlannerCalendar(1)" aria-label="Next month">→</button></div>
+    <div id="plannerCalendar" class="planner-calendar"></div>
+    <div class="calendar-legend"><span><i class="calendar-dot exam"></i> Exam date</span><span><i class="calendar-dot important"></i> Important date</span></div>
+    <div class="calendar-editor">
+      <label for="plannerDateInput">Selected date</label>
+      <input id="plannerDateInput" type="date" onchange="selectPlannerDate(this.value)">
+      <input id="plannerDateLabel" type="text" placeholder="Label, e.g. Physics revision" maxlength="80">
+      <div class="calendar-editor-actions"><button class="btn primary" type="button" onclick="savePlannerDate('important')">Mark important</button><button class="btn" type="button" onclick="savePlannerDate('exam')">Set exam date</button><button class="btn" type="button" onclick="removePlannerDate()">Remove</button></div>
+    </div>
+    <div class="deadline-summary"><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate">Choose a date to start your countdown.</span></div>
   </section>
-
   <section class="card quick-plan planner-paste-card">
     <div class="quick-plan-head"><div><h3>Paste quiz JSON</h3><small>Scheduling fields: <code>date</code>, <code>examDate</code>, <code>scheduledDate</code>, <code>time</code>.</small></div><button id="planPasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')">📋 Paste</button></div>
     <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
     <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test</div><button class="btn primary" type="button" onclick="saveQuickPlan()">🗓 Plan Test</button></div>
   </section>
   <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
+  </div>
+  <section class="panel card planner-todo-card"><div class="panel-heading"><div><h3>Study todo list</h3><small>Keep tasks beside your calendar.</small></div></div>
+    <div class="planner-todo-form"><input type="text" id="plannerTodoInput" placeholder="Add a study task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><input type="date" id="plannerTodoDeadline"><button class="btn primary" type="button" onclick="addPlannerTodo()">Add task</button></div>
+    <div id="plannerTodoList"></div>
+  </section>
+  </div>
 </div>
 </section>
 

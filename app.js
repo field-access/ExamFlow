@@ -232,6 +232,79 @@ function deleteTodo(i) {
   }
 }
 
+const PLANNER_DATES_KEY="examflow_planner_dates_v1";
+let plannerCalendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+let plannerSelectedDate="";
+function plannerDateKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
+function getPlannerDates(){return get(PLANNER_DATES_KEY,{})}
+function selectPlannerDate(value){
+  if(!value)return;
+  plannerSelectedDate=value;
+  const date=new Date(`${value}T00:00:00`);
+  plannerCalendarMonth=new Date(date.getFullYear(),date.getMonth(),1);
+  const input=document.getElementById("plannerDateInput");if(input)input.value=value;
+  const saved=getPlannerDates()[value];
+  const label=document.getElementById("plannerDateLabel");if(label)label.value=saved?.label||"";
+  renderPlannerCalendar();
+}
+function renderPlannerCalendar(){
+  const root=document.getElementById("plannerCalendar");if(!root)return;
+  const year=plannerCalendarMonth.getFullYear(),month=plannerCalendarMonth.getMonth();
+  const title=document.getElementById("plannerCalendarTitle");
+  if(title)title.textContent=plannerCalendarMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
+  const dates=getPlannerDates(),first=new Date(year,month,1),days=new Date(year,month+1,0).getDate();
+  let html=["<div class='calendar-weekdays'>","<span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>","</div><div class='calendar-days'>"];
+  const offset=(first.getDay()+6)%7;
+  for(let i=0;i<offset;i++)html.push("<span class='calendar-day is-empty'></span>");
+  const today=plannerDateKey(new Date()),exam=getSavedExamDeadline();
+  for(let day=1;day<=days;day++){
+    const value=plannerDateKey(new Date(year,month,day)),item=dates[value],classes=["calendar-day"];
+    if(value===today)classes.push("today");
+    if(value===plannerSelectedDate)classes.push("selected");
+    if(value===exam)classes.push("exam");
+    if(item?.type==="important")classes.push("important");
+    html.push(`<button type="button" class="${classes.join(" ")}" onclick="selectPlannerDate('${value}')" title="${esc(item?.label||"Select date")}"><span>${day}</span>${item||value===exam?`<i></i>`:""}</button>`);
+  }
+  html.push("</div>");
+  root.innerHTML=html.join("");
+  if(!plannerSelectedDate){
+    const input=document.getElementById("plannerDateInput");if(input)input.value="";
+  }
+}
+function shiftPlannerCalendar(delta){
+  plannerCalendarMonth=new Date(plannerCalendarMonth.getFullYear(),plannerCalendarMonth.getMonth()+delta,1);
+  renderPlannerCalendar();
+}
+function savePlannerDate(type){
+  const input=document.getElementById("plannerDateInput"),value=input?.value||plannerSelectedDate;
+  if(!value){toast("Select a calendar date first");return}
+  const label=document.getElementById("plannerDateLabel")?.value.trim()|| (type==="exam"?"Final exam":"Important study date");
+  if(type==="exam"){
+    localStorage.setItem("examflow_exam_deadline",value);
+  }else{
+    const dates=getPlannerDates();dates[value]={type:"important",label};put(PLANNER_DATES_KEY,dates);
+  }
+  plannerSelectedDate=value;renderPlannerCalendar();renderExamDeadline();toast(type==="exam"?"Exam date saved ✓":"Important date saved ✓");
+}
+function removePlannerDate(){
+  const value=document.getElementById("plannerDateInput")?.value||plannerSelectedDate;
+  if(!value)return;
+  const dates=getPlannerDates();delete dates[value];put(PLANNER_DATES_KEY,dates);
+  if(getSavedExamDeadline()===value)localStorage.removeItem("examflow_exam_deadline");
+  renderPlannerCalendar();renderExamDeadline();toast("Calendar date removed");
+}
+function renderPlannerTodos(){
+  const container=document.getElementById("plannerTodoList");if(!container)return;
+  const todos=get("examflow_todos_v1",[]);
+  container.innerHTML=todos.length?todos.map((t,i)=>`<div class="planner-todo-row${t.done?" done":""}"><label><input type="checkbox" ${t.done?"checked":""} onchange="toggleTodo(${i});renderPlannerTodos()"><span>${esc(t.text)}</span></label>${t.deadline?`<small>${esc(t.deadline)}</small>`:""}<button type="button" onclick="deleteTodo(${i});renderPlannerTodos()" aria-label="Delete task">×</button></div>`).join(""):"<div class='empty'>No study tasks yet.</div>";
+}
+function addPlannerTodo(){
+  const input=document.getElementById("plannerTodoInput"),deadline=document.getElementById("plannerTodoDeadline");
+  if(!input?.value.trim())return;
+  const todos=get("examflow_todos_v1",[]);todos.push({text:input.value.trim(),deadline:deadline?.value||"",done:false});put("examflow_todos_v1",todos);
+  input.value="";if(deadline)deadline.value="";renderPlannerTodos();renderTodos();
+}
+
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
 
 /* EXAMFLOW_PERSISTENT_BACKUP_START */
@@ -629,6 +702,11 @@ function formatExplanationText(text){
   if(text==null)return "";
   return String(text).trim();
 }
+function setQuizRichText(element,text){
+  if(!element)return;
+  // JSON authors sometimes provide a literal "\\n" instead of a decoded line break.
+  element.textContent=String(text??"").replace(/\\n/g,"\n");
+}
 function renderAllQuizMath(root=document){
   if(!root||typeof renderMathInElement!=="function")return;
   protectQuizCodeAndMath(root);
@@ -764,7 +842,9 @@ function renderSpecialQuestion(q,opts){
    q.options.forEach((text,i)=>{
      const letter=String.fromCharCode(65+i),b=document.createElement("button");
      b.className="option"+(answers[current]===letter?" selected":"");
-     b.innerHTML=`<span class="letter">${letter}</span><span class="option-text">${esc(text)}</span>`;
+     const letterEl=document.createElement("span");letterEl.className="letter";letterEl.textContent=letter;
+     const textEl=document.createElement("span");textEl.className="option-text";setQuizRichText(textEl,text);
+     b.append(letterEl,textEl);
      b.onclick=()=>choose(letter);opts.appendChild(b);
    });
  }
@@ -1923,7 +2003,7 @@ function showView(name){
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
  ["navHome","navExam","navDashboard","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  if(name!=="testResults")document.getElementById({home:"navHome",exam:"navExam",dashboard:"navDashboard",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
- if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner")renderPlans();if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
+ if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner"){renderPlans();renderPlannerCalendar();renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  const marks=document.getElementById("defaultMarks");if(marks)marks.value=settings.defaultMarks??1;
