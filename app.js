@@ -982,7 +982,8 @@ Images:
 - Do not use a local computer path. Example: "image": "https://your-site.example/diagram.png".
 
 Output rules:
-- Return only valid JSON. Do not return Markdown fences, commentary, or headings outside the JSON.
+- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
+- Return only that JSON code block. Do not include commentary or headings outside the code block.
 - Follow the complete ExamFlow schema below.
 - Make the JSON directly usable by pasting it into ExamFlow's CBQ loader.
 
@@ -1004,13 +1005,52 @@ ${schema}`;
   }
 }
 
+function currentQuestionCopyText(q){
+  const lines=[`Question: ${q.text||""}`];
+  if(q.type)lines.push(`Type: ${q.type}`);
+  if(q.type!=="ordering"&&Array.isArray(q.options)&&q.options.length)
+    lines.push(`Options:\n${q.options.map((option,i)=>`${String.fromCharCode(65+i)}. ${option}`).join("\n")}`);
+  if(Array.isArray(q.pairs)&&q.pairs.length)
+    lines.push(`Pairs:\n${q.pairs.map(pair=>`${pair.left} → ${pair.right}`).join("\n")}`);
+  if(q.type==="ordering"&&Array.isArray(q.options)&&q.options.length)
+    lines.push(`Items:\n${q.options.map((item,i)=>`${i+1}. ${item}`).join("\n")}`);
+  if(q.answer!==undefined)
+    lines.push(`Answer: ${Array.isArray(q.answer)?q.answer.join(" → "):q.answer}`);
+  if(Array.isArray(q.acceptedAnswers)&&q.acceptedAnswers.length)
+    lines.push(`Accepted answers:\n${q.acceptedAnswers.join("\n")}`);
+  if(q.explanation)lines.push(`Explanation:\n${q.explanation}`);
+  if(q.marks!==undefined)lines.push(`Marks: ${q.marks}`);
+  if(q.negativeMarks!==undefined)lines.push(`Negative marks: ${q.negativeMarks}`);
+  if(q.image)lines.push(`Image: ${q.image}`);
+  return lines.join("\n\n");
+}
+
+function copyCurrentQuestion(){
+  const q=questions[current];
+  if(!q){toast("No question loaded");return}
+  const text=currentQuestionCopyText(q);
+  const done=()=>toast("Question copied ✓");
+  const fallback=()=>{
+    const ta=document.createElement("textarea");
+    ta.value=text;ta.setAttribute("readonly","");ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");done()}catch(e){toast("Copy failed")}
+    ta.remove();
+  };
+  if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(done).catch(fallback);
+  else fallback();
+}
+
 function render(){
  updateModeUI();
  if(!questions.length){
    document.getElementById("currentLabel").textContent="0";document.getElementById("totalLabel").textContent="0";
    document.getElementById("questionText").textContent="Paste a quiz JSON to start.";
    document.getElementById("options").innerHTML="";document.getElementById("qgrid").innerHTML="";
-   document.getElementById("progressText").textContent="0 / 0";document.getElementById("progressBar").style.width="0%";return;
+   document.getElementById("progressText").textContent="0 / 0";document.getElementById("progressBar").style.width="0%";
+   const copyQuestionBtn=document.getElementById("copyQuestionBtn");
+   if(copyQuestionBtn)copyQuestionBtn.disabled=true;
+   return;
  }
  const q=questions[current],count=answers.filter(Boolean).length;
  const apExisting=document.getElementById("practiceAnswerPanel");
@@ -1045,6 +1085,8 @@ function render(){
  questions.forEach((_,i)=>{let b=document.createElement("button");b.className="qbtn"+(i===current?" current":"")+(answerIsPresent(answers[i],questions[i])?" answered":"")+(reviews.has(i)?" review":"");b.textContent=i+1;b.onclick=()=>{current=i;render();saveSessionSoon()};grid.appendChild(b)});
  document.getElementById("options").querySelectorAll("button,input,select").forEach(el=>el.disabled=examFinished);
  ["prevBtn","viewAnswerBtn","nextBtn","bookmark"].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=examFinished});
+ const copyQuestionBtn=document.getElementById("copyQuestionBtn");
+ if(copyQuestionBtn)copyQuestionBtn.disabled=false;
  document.getElementById("questionText").classList.toggle("exam-finished",examFinished);
 }
 function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
@@ -1112,7 +1154,8 @@ REQUIREMENTS:
 - Include explanations for each CBQ.
 - Use exactly 2 options for MCQs by default.
 - Put mathematical expressions in $...$ or $$...$$.
-- Return ONLY a JSON codeblock. Do not return prose outside the codeblock.
+- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
+- Return only that JSON code block. Do not include prose outside the code block.
 - The JSON must be valid JSON.
 
 USE THIS CBQ JSON SCHEMA:
