@@ -2128,6 +2128,68 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
   body.mobile-nav-open #mobileNav{display:grid !important}
 }
 
+/* Mobile navigation remains available while the exam toolbar is condensed. */
+@media(max-width:600px){
+  body.exam-active header .mobile-menu-toggle{
+    display:inline-flex !important;
+    order:1;
+    flex:0 0 auto;
+    min-height:38px;
+    padding:7px 10px;
+    border:1px solid color-mix(in srgb,var(--primary) 28%,var(--line));
+    border-radius:10px;
+    background:color-mix(in srgb,var(--primary) 8%,var(--surface));
+    color:var(--text);
+    font-size:11px;
+    font-weight:800;
+    box-shadow:0 1px 2px rgba(24,33,47,.06);
+  }
+  body.exam-active header .mobile-menu-toggle:hover,
+  body.exam-active header .mobile-menu-toggle:focus-visible{
+    border-color:var(--primary);
+    color:var(--primary);
+    background:color-mix(in srgb,var(--primary) 13%,var(--surface));
+  }
+  body.exam-active .global-exam-controls{
+    width:auto;
+    flex:1 1 auto;
+    order:2;
+    min-width:0;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  body.exam-active .global-exam-controls::-webkit-scrollbar{display:none}
+  body.exam-active header{
+    justify-content:flex-start;
+    gap:6px;
+  }
+  body.exam-active #mobileNav{
+    inset:56px 8px auto 8px;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    padding:10px;
+    border-radius:14px;
+    box-shadow:0 14px 34px rgba(24,33,47,.18);
+  }
+  body.exam-active #mobileNav button{
+    min-height:46px;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:var(--surface);
+    color:var(--text);
+    font-size:13px;
+    font-weight:750;
+    text-align:left;
+  }
+  body.exam-active #mobileNav button:hover,
+  body.exam-active #mobileNav button:focus-visible{
+    border-color:var(--primary);
+    background:color-mix(in srgb,var(--primary) 8%,var(--surface));
+    color:var(--primary);
+  }
+}
+
 /* Respect intentional hidden states even when a later layout rule sets display. */
 *[hidden]{display:none !important}
 #homeView .hero-actions .btn:nth-child(3){display:none}
