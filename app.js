@@ -519,7 +519,8 @@ function normalizeImageSource(value){
 function normalize(q,defaults={}){
  const text=q.question??q.text??"";
  const type=String(q.type??q.questionType??"mcq").toLowerCase().replace(/[\s-]+/g,"_");
- const explanation=q.explanation??q.reason??q.solution??q.rationale??q.hint??"";
+ const explanation=q.explanation??q.reason??q.solution??q.rationale??"";
+ const hint=q.hint??"";
  const marks=Number(q.marks??q.points??defaults.marks??settings.defaultMarks??1);
  const negativeMarks=Number(q.negativeMarks??q.negative??defaults.negativeMarks??settings.defaultNegative??0);
  const section=q.section??q.category??q.topic??defaults.name??"General";
@@ -534,7 +535,7 @@ function normalize(q,defaults={}){
    const accepted=q.acceptedAnswers??q.accepted??q.answers??q.answer;
    const vals=Array.isArray(accepted)?accepted.map(String):[String(accepted??"")];
    if(!vals[0])throw Error("Fill-in-the-blank needs answer/acceptedAnswers.");
-   return {type:"fill_blank",text,options:[],answer:vals[0],acceptedAnswers:vals,explanation,marks,negativeMarks,section,image};
+   return {type:"fill_blank",text,options:[],answer:vals[0],acceptedAnswers:vals,explanation,hint,marks,negativeMarks,section,image};
  }
 
  if(type==="match"||type==="matching"||type==="drag_drop"||type==="drag_and_drop"){
@@ -546,7 +547,7 @@ function normalize(q,defaults={}){
      throw Error(`Invalid matching pair ${i+1}.`);
    });
    if(normalizedPairs.some(p=>!p.left||!p.right))throw Error("Every matching pair needs left and right values.");
-   return {type:type.includes("drag")?"drag_drop":"match",text,options:[],answer:normalizedPairs.map(p=>p.right),pairs:normalizedPairs,explanation,marks,negativeMarks,section,image};
+   return {type:type.includes("drag")?"drag_drop":"match",text,options:[],answer:normalizedPairs.map(p=>p.right),pairs:normalizedPairs,explanation,hint,marks,negativeMarks,section,image};
  }
 
  if(type==="ordering"){
@@ -555,7 +556,7 @@ function normalize(q,defaults={}){
    if(!Array.isArray(items)||items.length<2)throw Error("Ordering questions need an items array.");
    const order=Array.isArray(raw)?raw.map(String):[];
    if(order.length!==items.length)throw Error("Ordering answer must contain every item in order.");
-   return {type:"ordering",text,options:items.map(String),answer:order,explanation,marks,negativeMarks,section,image};
+   return {type:"ordering",text,options:items.map(String),answer:order,explanation,hint,marks,negativeMarks,section,image};
  }
 
  const options=q.options??q.choices;
@@ -563,7 +564,7 @@ function normalize(q,defaults={}){
    const opts=["True","False"];
    const raw=q.answer??q.correct;
    const answer=String(raw).toLowerCase().startsWith("t")?"A":"B";
-   return {type:"true_false",text,options:opts,answer,explanation,marks,negativeMarks,section,image};
+   return {type:"true_false",text,options:opts,answer,explanation,hint,marks,negativeMarks,section,image};
  }
  if(!Array.isArray(options)||options.length<2)throw Error("Each choice question needs at least 2 options/choices.");
  const raw=q.answer??q.correct;
@@ -575,7 +576,7 @@ function normalize(q,defaults={}){
    if(!answer){let i=options.findIndex(x=>String(x).trim()===s);if(i>=0)answer=String.fromCharCode(65+i)}
  }
  if(!answer)throw Error("Could not resolve answer for: "+text.slice(0,55));
- return {type:type==="image_choice"?"image_choice":type==="image"?"image":"mcq",text,options:options.map(String),answer,explanation,marks,negativeMarks,section,image};
+ return {type:type==="image_choice"?"image_choice":type==="image"?"image":"mcq",text,options:options.map(String),answer,explanation,hint,marks,negativeMarks,section,image};
 }
 
 function parseQuizInput(raw){
@@ -1000,6 +1001,7 @@ function examflowKeyboardHandler(e){
   if(lower==="e"){e.preventDefault();setMode("exam");return}
   if(lower==="m"){e.preventDefault();setMode("practice");return}
   if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
+  if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
 
   if(e.key==="ArrowRight" || lower==="n"){
     e.preventDefault();
@@ -1047,6 +1049,7 @@ Your task:
 - Replace [TOPIC] with the topic or source material I provide.
 - Create a coherent quiz that tests understanding and step-by-step reasoning.
 - Include useful explanations for every question.
+- Add an optional "hint" for questions where a small nudge would help, without giving away the answer.
 - Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.
 - Give every question a correct answer and marks. Use negativeMarks only when appropriate.
 - Keep all question and answer text inside the JSON values.
@@ -1099,6 +1102,7 @@ function currentQuestionCopyText(q){
   if(Array.isArray(q.acceptedAnswers)&&q.acceptedAnswers.length)
     lines.push(`Accepted answers:\n${q.acceptedAnswers.join("\n")}`);
   if(q.explanation)lines.push(`Explanation:\n${q.explanation}`);
+  if(q.hint)lines.push(`Hint:\n${q.hint}`);
   if(q.marks!==undefined)lines.push(`Marks: ${q.marks}`);
   if(q.negativeMarks!==undefined)lines.push(`Negative marks: ${q.negativeMarks}`);
   if(q.image)lines.push(`Image: ${q.image}`);
@@ -1126,6 +1130,7 @@ function render(){
  if(!questions.length){
    document.getElementById("currentLabel").textContent="0";document.getElementById("totalLabel").textContent="0";
    document.getElementById("questionText").textContent="Paste a quiz JSON to start.";
+   const emptyHint=document.getElementById("hintCard");if(emptyHint)emptyHint.hidden=true;
    document.getElementById("options").innerHTML="";document.getElementById("qgrid").innerHTML="";
    document.getElementById("progressText").textContent="0 / 0";document.getElementById("progressBar").style.width="0%";
    const copyQuestionBtn=document.getElementById("copyQuestionBtn");
@@ -1137,6 +1142,15 @@ function render(){
  if(apExisting && apExisting.dataset.question!==String(current))apExisting.remove();
  document.getElementById("currentLabel").textContent=current+1;document.getElementById("totalLabel").textContent=questions.length;
  document.getElementById("questionText").innerHTML=esc(q.text||"");
+ const hintCard=document.getElementById("hintCard"),hintText=document.getElementById("hintText"),hintToggle=document.getElementById("hintToggle");
+ const hasHint=String(q.hint||"").trim()!=="";
+ if(hintCard&&hintText&&hintToggle){
+   hintCard.hidden=!hasHint;
+   hintText.hidden=true;
+   hintToggle.setAttribute("aria-expanded","false");
+   hintToggle.textContent="💡 Show hint";
+   if(hasHint){setQuizRichText(hintText,q.hint);renderAllQuizMath(hintText)}
+ }
  renderQuestionImage(q);
  const opts=document.getElementById("options");opts.innerHTML="";
  renderSpecialQuestion(q,opts);
@@ -1168,6 +1182,13 @@ function render(){
  const copyQuestionBtn=document.getElementById("copyQuestionBtn");
  if(copyQuestionBtn)copyQuestionBtn.disabled=false;
  document.getElementById("questionText").classList.toggle("exam-finished",examFinished);
+}
+function toggleHint(){
+ const hintText=document.getElementById("hintText"),hintToggle=document.getElementById("hintToggle");
+ if(!hintText||!hintToggle)return;
+ const open=hintText.hidden;
+ hintText.hidden=!open;hintToggle.setAttribute("aria-expanded",String(open));hintToggle.textContent=open?"💡 Hide hint":"💡 Show hint";
+ if(open)renderAllQuizMath(hintText);
 }
 function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
 function clearAnswer(){if(examFinished)return;answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
@@ -1216,6 +1237,7 @@ async function redirectQuestionToChatGPT(){
    source+=`\nOptions: ${q.options.map((x,i)=>`${String.fromCharCode(65+i)}. ${x}`).join(" | ")}`;
  if(q.answer!==undefined)source+=`\nAnswer: ${typeof q.answer==="string"?q.answer:JSON.stringify(q.answer)}`;
  if(q.explanation)source+=`\nExplanation: ${q.explanation}`;
+ if(q.hint)source+=`\nHint: ${q.hint}`;
  if(Array.isArray(q.pairs)&&q.pairs.length)
    source+=`\nPairs: ${q.pairs.map(p=>`${p.left} → ${p.right}`).join(" | ")}`;
 
@@ -1232,6 +1254,7 @@ REQUIREMENTS:
 - Each CBQ should help establish a concept or reasoning step needed for the next one.
 - Use the same subject terminology as the original question.
 - Include explanations for each CBQ.
+- Add a short optional "hint" when useful; hints should guide reasoning without revealing the answer.
 - Use exactly 2 options for MCQs by default.
 - Put mathematical expressions in $...$ or $$...$$.
 - Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
@@ -1253,6 +1276,7 @@ USE THIS CBQ JSON SCHEMA:
           "question": "Question text or $LaTeX$",
           "options": ["Option A", "Option B"],
           "answer": "A",
+          "hint": "A short optional nudge toward the underlying concept.",
           "explanation": "Explanation with $LaTeX$ where needed."
         }
       ]
@@ -1261,14 +1285,14 @@ USE THIS CBQ JSON SCHEMA:
 }
 
 SUPPORTED QUESTION TYPES:
-- mcq: question, options, answer, optional explanation
-- true_false: question, answer (True or False), optional explanation
-- fill_blank: question, acceptedAnswers, optional explanation
-- match: question, pairs, optional explanation
-- drag_drop: question, pairs, optional explanation
-- ordering: question, items, answer, optional explanation
-- image: question, image (prefer a publicly accessible HTTPS URL), options, answer, optional explanation
-- image_choice: question, image, options, answer, optional explanation
+- mcq: question, options, answer, optional hint and explanation
+- true_false: question, answer (True or False), optional hint and explanation
+- fill_blank: question, acceptedAnswers, optional hint and explanation
+- match: question, pairs, optional hint and explanation
+- drag_drop: question, pairs, optional hint and explanation
+- ordering: question, items, answer, optional hint and explanation
+- image: question, image (prefer a publicly accessible HTTPS URL), options, answer, optional hint and explanation
+- image_choice: question, image, options, answer, optional hint and explanation
 
 ALIASES MAY INCLUDE:
 text, choices, correct, points, negative, duration, category, topic, reason, solution, rationale, hint.

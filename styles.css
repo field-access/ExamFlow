@@ -1937,6 +1937,38 @@ body.exam-active #examView .question h2{
   line-height:1.55 !important;
   font-weight:500;
 }
+.hint-card{
+  max-width:700px;
+  margin:0 auto 14px;
+  border:1px solid color-mix(in srgb,var(--gold) 38%,var(--line));
+  border-radius:13px;
+  background:color-mix(in srgb,var(--gold) 8%,var(--surface));
+  overflow:hidden;
+}
+.hint-toggle{
+  width:100%;
+  min-height:42px;
+  padding:10px 13px;
+  border:0;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.hint-toggle:hover,.hint-toggle:focus-visible{
+  background:color-mix(in srgb,var(--gold) 13%,var(--surface));
+}
+.hint-text{
+  padding:0 14px 13px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+}
+.hint-text .quiz-code-block{margin:8px 0 0}
+body.dark .hint-card{background:color-mix(in srgb,var(--gold) 12%,var(--surface))}
 body.exam-active #examView .options{
   max-width:700px;
   gap:8px;

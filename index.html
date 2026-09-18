@@ -135,6 +135,7 @@
           "question": "What is the SI unit of force?",
           "options": ["Joule", "Newton", "Watt", "Pascal"],
           "answer": "B",
+          "hint": "Think about the unit named after a person associated with classical mechanics.",
           "explanation": "The SI unit of force is the newton (N)."
         },
         {
@@ -241,11 +242,15 @@
       <button id="practiceMode" class="modebtn" onclick="setMode('practice')">🧠 Practice</button>
 
       <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT with the minimal CBQ prompt">↗ GPT</button>
-      <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the current question without its answer">📋 Copy</button>
+      <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the current question with its answer and explanation">📋 Copy</button>
       <button id="bookmark" class="bookmark" onclick="toggleReview()">☆ Review</button>
     </div>
   </div>
   <h2 id="questionText">Paste a quiz JSON to start.</h2>
+  <div id="hintCard" class="hint-card" hidden>
+    <button id="hintToggle" class="hint-toggle" type="button" onclick="toggleHint()" aria-expanded="false" aria-controls="hintText">💡 Show hint</button>
+    <div id="hintText" class="hint-text" hidden></div>
+  </div>
   <div id="options" class="options"></div>
   <div id="feedback" class="feedback"></div><div id="explanation" class="exam-summary" style="display:none"></div>
   <div class="actions">
@@ -440,6 +445,7 @@
 <div><kbd>T</kbd><span>Pause / resume study timer</span></div>
 <div><kbd>E</kbd> / <kbd>M</kbd><span>Exam / Practice mode</span></div>
 <div><kbd>G</kbd><span>Open current question in GPT</span></div>
+<div><kbd>C</kbd><span>Copy current question with answer and explanation</span></div>
 <div><kbd>Shift</kbd> + <kbd>S</kbd><span>Open submit confirmation</span></div>
 <div><kbd>Enter</kbd><span>Confirm submit when the dialog is open</span></div>
 <div><kbd>Shift</kbd> + <kbd>Q</kbd><span>Open / close question palette</span></div>
