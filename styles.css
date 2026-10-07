@@ -3221,3 +3221,25 @@ body.dark #dashboardView .beautiful-dashboard .recent-quizzes-panel{
   #dashboardView .beautiful-dashboard .recent-quiz-row{align-items:flex-start;gap:6px}
   #dashboardView .beautiful-dashboard .recent-quiz-row .btn{padding:5px 7px}
 }
+
+/* A subtle electric sweep makes the header divider feel alive. */
+header::after{
+  position:absolute;
+  right:0;
+  bottom:0;
+  left:0;
+  height:2px;
+  background-image:
+    linear-gradient(90deg,transparent 0%,transparent 43%,color-mix(in srgb,var(--gold) 60%,transparent) 48%,#fff1c2 50%,color-mix(in srgb,var(--gold) 60%,transparent) 52%,transparent 57%,transparent 100%),
+    linear-gradient(90deg,transparent,color-mix(in srgb,var(--gold) 55%,transparent),transparent);
+  background-repeat:no-repeat;
+  background-position:100% 0,0 0;
+  background-size:260% 100%,100% 100%;
+  content:"";
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--gold) 55%,transparent));
+  pointer-events:none;
+  animation:header-divider-flow 3.6s linear infinite;
+}
+@keyframes header-divider-flow{
+  to{background-position:0 0,0 0}
+}
