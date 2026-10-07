@@ -2974,6 +2974,7 @@ body.dark #examView .option:hover:not(.correct):not(.answer-not-correct){
   display:block;
   grid-column:1/-1;
   padding:0;
+  margin:0;
 }
 #settingsView .keyboard-shortcuts-card summary{
   position:relative;
@@ -3039,7 +3040,7 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
   #settingsView .dashhead h1{font-size:22px}
   #settingsView .settings{
     grid-template-columns:minmax(0,1fr) !important;
-    gap:7px !important;
+    gap:8px !important;
   }
   #settingsView .setting.card{
     grid-template-columns:minmax(0,1fr) minmax(145px,42%);
