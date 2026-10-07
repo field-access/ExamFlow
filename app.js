@@ -1911,7 +1911,7 @@ function saveExamDeadline(sourceId="planExamDeadlineInput"){
 }
 function getSavedExamDeadline(){return localStorage.getItem("examflow_exam_deadline")||""}
 function setDeadlineInputValue(v){
-  ["planExamDeadlineInput","dashboardExamDeadlineInput"].forEach(id=>{
+  ["planExamDeadlineInput"].forEach(id=>{
     const input=document.getElementById(id);if(input)input.value=v;
   });
 }
@@ -1923,8 +1923,7 @@ function openDeadlinePicker(idValue){
 function renderExamDeadline(){
   const v=getSavedExamDeadline();
   const targets=[
-    [document.getElementById("planExamCountdown"),document.getElementById("planExamDate")],
-    [document.getElementById("dashboardExamCountdown"),document.getElementById("dashboardExamDate")]
+    [document.getElementById("planExamCountdown"),document.getElementById("planExamDate")]
   ];
   setDeadlineInputValue(v);
   if(!v){
