@@ -30,6 +30,7 @@
   </nav>
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
   <div class="global-exam-controls" style="display:flex; align-items: center; gap: 5px;">
+    <button id="examHomeBtn" class="btn exam-home-btn" type="button" onclick="showView('home')" aria-label="Go to home from exam"><span class="exam-home-full">⌂ Home</span><span class="exam-home-compact" aria-hidden="true">⌂</span></button>
     <button id="globalExamProgressBtn" class="btn" type="button" onclick="toggleQuestionProgress()">☷ Questions</button>
     <div class="pomodoro-widget" id="pomodoroWidget" aria-label="Pomodoro study timer"><div class="pomodoro-meta"><span id="pomodoroPhase">Open study timer</span><span id="pomodoroDots" aria-hidden="true"><i class="active"></i><i></i><i></i><i></i></span></div><select id="pomodoroSelect" class="btn" onchange="setPomodoro(this.value)" aria-label="Pomodoro duration">
       <option value="stopwatch">Stopwatch</option>
@@ -65,6 +66,7 @@
       <p>A Concept Breakdown Quiz takes one complex topic and walks you through five small questions, each building the next step of understanding until the solution makes sense.</p>
       <div class="hero-actions">
         <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
+        <button class="btn" type="button" onclick="copyBeginnerSchema()">📋 Copy schema</button>
         <button class="btn" onclick="showView('dashboard')">📊 Results</button>
         <button class="btn" onclick="showView('planner')">🗓 Future tests</button>
       </div>
@@ -119,7 +121,6 @@
       <h3>📋 CBQ JSON schema</h3>
       <p>New to CBQ JSON? Copy the complete schema below and replace the example values. The full template stays hidden until you need it.</p>
     </div>
-    <button class="btn" type="button" onclick="copyBeginnerSchema()">Copy schema</button>
   </div>
   <div class="schema-mini">7 question types · sections · timing · marks · explanations · LaTeX · images</div>
   <textarea id="beginnerSchema" hidden>{
@@ -427,7 +428,7 @@
 <option value="slate">Slate Ink</option>
 </select></div></section>
     <section class="setting card"><h3>🔊 Interface sounds</h3><p>Play clear, energetic sounds for button feedback and answer results.</p><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)">🔊 Sounds on</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">🔇 Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test sound</button></div></section>
-    <section class="setting card"><h3>⏱️ Default duration</h3><p>Used for quizzes without an explicit duration. Maximum test time is 10 minutes.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
+    <section class="setting card"><h3>⏱️ Default duration</h3><p>Used when a quiz does not specify a total duration or section times.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
 <option value="5">5 minutes</option><option value="10">10 minutes</option>
 <option value="15">15 minutes</option><option value="20">20 minutes</option>
 <option value="30">30 minutes</option><option value="45">45 minutes</option>

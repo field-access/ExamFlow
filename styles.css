@@ -2434,6 +2434,69 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   .stacked-list{grid-template-columns:1fr;gap:7px}
 }
 
+/* Exam toolbar controls: keep navigation reachable and the timer selector stable. */
+.exam-home-compact{display:none}
+body.exam-active .global-exam-controls .exam-home-btn{
+  flex:0 0 auto;
+  min-height:36px;
+  padding:7px 10px;
+  border-color:color-mix(in srgb,var(--primary) 30%,var(--line));
+  color:var(--primary);
+  white-space:nowrap;
+}
+body.exam-active #pomodoroSelect{
+  appearance:none;
+  -webkit-appearance:none;
+  flex:0 0 116px;
+  width:116px;
+  min-width:116px;
+  min-height:36px;
+  margin:0;
+  padding:7px 28px 7px 10px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background-color:var(--surface);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%23697386' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 9px center;
+  color:var(--text);
+  font-size:11px;
+  font-weight:700;
+  box-shadow:0 1px 3px rgba(24,33,47,.06);
+  cursor:pointer;
+}
+body.dark.exam-active #pomodoroSelect{
+  background-color:var(--surface2) !important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+  color:var(--text) !important;
+  border-color:var(--line) !important;
+}
+body.exam-active #pomodoroSelect option{
+  background:var(--surface);
+  color:var(--text);
+}
+body.exam-active #pomodoroSelect:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--primary) 32%,transparent);
+  outline-offset:1px;
+}
+@media(max-width:600px){
+  body.exam-active .exam-home-full{display:none}
+  body.exam-active .exam-home-compact{display:inline}
+  body.exam-active .global-exam-controls .exam-home-btn{
+    width:36px;
+    min-width:36px;
+    padding:6px;
+    justify-content:center;
+  }
+  body.exam-active #pomodoroSelect{
+    flex-basis:96px;
+    width:96px;
+    min-width:96px;
+    padding-left:7px;
+    font-size:10px;
+  }
+}
+
 /* The Settings width control changes the desktop card without affecting mobile. */
 @media(min-width:801px){
   body.exam-card-compact #examView .question{width:min(640px,calc(100% - 24px)) !important}

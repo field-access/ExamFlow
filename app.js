@@ -8,6 +8,10 @@ let questions=[],answers=[],reviews=new Set(),checkedQuestions=new Set(),current
 let examFinished=false;
 let examId=null;
 let timerState={examSeconds:5*60,practiceSeconds:5*60,running:false};
+function clampDurationMinutes(value,fallback=5){
+  const minutes=Number(value);
+  return Number.isFinite(minutes)?Math.min(60,Math.max(1,minutes)):fallback;
+}
 let universalStudyTimerSeconds = 0;
 let universalStudyTimerRunning = true;
 let universalStudyTimerMode = 'stopwatch'; // 'stopwatch' or 'countdown'
@@ -177,7 +181,7 @@ function openRecentQuiz(idValue){
   const session=get(K.sessions,[]).find(x=>x.examId===idValue&&!x.examFinished);
   if(session){restoreSession(session.id);return}
   const exam=getExamRecord(idValue);if(!exam)return;
-  examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=(exam.durationMinutes||settings.defaultDuration||5)*60;quizDurationMinutes=seconds/60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
+  examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;quizDurationMinutes=clampDurationMinutes(exam.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
 }
 
 function renderTodos() {
@@ -501,7 +505,7 @@ function setMode(x){
  if(mode==="practice"){
    if(!Number.isFinite(timerState.practiceSeconds)||timerState.practiceSeconds<=0)timerState.practiceSeconds=5*60;
  }else{
-   const maxExam=Math.min(10,Math.max(1,quizDurationMinutes||settings.defaultDuration||5))*60;
+   const maxExam=clampDurationMinutes(quizDurationMinutes||settings.defaultDuration||5)*60;
    if(!Number.isFinite(timerState.examSeconds)||timerState.examSeconds<=0)timerState.examSeconds=maxExam;
  }
  timerState.running=true;
@@ -639,7 +643,7 @@ function parseQuizInput(raw){
 }
 
 function parseQuiz(data){
- let qs=[],secs=[],name="Imported CBQ",duration=Number(settings.defaultDuration||5);
+ let qs=[],secs=[],name="Imported CBQ",duration=0,hasDuration=false;
  if(Array.isArray(data)){
    qs=data.map(q=>normalize(q));
  }else if(data&&Array.isArray(data.sections)){
@@ -647,14 +651,15 @@ function parseQuiz(data){
    data.sections.forEach(s=>{
      if(!Array.isArray(s.questions))throw Error("A section is missing its questions array.");
      s.questions.forEach(q=>qs.push(normalize(q,s)));
-     if(s.timeMinutes!=null)duration+=Number(s.timeMinutes||0);
+     if(s.timeMinutes!=null){duration+=Number(s.timeMinutes||0);hasDuration=true}
      secs.push({name:s.name||"General",timeMinutes:s.timeMinutes,marks:s.marks,negativeMarks:s.negativeMarks});
    });
-   if(data.timeMinutes!=null)duration=Number(data.timeMinutes);
+   if(data.timeMinutes!=null){duration=Number(data.timeMinutes);hasDuration=true}
  }else throw Error("Use a flat JSON array or an object containing sections.");
- if(Array.isArray(data)&&data.timeMinutes!=null)duration=Number(data.timeMinutes);
+ if(Array.isArray(data)&&data.timeMinutes!=null){duration=Number(data.timeMinutes);hasDuration=true}
  if(!qs.length)throw Error("No questions found.");
- return {name,questions:qs,sections:secs,durationMinutes:Math.min(10,Math.max(1,duration))};
+ if(!hasDuration)duration=settings.defaultDuration||5;
+ return {name,questions:qs,sections:secs,durationMinutes:clampDurationMinutes(duration)};
 }
 function openImporter(){document.getElementById("importer").classList.add("show");document.getElementById("jsonInput").value="";document.getElementById("jsonStatus").textContent="";setTimeout(()=>document.getElementById("jsonInput").focus(),40)}
 function closeImporter(){document.getElementById("importer").classList.remove("show")}
@@ -664,7 +669,7 @@ function loadQuiz(){
    const parsed=parseQuiz(parseQuizInput(document.getElementById("jsonInput").value));
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
-   quizDurationMinutes=Math.min(10,Math.max(1,parsed.durationMinutes||settings.defaultDuration||5));seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
+   quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
    registerActiveExam();closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
@@ -807,6 +812,11 @@ function renderSpecialQuestion(q,opts){
    input.className="fill-answer";input.placeholder="Type your answer…";input.autocomplete="off";
    input.value=answers[current]||"";
    input.oninput=()=>{answers[current]=input.value;checkedQuestions.delete(current);saveSessionSoon()};
+   input.onkeydown=e=>{
+     if(e.key==="Enter"&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){
+       e.preventDefault();e.stopPropagation();checkCurrentAnswer();
+     }
+   };
    wrap.appendChild(input);opts.appendChild(wrap);
  }else if(q.type==="match"||q.type==="drag_drop"){
    const chosen=answers[current]||[];
@@ -1078,6 +1088,54 @@ document.addEventListener("pointerdown",e=>{
   setTimeout(()=>b.classList.remove("click-pulse"),180);
 });
 
+const CBQ_MODE_GUIDE=`LANGUAGE STYLE:
+Use ASD-STE100-inspired controlled English for about 80% of the wording.
+- Use short sentences.
+- Use simple grammar and one idea at a time.
+- Use clear technical terms.
+- Avoid unnecessary synonyms and decorative academic wording.
+- Keep mathematical and computer science terms precise.
+- Simplify the language, not the thinking. Keep the reasoning deep.
+Example:
+Avoid: "Determine the appropriate structural invariant governing candidate elimination."
+Prefer: "What must remain true about the candidates after each step?"
+
+CBQ COMMAND MODES:
+Read any CBQ command included with the topic, source, or question. A command starts with CBQ/. Commands can be combined. Apply every requested mode together.
+- CBQ/mental: mental-set and problem-solving aptitude.
+- CBQ/depth: deep conceptual understanding.
+- CBQ/math: mathematical derivation and reasoning.
+- CBQ/bloom: progress through Bloom's taxonomy.
+- CBQ/normal: use mixed question formats.
+- CBQ/code: reason about code or pseudocode.
+- CBQ/RQ: reconstruct code line by line.
+- CBQ/hint: link hints across a chain of reasoning.
+- CBQ/active: use active recall and many fill-in-the-blank questions.
+- CBQ/match: match related items, relationships, or formulas.
+- CBQ/5x25: teach 5 core ideas, then create 25 reinforcement questions.
+- CBQ/leetcode: transfer the concept to a LeetCode-style problem.
+- CBQ/source: ground coverage in the supplied source, slides, or notes.
+- CBQ/diagnose: detect misconceptions and repair them.
+- CBQ/transfer: apply the concept to novel situations.
+- CBQ/reconstruct: rebuild an algorithm or process from reasoning.
+
+PRIMARY MODES:
+CBQ/mental, CBQ/depth, CBQ/math, CBQ/code, CBQ/RQ, CBQ/hint, CBQ/leetcode, CBQ/source, CBQ/diagnose, and CBQ/transfer are the main specialized modes.
+
+COMBINED MODES:
+- CBQ/mental/depth: build a mental model and deepen understanding step by step.
+- CBQ/mental/code: build problem-solving skill through code.
+- CBQ/mental/leetcode: teach problem-solving patterns, then transfer them to a LeetCode-style problem.
+- CBQ/depth/math: derive the mathematical idea instead of memorizing a formula.
+- CBQ/source/mental: use the supplied source while training problem-solving aptitude.
+- CBQ/code/RQ: understand an implementation, then reconstruct it line by line.
+- CBQ/mental/diagnose/transfer: identify the reasoning pattern, find mistakes, then apply the idea to a new problem.
+For other combinations, combine their intentions without dropping a requested mode.
+
+DEFAULT MODE:
+If the user says only "CBQ" and gives no specialized command, use CBQ/mental/depth: deep understanding plus problem-solving aptitude. A supplied CBQ/ command replaces this default or adds specialized modes.
+Unless CBQ/5x25 is requested, create exactly 5 connected, progressively deeper questions. CBQ/5x25 instead requires 5 core ideas followed by 25 reinforcement questions.`;
+
 function copyBeginnerSchema(){
   const source=document.getElementById("beginnerSchema");
   if(!source)return;
@@ -1086,6 +1144,8 @@ function copyBeginnerSchema(){
 
 What a CBQ means:
 A CBQ breaks one difficult topic into a sequence of small, connected questions. Each question should build the reasoning needed for the next step, moving from core ideas to application and finally to a clear solution. Do not make a list of unrelated recall questions.
+
+${CBQ_MODE_GUIDE}
 
 Your task:
 - Replace [TOPIC] with the topic or source material I provide.
@@ -1196,6 +1256,7 @@ function render(){
  renderQuestionImage(q);
  const opts=document.getElementById("options");opts.innerHTML="";
  renderSpecialQuestion(q,opts);
+ if(q.type==="fill_blank")opts.querySelector(".fill-answer")?.focus({preventScroll:true});
  renderMath();
  renderAllQuizMath(document.getElementById("examView"));
  renderAllQuizMath(opts);
@@ -1265,7 +1326,7 @@ function renderSessions(){
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
- sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(10*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=Math.min(10,Math.max(1,s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60)));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
+ sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(60*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=clampDurationMinutes(s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
 function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
@@ -1286,10 +1347,12 @@ async function redirectQuestionToChatGPT(){
  const prompt=`Create a Concept Breakdown Quiz (CBQ) for the question below.
 
 WHAT IS A CBQ:
-A CBQ is a sequence of step-by-step questions that breaks the original problem into smaller conceptual reasoning steps. It should guide the learner from basic understanding toward the original question, rather than simply asking recall questions or giving the answer. Create exactly 5 progressively deeper CBQs that help the learner understand and solve the original question.
+A CBQ is a sequence of step-by-step questions that breaks the original problem into smaller conceptual reasoning steps. It should guide the learner from basic understanding toward the original question, rather than simply asking recall questions or giving the answer. Follow the selected command for the number and style of questions.
+
+${CBQ_MODE_GUIDE}
 
 REQUIREMENTS:
-- Create exactly 5 CBQ questions.
+- Follow the question count required by the selected command. Create exactly 5 questions by default, or 25 reinforcement questions after 5 core ideas for CBQ/5x25.
 - Make them progressively more challenging.
 - Follow the reasoning path needed to solve the original question.
 - Do not simply repeat the original question.
@@ -1543,8 +1606,8 @@ function retakeLastTest(){
    explanation:q.explanation||"",marks:q.marks,negativeMarks:q.negativeMarks,section:q.section
  }));
  answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
- seconds=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5))*60;
- quizDurationMinutes=Math.min(10,Math.max(1,lastResultSnapshot.durationMinutes||settings.defaultDuration||5));
+ seconds=clampDurationMinutes(lastResultSnapshot.durationMinutes||settings.defaultDuration||5)*60;
+ quizDurationMinutes=clampDurationMinutes(lastResultSnapshot.durationMinutes||settings.defaultDuration||5);
  sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;examFinished=false;examId=lastResultSnapshot.examId||id();
  timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;
  registerActiveExam({name:examName});
@@ -1684,7 +1747,7 @@ function renderPlans(){
 }
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
- const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;examId=p.examId||p.id;quizDurationMinutes=Math.min(10,Math.max(1,q.durationMinutes||settings.defaultDuration||5));answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
+ const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;examId=p.examId||p.id;quizDurationMinutes=clampDurationMinutes(q.durationMinutes,settings.defaultDuration||5);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
  registerActiveExam({source:"planned",plannedDate:p.date,plannedTime:p.time,name:p.name});
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();setTimeout(applyQuestionSidebarState,50);saveSession();toast("Planned test loaded ✓")
 }
@@ -2014,7 +2077,7 @@ function startHomeQuiz(){
  try{
    const parsed=parseQuiz(parseQuizInput(raw));
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
-   quizDurationMinutes=parsed.durationMinutes||settings.defaultDuration||30;
+   quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
@@ -2261,7 +2324,7 @@ function checkCurrentAnswer(){
  if(!answerIsPresent(chosen,q)){toast("Answer the question first");return}
  const wasChecked=checkedQuestions.has(current);
  checkedQuestions.add(current);
- if(!wasChecked&&mode==="practice")playAnswerSound(chosen===q.answer);
+ if(!wasChecked&&mode==="practice")playAnswerSound(isQuestionCorrect(q,chosen));
  const fb=document.getElementById("feedback");
  if(!chosen){toast("Choose an option first");return}
  const correct=isQuestionCorrect(q,chosen);
