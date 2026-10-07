@@ -699,6 +699,40 @@ function protectQuizCodeAndMath(root){
     }
   });
 }
+function normalizeQuizLatex(root){
+  if(!root)return;
+  const isInsideMathDelimiter=(text,index)=>{
+    let open=null;
+    const delimiters=/\$\$?|\\\[|\\\]|\\\(|\\\)/g;
+    delimiters.lastIndex=0;
+    let match;
+    while((match=delimiters.exec(text))&&match.index<index){
+      const token=match[0];
+      if(!open){
+        if(token==="$"||token==="$$")open=token;
+        else if(token==="\\[")open="\\]";
+        else if(token==="\\(")open="\\)";
+      }else if(token===open){
+        open=null;
+      }
+    }
+    return !!open;
+  };
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  nodes.forEach(node=>{
+    const parent=node.parentElement;
+    if(!parent||parent.closest("pre,code,.katex,.katex-display"))return;
+    const text=node.nodeValue;
+    if(!text||!text.includes("\\begin{"))return;
+
+    let out=text.replace(/\\begin\{(align|equation|gather|multline)\*?\}/g,(_,env)=>`\\begin{${env==="align"||env==="equation"?"aligned":env==="gather"||env==="multline"?"gathered":env}}`)
+      .replace(/\\end\{(align|equation|gather|multline)\*?\}/g,(_,env)=>`\\end{${env==="align"||env==="equation"?"aligned":env==="gather"||env==="multline"?"gathered":env}}`);
+    const bareEnvironment=/\\begin\{(aligned|gathered)\}[\s\S]*?\\end\{\1\}/g;
+    out=out.replace(bareEnvironment,(match,_,offset,whole)=>isInsideMathDelimiter(whole,offset)?match:`$$${match}$$`);
+    if(out!==text)node.nodeValue=out;
+  });
+}
 function formatExplanationText(text){
   if(text==null)return "";
   return String(text).trim();
@@ -711,6 +745,7 @@ function setQuizRichText(element,text){
 function renderAllQuizMath(root=document){
   if(!root||typeof renderMathInElement!=="function")return;
   protectQuizCodeAndMath(root);
+  normalizeQuizLatex(root);
   const cfg={
     delimiters:[
       {left:"$$",right:"$$",display:true},
@@ -718,7 +753,14 @@ function renderAllQuizMath(root=document){
       {left:"$",right:"$",display:false},
       {left:"\\(",right:"\\)",display:false}
     ],
-    throwOnError:false,strict:false,trust:false
+    throwOnError:false,strict:false,trust:false,
+    macros:{
+      "\\R":"\\mathbb{R}",
+      "\\N":"\\mathbb{N}",
+      "\\Z":"\\mathbb{Z}",
+      "\\Q":"\\mathbb{Q}",
+      "\\C":"\\mathbb{C}"
+    }
   };
   try{renderMathInElement(root,cfg)}catch(e){}
 }
@@ -1602,7 +1644,7 @@ function saveQuickPlan(){
   const raw=box?.value.trim();
   if(!raw){toast("Paste quiz JSON first");return}
   try{
-    const source=JSON.parse(raw);
+    const source=parseQuizInput(raw);
     const quizSource=source.quiz||source.exam||source;
     const q=parseQuiz(quizSource);
     const name=source.name||q.name||"Planned CBQ";
@@ -2219,7 +2261,7 @@ function checkCurrentAnswer(){
  if(!answerIsPresent(chosen,q)){toast("Answer the question first");return}
  const wasChecked=checkedQuestions.has(current);
  checkedQuestions.add(current);
- if(!wasChecked)playAnswerSound(chosen===q.answer);
+ if(!wasChecked&&mode==="practice")playAnswerSound(chosen===q.answer);
  const fb=document.getElementById("feedback");
  if(!chosen){toast("Choose an option first");return}
  const correct=isQuestionCorrect(q,chosen);
