@@ -1717,9 +1717,21 @@ function planSortNewestFirst(a,b){
 }
 function renderDashboard(){
  renderRecentQuizzes();
- const ss=get(K.sessions,[]).slice().sort((a,b)=>String(b.updatedAt||b.createdAt||"").localeCompare(String(a.updatedAt||a.createdAt||"")));
+ const recent=get(K.recent,[]);
+ const openedAtFor=session=>{
+  const recentItem=recent.find(item=>item.id===(session.examId||session.id));
+  return recentItem?.lastOpenedAt||session.updatedAt||session.createdAt||"";
+ };
+ const ss=get(K.sessions,[]).slice().sort((a,b)=>String(openedAtFor(b)).localeCompare(String(openedAtFor(a))));
  const ssl = document.getElementById("homeSessionsList");
- if(ssl)ssl.innerHTML=renderStackedRows(ss,s=>`<div class="resultrow"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${s.answers.filter(Boolean).length}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small></div><div style="display:flex;gap:5px"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" style="border:1px solid var(--line); border-radius:10px; width: 34px; background:transparent; cursor:pointer; color:var(--muted); font-size:16px; display:flex; align-items:center; justify-content:center;" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`,`No saved sessions. Add a CBQ to begin.`);
+ if(ssl)ssl.innerHTML=renderStackedRows(ss,s=>{
+  const openedAt=openedAtFor(s),openedDate=new Date(openedAt);
+  const openedText=openedAt&&!Number.isNaN(openedDate.getTime())
+   ?`Last opened ${openedDate.toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}`
+   :"Last opened time unavailable";
+  const answered=s.answers.filter(Boolean).length;
+  return `<div class="resultrow home-session-row"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${answered}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small><small class="home-session-opened">${openedText}</small></div><div class="home-session-actions"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" aria-label="Delete saved session" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`;
+ },`No saved sessions. Add a CBQ to begin.`);
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const attempted=rs.reduce((a,r)=>a+(Number(r.correct)||0)+(Number(r.wrong)||0),0),solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=attempted;

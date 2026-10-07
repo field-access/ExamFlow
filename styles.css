@@ -3248,6 +3248,86 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   font-size:calc(15px * var(--question-text-scale)) !important;
 }
 
+/* Home: calm, evenly spaced resume-session list. */
+#homeView .home-continue-panel{
+  grid-column:1/-1;
+  min-width:0;
+  padding:16px 18px;
+  border-radius:12px;
+  box-shadow:none;
+}
+#homeView .home-continue-panel .panel-heading{margin-bottom:5px}
+#homeView .home-continue-panel .panel-heading h3{
+  margin:0 0 3px;
+  font:650 14px/1.35 system-ui,sans-serif;
+}
+#homeView .home-continue-panel .panel-heading small{
+  color:var(--muted);
+  font:400 10px/1.45 system-ui,sans-serif;
+}
+#homeView #homeSessionsList .stacked-list{
+  display:grid;
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+}
+#homeView #homeSessionsList .stack-column{gap:0}
+#homeView .home-session-row{
+  min-width:0;
+  margin:0;
+  padding:12px 2px;
+  border:0;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 75%,transparent);
+  border-radius:0;
+  background:transparent;
+}
+#homeView .stack-column .home-session-row:last-child{border-bottom:0}
+#homeView .home-session-row .resultmain strong{
+  color:var(--text);
+  font:550 12px/1.45 system-ui,sans-serif;
+}
+#homeView .home-session-row .resultmain small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font:400 10px/1.4 system-ui,sans-serif;
+}
+#homeView .home-session-row .resultmain .home-session-opened{
+  margin-top:2px;
+  color:color-mix(in srgb,var(--muted) 82%,transparent);
+  font-size:9px;
+}
+#homeView .home-session-actions{
+  display:flex;
+  flex:0 0 auto;
+  align-items:center;
+  gap:6px;
+}
+#homeView .home-session-actions .btn{
+  min-height:32px;
+  padding:6px 11px;
+  border-radius:8px;
+  box-shadow:none;
+  font:600 10px/1 system-ui,sans-serif;
+}
+#homeView .home-session-actions .session-delete2{
+  width:30px;
+  height:30px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--muted);
+  font:500 16px/1 system-ui,sans-serif;
+}
+#homeView .home-session-actions .session-delete2:hover{
+  border-color:color-mix(in srgb,var(--bad) 40%,var(--line));
+  color:var(--bad);
+}
+@media(max-width:600px){
+  #homeView .home-continue-panel{padding:13px 14px}
+  #homeView .home-session-row{gap:8px;padding:11px 1px}
+  #homeView .home-session-row .resultmain strong{font-size:11px}
+}
+
 /* A subtle electric sweep makes the header divider feel alive. */
 header::after{
   position:absolute;
