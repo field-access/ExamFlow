@@ -2270,14 +2270,6 @@ body.exam-active .global-exam-controls{
   gap:8px;
   overflow:visible;
 }
-body.exam-active .global-exam-controls .exam-home-btn{
-  min-height:34px;
-  padding:6px 10px;
-  border-radius:10px;
-  background:color-mix(in srgb,var(--primary) 8%,var(--surface));
-  font-size:11px;
-  font-weight:800;
-}
 body.exam-active .global-exam-timer{
   min-height:34px;
   padding:6px 9px;
@@ -2315,13 +2307,6 @@ body.exam-active .global-exam-timer span{
     flex:0 0 auto;
     width:auto;
     gap:4px;
-  }
-  body.exam-active .global-exam-controls .exam-home-btn{
-    width:32px;
-    min-width:32px;
-    min-height:32px;
-    padding:4px;
-    justify-content:center;
   }
   body.exam-active .global-exam-timer{
     min-height:32px;
@@ -2479,7 +2464,6 @@ body.exam-active #globalExamProgressBtn{display:none !important}
 .deadline-picker{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:40px;cursor:pointer;white-space:nowrap}
 .deadline-picker svg{width:16px;height:16px}
 .deadline-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.dashboard-deadline-card{margin-top:0}
 @media(max-width:600px){
   .deadline-card{grid-template-columns:auto minmax(0,1fr);gap:11px;padding:14px}
   .deadline-picker{grid-column:1/-1;width:100%;justify-content:center}
@@ -2539,27 +2523,6 @@ body.exam-active #globalExamProgressBtn{display:none !important}
 .result-question.keyboard-current{outline:2px solid color-mix(in srgb,var(--primary) 55%,transparent);outline-offset:-2px;background:color-mix(in srgb,var(--primary) 4%,var(--surface))}
 @media(max-width:600px){
   .stacked-list{grid-template-columns:1fr;gap:7px}
-}
-
-/* Exam toolbar controls: keep navigation and countdown reachable. */
-.exam-home-compact{display:none}
-body.exam-active .global-exam-controls .exam-home-btn{
-  flex:0 0 auto;
-  min-height:36px;
-  padding:7px 10px;
-  border-color:color-mix(in srgb,var(--primary) 30%,var(--line));
-  color:var(--primary);
-  white-space:nowrap;
-}
-@media(max-width:600px){
-  body.exam-active .exam-home-full{display:none}
-  body.exam-active .exam-home-compact{display:inline}
-  body.exam-active .global-exam-controls .exam-home-btn{
-    width:36px;
-    min-width:36px;
-    padding:6px;
-    justify-content:center;
-  }
 }
 
 /* The Settings width control changes the desktop card without affecting mobile. */
@@ -2796,15 +2759,6 @@ body:not(.exam-active) header .global-exam-controls{display:none !important}
     margin-left:auto;
     overflow:visible;
   }
-  body.exam-active .global-exam-controls .exam-home-btn{
-    width:auto;
-    min-width:0;
-    min-height:30px;
-    padding:4px 9px;
-    justify-content:center;
-  }
-  body.exam-active .exam-home-full{display:inline !important}
-  body.exam-active .exam-home-compact{display:none !important}
   #examView .qtop{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
@@ -3183,43 +3137,6 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
   font:650 19px/1.2 system-ui,sans-serif;
   letter-spacing:-.03em;
 }
-#dashboardView .dashboard-deadline-card{
-  grid-template-columns:36px minmax(0,1fr) auto;
-  gap:12px;
-  margin:0 0 14px;
-  padding:13px 15px;
-  border:1px solid var(--line);
-  border-radius:11px;
-  background:var(--surface);
-  box-shadow:none;
-}
-#dashboardView .dashboard-deadline-card .deadline-icon{
-  width:34px;
-  height:34px;
-  border-radius:8px;
-  background:var(--surface2);
-  color:var(--muted);
-}
-#dashboardView .dashboard-deadline-card .deadline-icon svg{width:19px;height:19px}
-#dashboardView .dashboard-deadline-card .deadline-copy{gap:3px}
-#dashboardView .dashboard-deadline-card .deadline-eyebrow{
-  font-size:9px;
-  letter-spacing:.08em;
-}
-#dashboardView .dashboard-deadline-card .deadline-copy strong{
-  font:600 14px/1.3 system-ui,sans-serif;
-  letter-spacing:-.01em;
-}
-#dashboardView .dashboard-deadline-card .deadline-copy span:last-child{
-  font:400 10px/1.4 system-ui,sans-serif;
-}
-#dashboardView .dashboard-deadline-card .deadline-picker{
-  min-height:34px;
-  padding:6px 10px;
-  border-radius:8px;
-  font:600 10px/1 system-ui,sans-serif;
-  box-shadow:none;
-}
 #dashboardView .beautiful-dashboard .dashcols{gap:10px}
 #dashboardView .beautiful-dashboard .recent-quizzes-panel{
   padding:14px 16px;
@@ -3277,7 +3194,6 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
   color:var(--primary);
 }
 body.dark #dashboardView .beautiful-dashboard .metric,
-body.dark #dashboardView .dashboard-deadline-card,
 body.dark #dashboardView .beautiful-dashboard .recent-quizzes-panel{
   background:var(--surface);
   box-shadow:none;
@@ -3295,19 +3211,6 @@ body.dark #dashboardView .beautiful-dashboard .recent-quizzes-panel{
   #dashboardView .beautiful-dashboard .metric{padding:11px}
   #dashboardView .beautiful-dashboard .metric small{font-size:9px}
   #dashboardView .beautiful-dashboard .metric b{font-size:17px}
-  #dashboardView .dashboard-deadline-card{
-    grid-template-columns:32px minmax(0,1fr);
-    gap:9px;
-    padding:11px;
-    margin-bottom:10px;
-  }
-  #dashboardView .dashboard-deadline-card .deadline-icon{width:30px;height:30px}
-  #dashboardView .dashboard-deadline-card .deadline-picker{
-    grid-column:2;
-    justify-self:start;
-    min-height:30px;
-    margin-top:2px;
-  }
   #dashboardView .beautiful-dashboard .recent-quizzes-panel{padding:12px}
 }
 @media(max-width:380px){
