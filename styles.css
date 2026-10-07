@@ -2589,3 +2589,28 @@ body:not(.dark).scheme-slate{
   --ink:#202a38;--paper:#fcfdff;--paper2:#e3e8ef;--accent:#405d86;--accent2:#6788b4;--gold:#b57d2c;--green:#287b65;
   --ux-primary:#405d86;--ux-primary-2:#6788b4;background:radial-gradient(circle at 85% 0%,#dce4ef 0,transparent 35%),var(--bg)
 }
+
+/* Quiet, readable surfaces for answer and explanation cards. */
+#examView #explanation,
+#examView .practice-answer-panel{
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--primary) 6%,var(--surface)),
+    color-mix(in srgb,var(--surface2) 46%,var(--surface))) !important;
+  border:1px solid color-mix(in srgb,var(--primary) 18%,var(--line)) !important;
+  border-left:4px solid color-mix(in srgb,var(--primary) 58%,var(--gold)) !important;
+  border-radius:13px !important;
+  box-shadow:0 5px 16px rgba(24,33,47,.045);
+}
+#examView #explanation strong,
+#examView .practice-answer-panel .answer-label{
+  color:var(--text);
+}
+body.dark #examView #explanation,
+body.dark #examView .practice-answer-panel{
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--primary) 13%,var(--surface)),
+    color-mix(in srgb,var(--surface2) 58%,var(--surface))) !important;
+  border-color:color-mix(in srgb,var(--primary) 27%,var(--line)) !important;
+  border-left-color:color-mix(in srgb,var(--primary) 70%,var(--gold)) !important;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);
+}
