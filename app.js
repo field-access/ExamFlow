@@ -349,7 +349,7 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"System Default",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"IBM Plex Mono",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -368,7 +368,7 @@ function applySettings(){
  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
- const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"System Default";
+ const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"IBM Plex Mono";
  const schemes=["classic","ocean","forest","sunset","slate"];
  document.body.classList.remove(...schemes.map(x=>`scheme-${x}`));
  const scheme=schemes.includes(settings.colorScheme)?settings.colorScheme:"classic";
@@ -385,7 +385,8 @@ function applySettings(){
  const soundToggle=document.getElementById("soundOnBtn"),soundMute=document.getElementById("soundOffBtn");
  if(soundToggle)soundToggle.classList.toggle("active",soundOn);
  if(soundMute)soundMute.classList.toggle("active",!soundOn);
- let fstr = "'Inter', 'Segoe UI', Arial, sans-serif";
+ let fstr = "'IBM Plex Mono', Consolas, monospace";
+ if(settings.fontFamily==="System Default") fstr = "'IBM Plex Mono', Consolas, monospace";
  if(settings.fontFamily==="Serif Elegant") fstr = "'Latin Modern Roman', 'Computer Modern', 'STIX Two Text', 'Times New Roman', serif";
  if(settings.fontFamily==="Modern Rounded") fstr = "'Nunito', 'Quicksand', 'Arial Rounded MT Bold', sans-serif";
  if(settings.fontFamily==="Monospace") fstr = "'Cascadia Code', 'SFMono-Regular', Consolas, monospace";
@@ -404,10 +405,7 @@ function setDefaultMode(x){settings.defaultMode=x;put(K.settings,settings);setMo
 function updateTheme(){document.getElementById("lightBtn").classList.toggle("active",settings.theme==="light");document.getElementById("darkBtn").classList.toggle("active",settings.theme==="dark")}
 function updateTimerUI(){
  const examEl=document.getElementById("timer");
- const active=mode==="practice"?timerState.practiceSeconds:timerState.examSeconds;
  if(examEl)examEl.textContent=formatGlobalTime(timerState.examSeconds);
- const headerTimer=document.getElementById("globalTimer");
- if(headerTimer)headerTimer.textContent=formatGlobalTime(timerState.examSeconds);
  const examCtl=document.getElementById("examTimerControl");
  if(examCtl)examCtl.style.display=mode==="exam"?"flex":"none";
 }
@@ -533,6 +531,24 @@ function normalize(q,defaults={}){
  return {type:type==="image_choice"?"image_choice":type==="image"?"image":"mcq",text,options:options.map(String),answer,explanation,hint,marks,negativeMarks,section,image};
 }
 
+function escapeInvalidJsonBackslashes(text){
+ let output="",inString=false;
+ for(let i=0;i<text.length;i++){
+   const char=text[i];
+   if(char==='"'){inString=!inString;output+=char;continue}
+   if(!inString||char!=="\\"){output+=char;continue}
+   const next=text[i+1];
+   const latexCommand=text.slice(i+1).match(/^(?:text|times|theta|therefore|thinspace|rightarrow|right|rho|begin|beta|bigg|big|bold|bar|frac|forall|function|neq|nabla|not|nu)(?![A-Za-z])/);
+   if(latexCommand){output+="\\\\"+latexCommand[0];i+=latexCommand[0].length;continue}
+   if(next&&'"\\/bfnrt'.includes(next)){output+=char+next;i++;continue}
+   if(next==="u"&&/^[\da-f]{4}$/i.test(text.slice(i+2,i+6))){
+     output+=text.slice(i,i+6);i+=5;continue;
+   }
+   output+="\\\\";
+ }
+ return output;
+}
+
 function parseQuizInput(raw){
   let text=String(raw??"").trim();
   if(!text)throw Error("Paste quiz JSON first.");
@@ -550,6 +566,9 @@ function parseQuizInput(raw){
   let parsed=direct();
   if(parsed!==null)return parsed;
 
+  const escapedBackslashes=escapeInvalidJsonBackslashes(text);
+  try{return JSON.parse(escapedBackslashes)}catch(e){}
+
   let candidate=text;
   const firstObj=text.indexOf("{"),firstArr=text.indexOf("[");
   let start=-1;
@@ -557,6 +576,7 @@ function parseQuizInput(raw){
   else if(firstArr<0)start=firstObj;
   else start=Math.min(firstObj,firstArr);
   if(start>0)candidate=text.slice(start);
+  candidate=escapeInvalidJsonBackslashes(candidate);
 
   // Remove JS-style comments outside strings and trailing commas.
   candidate=candidate
@@ -588,7 +608,7 @@ function parseQuizInput(raw){
       const clipped=candidate.slice(0,end+1);
       try{return JSON.parse(clipped)}catch(_){}
     }
-    throw Error("Quiz JSON could not be repaired. Paste the JSON, optionally inside ```json ... ```, and the quiz will try to recover common formatting errors.");
+    throw Error("Quiz JSON could not be parsed. Escape LaTeX backslashes inside JSON strings (for example, write `\\\\lambda` or `\\\\|`). You can paste plain JSON or wrap it in a ```json code block.");
   }
 }
 
@@ -692,10 +712,93 @@ function formatExplanationText(text){
   if(text==null)return "";
   return String(text).trim();
 }
+function renderQuizInlineMarkdown(text){
+  const tokens=[];
+  const hold=html=>`\uE000${tokens.push(html)-1}\uE001`;
+  const protectedText=String(text).replace(/(`[^`\n]+`|\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)|\$[^$\n]+\$)/g,match=>{
+    if(match[0]==="`")return hold(`<code class="quiz-inline-code">${esc(match.slice(1,-1))}</code>`);
+    return hold(esc(match));
+  });
+  let html=esc(protectedText);
+  html=html
+    .replace(/&lt;u&gt;([\s\S]+?)&lt;\/u&gt;/gi,"<u>$1</u>")
+    .replace(/\+\+([^+\n]+)\+\+/g,"<u>$1</u>")
+    .replace(/\*\*([^*\n]+)\*\*/g,"<strong>$1</strong>")
+    .replace(/(^|[^\w])__([^_\n]+)__(?!\w)/g,"$1<strong>$2</strong>")
+    .replace(/~~([^~\n]+)~~/g,"<del>$1</del>")
+    .replace(/\*([^*\n]+)\*/g,"<em>$1</em>")
+    .replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,"$1<em>$2</em>");
+  return html.replace(/\uE000(\d+)\uE001/g,(_,index)=>tokens[Number(index)]);
+}
+function quizMarkdownHtml(text){
+  const lines=String(text??"").replace(/\\n/g,"\n").replace(/\r\n?/g,"\n").split("\n");
+  const blocks=[];
+  let paragraph=[],i=0;
+  const flushParagraph=()=>{
+    if(paragraph.length){
+      blocks.push(`<p>${paragraph.map(renderQuizInlineMarkdown).join("<br>")}</p>`);
+      paragraph=[];
+    }
+  };
+  while(i<lines.length){
+    const line=lines[i],trimmed=line.trim();
+    if(!trimmed){flushParagraph();i++;continue}
+    if(/^```/.test(trimmed)){
+      flushParagraph();
+      const inlineWithLanguage=trimmed.match(/^```([A-Za-z0-9_+-]+)[ \t]+([\s\S]*?)```$/);
+      const isSingleLine=trimmed.length>=6&&trimmed.endsWith("```");
+      const lang=(inlineWithLanguage?.[1]||"").replace(/[^A-Za-z0-9_+-]/g,"");
+      const code=inlineWithLanguage
+        ?[inlineWithLanguage[2].trimEnd()]
+        :isSingleLine
+          ?[trimmed.slice(3,-3)]
+          :[];
+      if(!isSingleLine){
+        i++;
+        while(i<lines.length&&!/^```/.test(lines[i].trim()))code.push(lines[i++]);
+        if(i<lines.length)i++;
+      }else i++;
+      blocks.push(`<pre class="quiz-code-block"><code${lang?` class="language-${lang}"`:""}>${esc(code.join("\n"))}</code></pre>`);
+      continue;
+    }
+    const heading=trimmed.match(/^(#{1,3})\s+(.+)$/);
+    if(heading){
+      flushParagraph();
+      const level=heading[1].length+2;
+      blocks.push(`<h${level}>${renderQuizInlineMarkdown(heading[2])}</h${level}>`);
+      i++;continue;
+    }
+    const listItem=trimmed.match(/^([-*+]|\d+[.)])\s+(.+)$/);
+    if(listItem){
+      flushParagraph();
+      const ordered=/^\d/.test(listItem[1]),items=[];
+      while(i<lines.length){
+        const match=lines[i].trim().match(/^([-*+]|\d+[.)])\s+(.+)$/);
+        if(!match||/^\d/.test(match[1])!==ordered)break;
+        items.push(`<li>${renderQuizInlineMarkdown(match[2])}</li>`);
+        i++;
+      }
+      blocks.push(`<${ordered?"ol":"ul"}>${items.join("")}</${ordered?"ol":"ul"}>`);
+      continue;
+    }
+    paragraph.push(line);i++;
+  }
+  flushParagraph();
+  return blocks.join("");
+}
 function setQuizRichText(element,text){
   if(!element)return;
-  // JSON authors sometimes provide a literal "\\n" instead of a decoded line break.
-  element.textContent=String(text??"").replace(/\\n/g,"\n");
+  element.classList.add("quiz-rich-text");
+  element.innerHTML=quizMarkdownHtml(text);
+}
+function setQuizExplanation(element,text){
+  if(!element)return;
+  element.innerHTML="<strong>💡 Explanation</strong>";
+  const content=document.createElement("div");
+  content.className="explanation-content";
+  setQuizRichText(content,formatExplanationText(text));
+  element.appendChild(content);
+  renderAllQuizMath(element);
 }
 function renderAllQuizMath(root=document){
   if(!root||typeof renderMathInElement!=="function")return;
@@ -846,7 +949,7 @@ function renderSpecialQuestion(q,opts){
      const letter=String.fromCharCode(65+i),b=document.createElement("button");
      b.className="option"+(answers[current]===letter?" selected":"");
      const letterEl=document.createElement("span");letterEl.className="letter";letterEl.textContent=letter;
-     const textEl=document.createElement("span");textEl.className="option-text";setQuizRichText(textEl,text);
+     const textEl=document.createElement("div");textEl.className="option-text";setQuizRichText(textEl,text);
      b.append(letterEl,textEl);
      b.onclick=()=>choose(letter);opts.appendChild(b);
    });
@@ -1048,6 +1151,9 @@ Example:
 Avoid: "Determine the appropriate structural invariant governing candidate elimination."
 Prefer: "What must remain true about the candidates after each step?"
 
+TEXT FORMATTING:
+Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
+
 CBQ COMMAND MODES:
 Read any CBQ command included with the topic, source, or question. A command starts with CBQ/. Commands can be combined. Apply every requested mode together.
 - CBQ/mental: mental-set and problem-solving aptitude.
@@ -1103,12 +1209,13 @@ Your task:
 - Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.
 - Give every question a correct answer and marks. Use negativeMarks only when appropriate.
 - Keep all question and answer text inside the JSON values.
+- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
 
 Math and LaTeX:
 - Use inline LaTeX such as $E=mc^2$ inside JSON strings when helpful.
 - Use display LaTeX such as $$\\int_0^1 x^2 dx$$ when a separate equation is needed.
 - ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.
-- Escape backslashes correctly for JSON strings.
+- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
 
 Images:
 - For image questions, use a publicly accessible HTTPS image URL in the "image" field.
@@ -1191,7 +1298,7 @@ function render(){
  const apExisting=document.getElementById("practiceAnswerPanel");
  if(apExisting && apExisting.dataset.question!==String(current))apExisting.remove();
  document.getElementById("currentLabel").textContent=current+1;document.getElementById("totalLabel").textContent=questions.length;
- document.getElementById("questionText").innerHTML=esc(q.text||"");
+ setQuizRichText(document.getElementById("questionText"),q.text||"");
  const hintCard=document.getElementById("hintCard"),hintText=document.getElementById("hintText"),hintToggle=document.getElementById("hintToggle");
  const hasHint=String(q.hint||"").trim()!=="";
  if(hintCard&&hintText&&hintToggle){
@@ -1218,8 +1325,7 @@ function render(){
    fb.style.color=correct?"var(--good)":"var(--bad)";
    if(q.explanation){
      ex.style.display="block";
-     ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content' style='white-space:pre-wrap;'>"+esc(formatExplanationText(q.explanation))+"</div>";
-     renderAllQuizMath(ex);
+     setQuizExplanation(ex,q.explanation);
    }else ex.style.display="none";
  }else{fb.textContent="";ex.style.display="none";}
  document.getElementById("bookmark").textContent=reviews.has(current)?"★ Review":"☆ Review";document.getElementById("bookmark").classList.toggle("saved",reviews.has(current));
@@ -1308,8 +1414,10 @@ REQUIREMENTS:
 - Use the same subject terminology as the original question.
 - Include explanations for each CBQ.
 - Add a short optional "hint" when useful; hints should guide reasoning without revealing the answer.
+- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
 - Use exactly 2 options for MCQs by default.
 - Put mathematical expressions in $...$ or $$...$$.
+- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
 - Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
 - Return only that JSON code block. Do not include prose outside the code block.
 - The JSON must be valid JSON.
@@ -1607,10 +1715,6 @@ function renderDashboard(){
    row.addEventListener("click",()=>openSavedResult(result.id));
    row.querySelectorAll(".session-delete").forEach(button=>button.addEventListener("click",event=>event.stopPropagation()));
  });
- const latest=rs[0],ad=document.getElementById("advice");
- if(!latest)ad.innerHTML='<div class="empty">Complete a test to unlock performance advice.</div>';
- else ad.innerHTML=`<strong>Latest: ${latest.percent}%</strong><p style="color:var(--muted);font-size:12px;line-height:1.6">${latest.percent>=80?"Strong performance. Push consistency with timed Exam Mode.":latest.percent>=60?"Good foundation. Use Practice Mode on weak topics, then retest.":"Focus on concept breakdown first, then repeat the same quiz after revision."}</p>`;
-
 }
 function deleteResult(id) {
   const rs = get(K.results, []);
@@ -2062,9 +2166,6 @@ function syncExamTitleBar(){
     if(bar){bar.textContent=examName;bar.title=examName;}
     if(globalTitle){globalTitle.textContent=examName;globalTitle.title=examName;}
   }
-  const oldTimer=document.getElementById("timer");
-  const globalTimer=document.getElementById("globalTimer");
-  if(oldTimer&&globalTimer)globalTimer.textContent=oldTimer.textContent;
 }
 
 function showView(name){
@@ -2190,8 +2291,7 @@ function viewPracticeAnswer(){
   const ex=document.getElementById("explanation");
   if(ex&&q.explanation){
     ex.style.display="block";
-    ex.innerHTML="<strong>💡 Explanation</strong><div class='explanation-content' style='white-space:pre-wrap;'>"+esc(q.explanation)+"</div>";
-    renderAllQuizMath(ex);
+    setQuizExplanation(ex,q.explanation);
   }
   highlightCorrectAnswerForView(q);
 }
@@ -2281,9 +2381,7 @@ function checkCurrentAnswer(){
  const ex=document.getElementById("explanation");
  if(q.explanation){
    ex.style.display="block";
-   ex.innerHTML="<strong>💡 Explanation</strong><div style='margin-top:6px;line-height:1.6;white-space:pre-wrap;'>"+esc(q.explanation)+"</div>";
-   renderAllQuizMath(ex);
-   renderAllQuizMath(document.getElementById("explanation"));
+   setQuizExplanation(ex,q.explanation);
  }
  // In practice mode, checking is always allowed. In exam mode it is
  // intentionally feedback-only and does not reveal correctness until submit.

@@ -29,10 +29,8 @@
     <button id="navSettings" onclick="showView('settings')">Settings</button>
   </nav>
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
-  <div class="global-exam-controls" style="display:flex; align-items: center; gap: 5px;">
+  <div class="global-exam-controls">
     <button id="examHomeBtn" class="btn exam-home-btn" type="button" onclick="showView('home')" aria-label="Go to home from exam"><span class="exam-home-full">⌂ Home</span><span class="exam-home-compact" aria-hidden="true">⌂</span></button>
-    <button id="globalExamProgressBtn" class="btn" type="button" onclick="toggleQuestionProgress()">☷ Questions</button>
-    <div class="global-exam-timer">⏱ <span id="globalTimer">30:00</span></div>
   </div>
   <div class="header-right" hidden>
     <div class="pill" id="headerQuizName">CBQ Practice</div>
@@ -110,10 +108,9 @@
     <div>
       <div class="hero-kicker">BEGINNER GUIDE</div>
       <h3>📋 CBQ JSON schema</h3>
-      <p>New to CBQ JSON? Copy the complete schema below and replace the example values. The full template stays hidden until you need it.</p>
+      <p>Copy the template and replace the example values.</p>
     </div>
   </div>
-  <div class="schema-mini">7 question types · sections · timing · marks · explanations · LaTeX · images</div>
   <textarea id="beginnerSchema" hidden>{
   "name": "My Exam",
   "sections": [
@@ -239,7 +236,7 @@
       <button id="bookmark" class="bookmark" onclick="toggleReview()">☆ Review</button>
     </div>
   </div>
-  <h2 id="questionText">Paste a quiz JSON to start.</h2>
+  <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
   <div id="hintCard" class="hint-card" hidden>
     <button id="hintToggle" class="hint-toggle" type="button" onclick="toggleHint()" aria-expanded="false" aria-controls="hintText">💡 Show hint</button>
     <div id="hintText" class="hint-text" hidden></div>
@@ -284,7 +281,6 @@
   <div class="dashcols" style="display:flex; flex-direction:column; gap:16px;">
     <section class="panel card recent-quizzes-panel"><div class="panel-heading"><div><h3>Recent Quizzes</h3><small>Your recently opened quizzes</small></div></div><div id="recentQuizzesList"></div></section>
     <section class="panel card results-panel"><div class="panel-heading"><div><h3>Recent performance</h3><small>Your latest saved sessions</small></div><button class="text-btn" aria-label="Refresh dashboard" onclick="renderDashboard()">↻</button></div><div id="resultsList"></div></section>
-    <section class="panel card advice-panel"><div class="panel-heading"><div><h3>Next improvement</h3><small>A simple direction for your next session</small></div><span class="advice-mark">↗</span></div><div id="advice" class="empty">Complete a test to unlock performance advice.</div></section>
   </div>
 </div>
 </section>
@@ -389,11 +385,11 @@
 <div class="dashboard">
   <div class="dashhead"><div><h1>⚙️ Settings</h1><p>Customize ExamFlow.</p></div></div>
   <div class="settings">
-    <section class="setting card"><h3>🌙 Appearance</h3><p>Switch between light and dark mode.</p><div id="persistentStorageStatus" class="paste-status" style="margin-top:10px">💾 Automatic persistent backup enabled</div>
+    <section class="setting card setting-appearance"><h3>🌙 Appearance</h3><p>Switch between light and dark mode.</p><div id="persistentStorageStatus" class="paste-status" style="margin-top:10px">💾 Automatic persistent backup enabled</div>
 <div class="setting-actions"><button id="lightBtn" class="modebtn" onclick="setTheme('light')">☀️ Light</button><button id="darkBtn" class="modebtn" onclick="setTheme('dark')">🌙 Dark</button></div></section>
     <section class="setting card"><h3>🧠 Default mode</h3><p>New quizzes start in this mode.</p><div class="setting-actions"><button id="defaultPractice" class="modebtn" onclick="setDefaultMode('practice')">Practice</button><button id="defaultExam" class="modebtn" onclick="setDefaultMode('exam')">Exam</button></div></section>
-    <section class="setting card"><h3>🔤 Font Selection</h3><p>Choose a beautiful font for questions and options.</p><div class="setting-control"><select id="fontSelect" onchange="saveSettings()">
-<option value="System Default">System Default (Inter)</option>
+    <section class="setting card"><h3>🔤 Font Selection</h3><p>Choose the default font for ExamFlow.</p><div class="setting-control"><select id="fontSelect" onchange="saveSettings()">
+<option value="System Default">System Default (IBM Plex Mono)</option>
 <option value="Serif Elegant">Serif Elegant (Georgia)</option>
 <option value="Modern Rounded">Modern Rounded (Quicksand)</option>
 <option value="Monospace">Monospace (Cascadia Code)</option>
@@ -416,7 +412,7 @@
 <option value="sunset">Warm Sunset</option>
 <option value="slate">Slate Ink</option>
 </select></div></section>
-    <section class="setting card"><h3>🔊 Interface sounds</h3><p>Play clear, energetic sounds for button feedback and answer results.</p><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)">🔊 Sounds on</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">🔇 Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test sound</button></div></section>
+    <section class="setting card setting-sounds"><h3>🔊 Interface sounds</h3><p>Play clear, energetic sounds for button feedback and answer results.</p><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)">🔊 Sounds on</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">🔇 Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test sound</button></div></section>
     <section class="setting card"><h3>⏱️ Default duration</h3><p>Used when a quiz does not specify a total duration or section times.</p><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
 <option value="5">5 minutes</option><option value="10">10 minutes</option>
 <option value="15">15 minutes</option><option value="20">20 minutes</option>
@@ -424,8 +420,8 @@
 <option value="60">60 minutes</option>
 </select></div></section>
 
-    <section class="setting card"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
-<section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3><p>Fast controls for the whole app. ExamFlow avoids browser-reserved Ctrl/Cmd shortcuts and ignores app shortcuts while you are typing.</p>
+    <section class="setting card setting-scoring"><h3>🏆 Default scoring</h3><p>Used when questions do not specify marks or negative marks.</p><div class="setting-scoring-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div><label style="font-size:10px;color:var(--muted)">Marks</label><input id="defaultMarks" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div><div><label style="font-size:10px;color:var(--muted)">Negative</label><input id="defaultNegative" class="goalinput" type="number" step="0.25" min="0" onchange="saveSettings()"></div></div></section>
+<details class="setting card keyboard-shortcuts-card"><summary><h3>⌨️ Keyboard shortcuts</h3><p>Show all available keyboard controls.</p></summary>
 <div class="shortcut-grid">
 <div><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>5</kbd><span>Home / Exam / Results / Plan / Settings</span></div>
 <div><kbd>Alt</kbd> + <kbd>M</kbd><span>Toggle mobile navigation</span></div>
@@ -452,8 +448,8 @@
 <div><kbd>H</kbd><span>Return to home</span></div>
 <div><kbd>Esc</kbd><span>Close importer, submit dialog, sessions or palette</span></div>
 <div><kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd><span>Results: Retake / Save / Change exam</span></div>
-</div></section>
-<section class="setting card"><h3>💾 Local data</h3><p>Quizzes, sessions, results, goals and plans stay in this browser.</p><div class="setting-actions">
+</div></details>
+<section class="setting card setting-data"><h3>💾 Local data</h3><p>Quizzes, sessions, results, goals and plans stay in this browser.</p><div class="setting-actions">
 <button class="btn" onclick="exportData()">Export JSON</button>
 <label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>
 <button class="btn" onclick="resetData()">Reset data</button>

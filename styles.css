@@ -1,5 +1,5 @@
-:root{--bg:#f5f7fb;--surface:#fff;--surface2:#f0f3f8;--text:#18212f;--muted:#697386;--line:#e2e7ef;--primary:#4f46e5;--good:#16a34a;--warn:#d97706;--bad:#dc2626;--shadow:0 12px 35px rgba(24,33,47,.08);--radius:18px}
-*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--text)}
+:root{--bg:#f5f7fb;--surface:#fff;--surface2:#f0f3f8;--text:#18212f;--muted:#697386;--line:#e2e7ef;--primary:#4f46e5;--good:#16a34a;--warn:#d97706;--bad:#dc2626;--shadow:0 12px 35px rgba(24,33,47,.08);--radius:18px;--exam-font:"IBM Plex Mono",Consolas,monospace}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{font-family:var(--exam-font);background:var(--bg);color:var(--text)}
 body.dark{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--text:#f8fafc;--muted:#94a3b8;--line:#475569;--primary:#818cf8;--good:#34d399;--warn:#fbbf24;--bad:#f87171;--shadow:0 14px 38px rgba(0,0,0,.28)}
 button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}
 header{height:68px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 22px;gap:18px;position:sticky;top:0;z-index:30}
@@ -805,6 +805,7 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
     box-sizing:border-box;
   }
 }
+
 /* Center the exam workspace in the available content area while keeping the
    persistent question sidebar independent of the question card. */
 #examView .main{
@@ -1937,9 +1938,12 @@ body.exam-active #examView .question h2{
 .hint-card{
   max-width:700px;
   margin:0 auto 14px;
-  border:1px solid color-mix(in srgb,var(--gold) 38%,var(--line));
-  border-radius:13px;
-  background:color-mix(in srgb,var(--gold) 8%,var(--surface));
+  border:1px solid color-mix(in srgb,var(--ux-primary) 20%,var(--line));
+  border-radius:14px;
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--ux-primary) 7%,var(--surface)),
+    color-mix(in srgb,var(--ux-primary-2) 5%,var(--surface)));
+  box-shadow:0 5px 18px color-mix(in srgb,var(--ux-primary) 6%,transparent);
   overflow:hidden;
 }
 .hint-toggle{
@@ -1955,17 +1959,23 @@ body.exam-active #examView .question h2{
   cursor:pointer;
 }
 .hint-toggle:hover,.hint-toggle:focus-visible{
-  background:color-mix(in srgb,var(--gold) 13%,var(--surface));
+  background:color-mix(in srgb,var(--ux-primary) 8%,transparent);
 }
 .hint-text{
   padding:0 14px 13px;
-  color:var(--muted);
+  color:var(--text);
   font-size:13px;
   line-height:1.6;
   overflow-wrap:anywhere;
 }
 .hint-text .quiz-code-block{margin:8px 0 0}
-body.dark .hint-card{background:color-mix(in srgb,var(--gold) 12%,var(--surface))}
+body.dark .hint-card{
+  border-color:color-mix(in srgb,var(--ux-primary) 25%,var(--line));
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--ux-primary) 14%,var(--surface)),
+    color-mix(in srgb,var(--ux-primary-2) 10%,var(--surface)));
+  box-shadow:0 7px 22px rgba(0,0,0,.16);
+}
 body.exam-active #examView .options{
   max-width:700px;
   gap:8px;
@@ -2182,8 +2192,8 @@ img,svg,textarea,pre,code{max-width:100%}
 }
 
 /* Home landing: explain the method beside the place where users start. */
-:root{--serif:'Source Serif 4',Georgia,'Times New Roman',serif}
-body{font-family:'Source Serif 4',Georgia,'Times New Roman',serif;background:
+:root{--serif:var(--exam-font)}
+body{font-family:var(--exam-font);background:
   radial-gradient(circle at 8% 18%,rgba(183,138,60,.13),transparent 25%),
   radial-gradient(circle at 92% 75%,rgba(63,79,143,.12),transparent 29%),
   linear-gradient(135deg,#f8f4ec 0%,#f3f5f8 52%,#eef1f6 100%)}
@@ -2222,8 +2232,8 @@ body.exam-active header{
   flex-direction:row;
   align-items:center;
   justify-content:space-between;
-  height:50px;
-  min-height:50px;
+  height:44px;
+  min-height:44px;
   padding:0 clamp(10px,2.5vw,24px);
   gap:12px;
   border-bottom:1px solid color-mix(in srgb,var(--primary) 18%,var(--line));
@@ -2281,17 +2291,17 @@ body.exam-active .global-exam-timer span{
 }
 @media(max-width:600px){
   body.exam-active header{
-    height:46px;
-    min-height:46px;
-    padding:0 7px;
-    gap:6px;
+    height:40px;
+    min-height:40px;
+    padding:0 9px;
+    gap:7px;
   }
   body.exam-active header .mobile-menu-toggle{
     display:inline-flex !important;
     order:1;
     flex:0 0 auto;
-    min-height:32px;
-    padding:5px 8px;
+    min-height:30px;
+    padding:4px 8px;
     border-radius:9px;
     font-size:10px;
   }
@@ -2596,15 +2606,14 @@ body:not(.dark).scheme-slate{
 /* Translucent, softly illuminated surfaces for answer and explanation cards. */
 #examView #explanation,
 #examView .practice-answer-panel{
-  background:
-    radial-gradient(ellipse at 0% 0%,color-mix(in srgb,var(--ux-primary) 13%,transparent),transparent 58%),
-    linear-gradient(125deg,color-mix(in srgb,var(--surface) 84%,var(--ux-primary)),color-mix(in srgb,var(--surface2) 48%,var(--surface))) !important;
-  border:1px solid color-mix(in srgb,var(--ux-primary) 28%,var(--line)) !important;
-  border-left:3px solid color-mix(in srgb,var(--ux-primary) 72%,var(--primary)) !important;
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--ux-primary) 7%,var(--surface)),
+    color-mix(in srgb,var(--surface2) 42%,var(--surface))) !important;
+  border:1px solid color-mix(in srgb,var(--ux-primary) 14%,var(--line)) !important;
   border-radius:15px !important;
-  box-shadow:0 8px 24px color-mix(in srgb,var(--ux-primary) 9%,transparent),inset 0 1px 0 rgba(255,255,255,.55);
-  -webkit-backdrop-filter:blur(16px) saturate(140%);
-  backdrop-filter:blur(16px) saturate(140%);
+  box-shadow:0 6px 20px color-mix(in srgb,var(--ux-primary) 6%,transparent);
+  -webkit-backdrop-filter:blur(18px) saturate(120%);
+  backdrop-filter:blur(18px) saturate(120%);
 }
 #examView #explanation strong,
 #examView .practice-answer-panel .answer-label{
@@ -2612,12 +2621,11 @@ body:not(.dark).scheme-slate{
 }
 body.dark #examView #explanation,
 body.dark #examView .practice-answer-panel{
-  background:
-    radial-gradient(ellipse at 0% 0%,color-mix(in srgb,var(--ux-primary) 21%,transparent),transparent 60%),
-    linear-gradient(125deg,color-mix(in srgb,var(--surface) 86%,var(--ux-primary)),color-mix(in srgb,var(--surface2) 48%,var(--surface))) !important;
-  border-color:color-mix(in srgb,var(--ux-primary) 35%,var(--line)) !important;
-  border-left-color:color-mix(in srgb,var(--ux-primary) 80%,var(--primary)) !important;
-  box-shadow:0 10px 28px rgba(0,0,0,.22),0 0 22px color-mix(in srgb,var(--ux-primary) 11%,transparent),inset 0 1px 0 rgba(255,255,255,.07);
+  background:linear-gradient(135deg,
+    color-mix(in srgb,var(--ux-primary) 13%,var(--surface)),
+    color-mix(in srgb,var(--surface2) 48%,var(--surface))) !important;
+  border-color:color-mix(in srgb,var(--ux-primary) 20%,var(--line)) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16);
 }
 
 /* Brighter, cohesive base theme and more tactile shared surfaces. */
@@ -2718,6 +2726,36 @@ body.dark .card{
   background:color-mix(in srgb,var(--surface) 95%,var(--ux-primary));
   border-color:color-mix(in srgb,var(--ux-primary) 17%,var(--line));
 }
+.question-prompt{
+  max-width:68ch;
+  margin:18px auto 21px;
+  color:var(--text);
+  font-family:var(--exam-font,"Inter","Segoe UI",Arial,sans-serif);
+  font-size:clamp(20px,2.1vw,25px);
+  font-weight:500;
+  line-height:1.58;
+  letter-spacing:0;
+  overflow-wrap:anywhere;
+}
+.quiz-rich-text p{margin:.55em 0}
+.quiz-rich-text p:first-child{margin-top:0}
+.quiz-rich-text p:last-child{margin-bottom:0}
+.quiz-rich-text ul,.quiz-rich-text ol{
+  margin:.65em 0;
+  padding-inline-start:1.55em;
+}
+.quiz-rich-text li{padding-inline-start:.18em}
+.quiz-rich-text li+li{margin-top:.28em}
+.quiz-rich-text u{text-decoration-thickness:.09em;text-underline-offset:.15em}
+.option-text.quiz-rich-text{flex:1 1 auto;min-width:0}
+.option-text.quiz-rich-text p{margin:.15em 0}
+.option-text.quiz-rich-text ul,.option-text.quiz-rich-text ol{margin:.35em 0}
+@media(max-width:800px){
+  .question-prompt{max-width:36ch;font-size:20px;line-height:1.55}
+}
+@media(max-width:430px){
+  .question-prompt{font-size:18px;margin:15px auto}
+}
 @media(max-width:600px){
   body.exam-active .global-exam-controls{overflow:visible !important}
   body.exam-active .global-exam-title{min-width:0}
@@ -2725,4 +2763,558 @@ body.dark .card{
 @media(max-width:360px){
   body.exam-active .global-exam-title{display:none !important}
   body.exam-active .global-exam-controls{margin-left:auto}
+}
+
+/* Keep the mobile exam controls grouped and remove redundant header controls. */
+body:not(.exam-active) header .global-exam-controls{display:none !important}
+@media(max-width:600px){
+  body.exam-active header{
+    display:flex;
+    flex-direction:row;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    height:40px;
+    min-height:40px;
+    padding:0 10px;
+    gap:8px;
+  }
+  body.exam-active header .global-exam-title{display:none !important}
+  body.exam-active header .mobile-menu-toggle{
+    display:inline-flex !important;
+    order:0;
+    flex:0 0 auto;
+    min-height:30px;
+    padding:4px 9px;
+    font-size:11px;
+  }
+  body.exam-active .global-exam-controls{
+    display:flex;
+    order:1;
+    flex:0 0 auto;
+    width:auto;
+    margin-left:auto;
+    overflow:visible;
+  }
+  body.exam-active .global-exam-controls .exam-home-btn{
+    width:auto;
+    min-width:0;
+    min-height:30px;
+    padding:4px 9px;
+    justify-content:center;
+  }
+  body.exam-active .exam-home-full{display:inline !important}
+  body.exam-active .exam-home-compact{display:none !important}
+  #examView .qtop{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px 8px;
+  }
+  #examView .qtop>#examTimerControl{
+    grid-column:2;
+    grid-row:1;
+    justify-self:end;
+  }
+  #examView .qtop>div:nth-child(2){
+    grid-column:1;
+    grid-row:1;
+    justify-self:start;
+    white-space:nowrap;
+  }
+  #examView .qtop>#examTimerControl[style*="display: none"]+div{
+    grid-column:1/-1;
+    justify-self:start;
+  }
+  #examView .qtop .modepicker{
+    display:grid !important;
+    grid-column:1/-1;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    justify-content:stretch;
+    gap:7px;
+    width:100%;
+    min-width:0;
+    margin:0;
+    overflow:visible !important;
+  }
+  #examView .modepicker>.modebtn,
+  #examView .modepicker>.bookmark{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    min-width:0;
+    min-height:42px;
+    padding:7px 4px;
+    font-size:10px;
+    line-height:1.25;
+    text-align:center;
+    white-space:normal;
+    overflow-wrap:anywhere;
+    grid-column:auto !important;
+    grid-row:auto !important;
+  }
+  #examView .actions{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    align-items:stretch;
+  }
+  #examView .actions>div{display:contents}
+  #examView #prevBtn{grid-column:1;grid-row:1}
+  #examView #nextBtn{grid-column:2;grid-row:1}
+  #examView #viewAnswerBtn{grid-column:1;grid-row:2}
+  #examView .actions .btn[onclick="clearAnswer()"]{grid-column:2;grid-row:2}
+  #examView .actions .btn{
+    min-height:42px;
+    padding:8px 6px;
+    font-size:11px;
+  }
+}
+
+/* Rounded, theme-aware answer cards. */
+#examView .option{
+  border-radius:20px !important;
+  border-color:color-mix(in srgb,var(--ux-primary) 18%,var(--line));
+  background:var(--surface);
+}
+#examView .option:hover{
+  border-color:color-mix(in srgb,var(--ux-primary) 42%,var(--line));
+  background:color-mix(in srgb,var(--ux-primary) 4%,var(--surface));
+}
+#examView .option.selected{
+  border-color:color-mix(in srgb,var(--ux-primary) 64%,var(--line));
+  background:color-mix(in srgb,var(--ux-primary) 9%,var(--surface));
+}
+body.dark #examView .option:not(.correct):not(.answer-not-correct){
+  background:color-mix(in srgb,var(--surface) 94%,var(--ux-primary));
+}
+body.dark #examView .option.selected:not(.correct){
+  background:color-mix(in srgb,var(--ux-primary) 22%,var(--surface));
+}
+body.dark #examView .option:hover:not(.correct):not(.answer-not-correct){
+  background:color-mix(in srgb,var(--ux-primary) 14%,var(--surface));
+}
+
+/* Settings: compact, grouped rows with the controls easy to reach. */
+#settingsView .dashboard{
+  width:min(980px,calc(100% - 32px));
+  margin:24px auto 40px;
+}
+#settingsView .dashhead{margin-bottom:16px}
+#settingsView .dashhead h1{font-size:25px}
+#settingsView .dashhead p{font-size:12px}
+#settingsView .settings{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  align-items:start;
+  gap:10px;
+}
+#settingsView .setting.card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(150px,.85fr);
+  grid-template-rows:auto auto;
+  align-items:center;
+  gap:4px 14px;
+  min-width:0;
+  padding:13px 15px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  box-shadow:0 2px 8px rgba(24,33,47,.035);
+  background:color-mix(in srgb,var(--surface) 97%,var(--ux-primary));
+}
+#settingsView .setting.card::before{display:none}
+#settingsView .setting.card h3{
+  grid-column:1;
+  grid-row:1;
+  margin:0;
+  font-size:12px;
+  line-height:1.4;
+}
+#settingsView .setting.card>p{
+  grid-column:1;
+  grid-row:2;
+  align-self:start;
+  max-width:38ch;
+  margin:2px 0 0;
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.45;
+}
+#settingsView .setting-control,
+#settingsView .setting-actions{
+  grid-column:2;
+  grid-row:1 / span 2;
+  align-self:center;
+  min-width:0;
+  margin:0;
+}
+#settingsView .setting-control select{
+  width:100%;
+  min-height:36px;
+  margin:0;
+  padding:7px 9px;
+  border-radius:8px;
+  font-size:11px;
+}
+#settingsView .setting-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:5px;
+}
+#settingsView .setting-actions .btn,
+#settingsView .setting-actions .modebtn{
+  min-width:0;
+  min-height:34px;
+  padding:6px 8px;
+  border-radius:8px;
+  font-size:10px;
+  white-space:nowrap;
+}
+#settingsView .setting-appearance{
+  grid-template-rows:auto auto auto;
+}
+#settingsView .setting-appearance #persistentStorageStatus{
+  grid-column:1;
+  grid-row:3;
+  margin:2px 0 0 !important;
+  font-size:9px;
+}
+#settingsView .setting-appearance .setting-actions{
+  grid-column:2;
+  grid-row:1 / span 3;
+}
+#settingsView .setting-sounds .setting-actions,
+#settingsView .setting-data .setting-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+#settingsView .setting-sounds .setting-actions .btn:last-child{grid-column:1/-1}
+#settingsView .setting-scoring-fields{
+  grid-column:2;
+  grid-row:1 / span 2;
+  min-width:0;
+  gap:6px !important;
+  margin:0 !important;
+}
+#settingsView .setting-scoring-fields label{
+  display:block;
+  margin-bottom:2px;
+  font-size:9px !important;
+}
+#settingsView .setting-scoring-fields .goalinput{
+  min-height:34px;
+  margin:0;
+  padding:6px 8px;
+  font-size:12px;
+}
+#settingsView .setting-data #dataImportStatus{
+  grid-column:1;
+  grid-row:3;
+  margin:2px 0 0 !important;
+  font-size:9px;
+}
+#settingsView .setting-data{grid-template-rows:auto auto auto}
+#settingsView .setting-data .setting-actions{grid-row:1 / span 3}
+#settingsView .keyboard-shortcuts-card{
+  display:block;
+  grid-column:1/-1;
+  padding:0;
+}
+#settingsView .keyboard-shortcuts-card summary{
+  position:relative;
+  display:block;
+  padding:13px 42px 13px 15px;
+  cursor:pointer;
+  list-style:none;
+}
+#settingsView .keyboard-shortcuts-card summary::-webkit-details-marker{display:none}
+#settingsView .keyboard-shortcuts-card summary::after{
+  position:absolute;
+  top:50%;
+  right:16px;
+  color:var(--muted);
+  content:"⌄";
+  font-size:16px;
+  transform:translateY(-50%);
+  transition:transform .15s ease;
+}
+#settingsView .keyboard-shortcuts-card[open] summary::after{transform:translateY(-50%) rotate(180deg)}
+#settingsView .keyboard-shortcuts-card summary h3{margin:0;font-size:12px}
+#settingsView .keyboard-shortcuts-card summary p{margin:3px 0 0;font-size:10px}
+#settingsView .keyboard-shortcuts-card .shortcut-grid{
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px 8px;
+  margin:0;
+  padding:0 14px 14px;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-grid>div{
+  min-height:34px;
+  padding:6px 7px;
+  border:1px solid color-mix(in srgb,var(--line) 70%,transparent);
+  border-radius:8px;
+  background:color-mix(in srgb,var(--surface2) 60%,var(--surface));
+  font-size:9px;
+  line-height:1.35;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-grid span{
+  margin-left:auto;
+  text-align:right;
+  font-size:9px;
+  font-weight:500;
+}
+#settingsView .keyboard-shortcuts-card kbd{
+  min-width:20px;
+  padding:2px 4px;
+  font-size:8px;
+}
+body.dark #settingsView .setting.card{
+  background:color-mix(in srgb,var(--surface) 97%,var(--ux-primary));
+  box-shadow:0 2px 10px rgba(0,0,0,.12);
+}
+body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
+  border-color:color-mix(in srgb,var(--line) 78%,transparent);
+  background:color-mix(in srgb,var(--surface2) 72%,var(--surface));
+}
+@media(max-width:700px){
+  #settingsView .dashboard{
+    width:calc(100% - 24px) !important;
+    margin:16px auto 28px !important;
+  }
+  #settingsView .dashhead{margin-bottom:12px}
+  #settingsView .dashhead h1{font-size:22px}
+  #settingsView .settings{
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:7px !important;
+  }
+  #settingsView .setting.card{
+    grid-template-columns:minmax(0,1fr) minmax(145px,42%);
+    gap:3px 10px;
+    padding:11px 12px !important;
+    border-radius:11px;
+  }
+  #settingsView .setting.card h3{font-size:11px}
+  #settingsView .setting.card>p{font-size:9px;line-height:1.4}
+  #settingsView .setting-control select{min-height:34px;font-size:10px}
+  #settingsView .setting-actions{gap:4px}
+  #settingsView .setting-actions .btn,
+  #settingsView .setting-actions .modebtn{
+    min-height:32px;
+    padding:5px 6px;
+    font-size:9px;
+  }
+  #settingsView .setting-appearance #persistentStorageStatus,
+  #settingsView .setting-data #dataImportStatus{font-size:8px}
+  #settingsView .keyboard-shortcuts-card .shortcut-grid{
+    grid-template-columns:1fr !important;
+  }
+  #settingsView .keyboard-shortcuts-card .shortcut-grid span{
+    margin-left:7px;
+    text-align:left;
+  }
+}
+@media(max-width:380px){
+  #settingsView .setting.card{grid-template-columns:minmax(0,1fr) minmax(120px,40%)}
+  #settingsView .setting-sounds .setting-actions{
+    grid-template-columns:minmax(0,1fr);
+  }
+  #settingsView .setting-sounds .setting-actions .btn:last-child{grid-column:auto}
+  #settingsView .setting-data .setting-actions{grid-template-columns:minmax(0,1fr)}
+}
+
+/* Home dashboard: calm, Notion-inspired surfaces and compact information blocks. */
+#dashboardView .beautiful-dashboard{
+  width:min(940px,calc(100% - 40px));
+  max-width:940px;
+  margin:22px auto 40px;
+  padding-top:0;
+}
+#dashboardView .beautiful-dashboard .metrics{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin:0 0 14px;
+}
+#dashboardView .beautiful-dashboard .metric{
+  display:grid;
+  grid-template-columns:30px minmax(0,1fr);
+  grid-template-rows:auto auto;
+  align-items:center;
+  column-gap:10px;
+  min-width:0;
+  padding:13px 14px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface);
+  box-shadow:none;
+}
+#dashboardView .beautiful-dashboard .metric::before{display:none}
+#dashboardView .beautiful-dashboard .metric-icon{
+  grid-column:1;
+  grid-row:1 / span 2;
+  width:29px;
+  height:29px;
+  margin:0;
+  border-radius:8px;
+  background:var(--surface2);
+  color:var(--muted);
+  font-size:13px;
+}
+#dashboardView .beautiful-dashboard .metric-tests .metric-icon,
+#dashboardView .beautiful-dashboard .metric-average .metric-icon,
+#dashboardView .beautiful-dashboard .metric-best .metric-icon,
+#dashboardView .beautiful-dashboard .metric-questions .metric-icon{
+  background:var(--surface2);
+  color:var(--muted);
+}
+#dashboardView .beautiful-dashboard .metric small{
+  grid-column:2;
+  grid-row:1;
+  min-width:0;
+  color:var(--muted);
+  font:500 10px/1.35 system-ui,sans-serif;
+}
+#dashboardView .beautiful-dashboard .metric b{
+  grid-column:2;
+  grid-row:2;
+  display:block;
+  min-width:0;
+  margin:2px 0 0;
+  color:var(--text);
+  font:650 19px/1.2 system-ui,sans-serif;
+  letter-spacing:-.03em;
+}
+#dashboardView .dashboard-deadline-card{
+  grid-template-columns:36px minmax(0,1fr) auto;
+  gap:12px;
+  margin:0 0 14px;
+  padding:13px 15px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface);
+  box-shadow:none;
+}
+#dashboardView .dashboard-deadline-card .deadline-icon{
+  width:34px;
+  height:34px;
+  border-radius:8px;
+  background:var(--surface2);
+  color:var(--muted);
+}
+#dashboardView .dashboard-deadline-card .deadline-icon svg{width:19px;height:19px}
+#dashboardView .dashboard-deadline-card .deadline-copy{gap:3px}
+#dashboardView .dashboard-deadline-card .deadline-eyebrow{
+  font-size:9px;
+  letter-spacing:.08em;
+}
+#dashboardView .dashboard-deadline-card .deadline-copy strong{
+  font:600 14px/1.3 system-ui,sans-serif;
+  letter-spacing:-.01em;
+}
+#dashboardView .dashboard-deadline-card .deadline-copy span:last-child{
+  font:400 10px/1.4 system-ui,sans-serif;
+}
+#dashboardView .dashboard-deadline-card .deadline-picker{
+  min-height:34px;
+  padding:6px 10px;
+  border-radius:8px;
+  font:600 10px/1 system-ui,sans-serif;
+  box-shadow:none;
+}
+#dashboardView .beautiful-dashboard .dashcols{gap:10px}
+#dashboardView .beautiful-dashboard .recent-quizzes-panel{
+  padding:14px 16px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface);
+  box-shadow:none;
+}
+#dashboardView .beautiful-dashboard .panel-heading{margin-bottom:5px}
+#dashboardView .beautiful-dashboard .panel-heading h3{
+  margin:0 0 3px;
+  font:650 13px/1.35 system-ui,sans-serif;
+  letter-spacing:-.01em;
+}
+#dashboardView .beautiful-dashboard .panel-heading small{
+  color:var(--muted);
+  font:400 10px/1.4 system-ui,sans-serif;
+}
+#dashboardView .beautiful-dashboard .stacked-list{
+  grid-template-columns:minmax(0,1fr);
+  gap:0;
+}
+#dashboardView .beautiful-dashboard .stack-column{gap:0}
+#dashboardView .beautiful-dashboard .recent-quiz-row{
+  min-width:0;
+  margin:0;
+  padding:11px 2px;
+  border:0;
+  border-bottom:1px solid color-mix(in srgb,var(--line) 75%,transparent);
+  border-radius:0;
+  background:transparent;
+}
+#dashboardView .beautiful-dashboard .stack-column .recent-quiz-row:last-child{border-bottom:0}
+#dashboardView .beautiful-dashboard .recent-quiz-row .resultmain strong{
+  color:var(--text);
+  font:550 11px/1.45 system-ui,sans-serif;
+}
+#dashboardView .beautiful-dashboard .recent-quiz-row .resultmain small{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font:400 9px/1.4 system-ui,sans-serif;
+}
+#dashboardView .beautiful-dashboard .recent-quiz-row .btn{
+  min-height:30px;
+  padding:5px 10px;
+  border-radius:7px;
+  background:var(--surface);
+  box-shadow:none;
+  font:600 10px/1 system-ui,sans-serif;
+}
+#dashboardView .beautiful-dashboard .recent-quiz-row .btn:hover{
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+  background:color-mix(in srgb,var(--primary) 5%,var(--surface));
+  color:var(--primary);
+}
+body.dark #dashboardView .beautiful-dashboard .metric,
+body.dark #dashboardView .dashboard-deadline-card,
+body.dark #dashboardView .beautiful-dashboard .recent-quizzes-panel{
+  background:var(--surface);
+  box-shadow:none;
+}
+@media(max-width:700px){
+  #dashboardView .beautiful-dashboard{
+    width:calc(100% - 24px);
+    margin:16px auto 28px;
+  }
+  #dashboardView .beautiful-dashboard .metrics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    margin-bottom:10px;
+  }
+  #dashboardView .beautiful-dashboard .metric{padding:11px}
+  #dashboardView .beautiful-dashboard .metric small{font-size:9px}
+  #dashboardView .beautiful-dashboard .metric b{font-size:17px}
+  #dashboardView .dashboard-deadline-card{
+    grid-template-columns:32px minmax(0,1fr);
+    gap:9px;
+    padding:11px;
+    margin-bottom:10px;
+  }
+  #dashboardView .dashboard-deadline-card .deadline-icon{width:30px;height:30px}
+  #dashboardView .dashboard-deadline-card .deadline-picker{
+    grid-column:2;
+    justify-self:start;
+    min-height:30px;
+    margin-top:2px;
+  }
+  #dashboardView .beautiful-dashboard .recent-quizzes-panel{padding:12px}
+}
+@media(max-width:380px){
+  #dashboardView .beautiful-dashboard{width:calc(100% - 18px)}
+  #dashboardView .beautiful-dashboard .metric{grid-template-columns:25px minmax(0,1fr);column-gap:7px;padding:9px}
+  #dashboardView .beautiful-dashboard .metric-icon{width:25px;height:25px;font-size:11px}
+  #dashboardView .beautiful-dashboard .metric small{font-size:8px}
+  #dashboardView .beautiful-dashboard .recent-quiz-row{align-items:flex-start;gap:6px}
+  #dashboardView .beautiful-dashboard .recent-quiz-row .btn{padding:5px 7px}
 }
