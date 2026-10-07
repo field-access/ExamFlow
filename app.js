@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",pomodoroStats:"examflow_pomodoro_stats_v1"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -11,55 +11,6 @@ let timerState={examSeconds:5*60,practiceSeconds:5*60,running:false};
 function clampDurationMinutes(value,fallback=5){
   const minutes=Number(value);
   return Number.isFinite(minutes)?Math.min(60,Math.max(1,minutes)):fallback;
-}
-let universalStudyTimerSeconds = 0;
-let universalStudyTimerRunning = true;
-let universalStudyTimerMode = 'stopwatch'; // 'stopwatch' or 'countdown'
-let pomodoroCycle = 0;
-let pomodoroPhase = 'focus';
-let pomodoroStats = {sessions:0,minutes:0};
-
-function loadPomodoroStats(){
-  const saved=get(K.pomodoroStats,{});
-  return {sessions:Math.max(0,Number(saved.sessions)||0),minutes:Math.max(0,Number(saved.minutes)||0)};
-}
-function savePomodoroStats(){put(K.pomodoroStats,pomodoroStats)}
-
-function setPomodoro(val) {
-  if(val === 'stopwatch') {
-    universalStudyTimerMode = 'stopwatch';
-    universalStudyTimerSeconds = 0;
-  } else {
-    universalStudyTimerMode = 'countdown';
-    universalStudyTimerSeconds = parseInt(val, 10) * 60;
-  }
-  universalStudyTimerRunning = true;
-  pomodoroPhase = val === 'stopwatch' ? 'stopwatch' : (val === '5' || val === '15' ? 'break' : 'focus');
-  const btn = document.getElementById("universalTimerToggleBtn");
-  if(btn) btn.textContent = "⏸ Pause";
-  updateUniversalTimerUI();
-}
-
-function toggleUniversalTimer() {
-  universalStudyTimerRunning = !universalStudyTimerRunning;
-  const btn = document.getElementById("universalTimerToggleBtn");
-  if(btn) {
-    btn.textContent = universalStudyTimerRunning ? "⏸ Pause" : "▶ Resume";
-  }
-}
-
-function updateUniversalTimerUI() {
-  const gt = document.getElementById("globalTimer");
-  if(gt) {
-    const hrs = Math.floor(Math.abs(universalStudyTimerSeconds) / 3600);
-    const mins = Math.floor((Math.abs(universalStudyTimerSeconds) % 3600) / 60);
-    const secs = Math.abs(universalStudyTimerSeconds) % 60;
-    const sign = universalStudyTimerSeconds < 0 ? "-" : "";
-    gt.textContent = `${sign}${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  }
-  const phase=document.getElementById("pomodoroPhase");
-  if(phase)phase.textContent=universalStudyTimerMode==='stopwatch'?'Open study timer':(pomodoroPhase==='break'?'Break':'Focus');
-  document.querySelectorAll("#pomodoroDots i").forEach((dot,i)=>dot.classList.toggle("active",i<=pomodoroCycle%4));
 }
 let matchOrders={};
 let settings=loadSettings();
@@ -80,8 +31,6 @@ function put(k,v){
   }
   schedulePersistentBackup();
 }
-pomodoroStats=loadPomodoroStats();
-
 /* Persistent data backup: IndexedDB is substantially larger than localStorage.
    localStorage remains the fast synchronous cache, while IndexedDB protects
    quizzes/results/sessions if the browser evicts or fills the cache. */
@@ -457,9 +406,10 @@ function updateTimerUI(){
  const examEl=document.getElementById("timer");
  const active=mode==="practice"?timerState.practiceSeconds:timerState.examSeconds;
  if(examEl)examEl.textContent=formatGlobalTime(timerState.examSeconds);
+ const headerTimer=document.getElementById("globalTimer");
+ if(headerTimer)headerTimer.textContent=formatGlobalTime(timerState.examSeconds);
  const examCtl=document.getElementById("examTimerControl");
  if(examCtl)examCtl.style.display=mode==="exam"?"flex":"none";
- updateUniversalTimerUI();
 }
 function formatGlobalTime(sec){
  sec=Math.max(0,Math.floor(Number(sec)||0));
@@ -1018,7 +968,6 @@ function examflowKeyboardHandler(e){
     return;
   }
 
-  if(lower==="t"){e.preventDefault();toggleUniversalTimer();return}
   if(e.shiftKey && !e.altKey && lower==="l"){e.preventDefault();setTheme("light");return}
   if(e.shiftKey && !e.altKey && lower==="d"){e.preventDefault();setTheme("dark");return}
 
@@ -1047,7 +996,6 @@ function examflowKeyboardHandler(e){
   if(e.shiftKey && lower==="e"){e.preventDefault();setMode("exam");return}
   if(e.shiftKey && lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
   if(e.shiftKey && lower==="q"){e.preventDefault();toggleQuestionProgress();return}
-  if(e.shiftKey && lower==="t"){e.preventDefault();toggleUniversalTimer();return}
   if(e.shiftKey && lower==="s"){e.preventDefault();submitExam();return}
 
   if(lower==="e"){e.preventDefault();setMode("exam");return}
@@ -1651,7 +1599,7 @@ function renderDashboard(){
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const attempted=rs.reduce((a,r)=>a+(Number(r.correct)||0)+(Number(r.wrong)||0),0),solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=attempted;
- document.getElementById("mSolved").textContent=solved;document.getElementById("mPomodoro").textContent=pomodoroStats.sessions;document.getElementById("mStudyMinutes").textContent=pomodoroStats.minutes;
+ document.getElementById("mSolved").textContent=solved;
  document.getElementById("resultsList").innerHTML=rs.length?rs.slice(0,15).map(r=>`<div class="resultrow"><div class="resultmain"><strong>${esc(r.name)}</strong><small>${new Date(r.date).toLocaleString()} · ${r.mode==="practice"?"Practice":"Exam"} · ${r.correct}/${r.total} correct</small></div><div style="display:flex;align-items:center;gap:10px;"><b class="${r.percent>=80?"good":r.percent>=50?"mid":"bad"}">${r.percent}%</b><button class="session-delete" onclick="deleteResult('${r.id}')">×</button></div></div>`).join(""):'<div class="empty">No results yet.</div>';
  document.querySelectorAll("#resultsList .resultrow").forEach((row,i)=>{
    const result=rs[i];if(!result)return;
@@ -1762,7 +1710,7 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions","exams","recent","pomodoroStats"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
 
@@ -1782,13 +1730,12 @@ async function importDataFile(event){
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
     if(parsed.exams!==undefined)put(K.exams,Array.isArray(parsed.exams)?parsed.exams:[]);
     if(parsed.recent!==undefined)put(K.recent,Array.isArray(parsed.recent)?parsed.recent:[]);
-    if(parsed.pomodoroStats!==undefined)put(K.pomodoroStats,parsed.pomodoroStats||{});
     if(parsed.examDeadline!==undefined){
       if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
       else localStorage.removeItem("examflow_exam_deadline");
     }
 
-    settings=loadSettings();pomodoroStats=loadPomodoroStats();
+    settings=loadSettings();
     renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();
     await savePersistentBackup();
     if(status){
@@ -1808,7 +1755,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[]),pomodoroStats},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
@@ -2098,7 +2045,7 @@ function renderHome(){
  const rs=get(K.results,[]),ss=get(K.sessions,[]),ps=get(K.plans,[]);
  const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
- const homeMetrics={homeTests:rs.length,homeQuestions:solved,homePomodoro:pomodoroStats.sessions,homeStudyMinutes:pomodoroStats.minutes};
+ const homeMetrics={homeTests:rs.length,homeQuestions:solved};
  Object.entries(homeMetrics).forEach(([key,value])=>{const el=document.getElementById(key);if(el)el.textContent=value});
  const tip=rs.length?(rs[0].percent>=80?"You are in a strong rhythm. Try a timed Exam Mode session next.":rs[0].percent>=60?"Good momentum. Use Practice Mode on your weakest concepts.":"Slow down, break concepts into CBQs, then retest."): "Paste a CBQ below and begin a focused session.";
  const hst=document.getElementById("homeStudyTip"); if(hst) hst.textContent=tip;
@@ -2363,30 +2310,6 @@ setTimeout(()=>{if(document.getElementById("examProgressDrawer")?.classList.cont
 setInterval(()=>{if(document.getElementById("examProgressDrawer")?.classList.contains("open"))renderQuestionProgress()},250);
 
 setInterval(()=>{
-  if(universalStudyTimerRunning){
-    if(universalStudyTimerMode === 'stopwatch') {
-      universalStudyTimerSeconds++;
-    } else {
-      universalStudyTimerSeconds--;
-      if(universalStudyTimerSeconds <= 0) {
-         universalStudyTimerSeconds=0;
-         if(pomodoroPhase==='focus'){
-           pomodoroStats.sessions++;
-           pomodoroStats.minutes+=25;
-           savePomodoroStats();
-           pomodoroCycle++;
-           toast("Focus session complete. Take a 5-minute break.");
-         }else{
-           toast("Break complete. Ready for another focus session.");
-         }
-         universalStudyTimerRunning = false;
-         const btn = document.getElementById("universalTimerToggleBtn");
-         if(btn) btn.textContent = "▶ Resume";
-      }
-    }
-    updateUniversalTimerUI();
-  }
-
   if(!timerState || !timerState.running || examFinished)return;
   if(mode==="practice"){
     // Practice timer logic removed, but keeping the block in case of future extensions

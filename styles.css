@@ -1882,9 +1882,8 @@ header {
 #examView .actions .btn{width:100%;min-width:0}
 #examView .actions .btn:disabled{opacity:.5;cursor:not-allowed}
 .mobile-menu-toggle,.mobile-nav{display:none}
-.pomodoro-widget{display:flex;align-items:center;gap:7px}
 
-/* Focus mode: the exam keeps only its study controls in the global bar. */
+/* Focus mode: keep only exam navigation and countdown controls in the global bar. */
 body.exam-active header{
   height:52px;
   min-height:52px;
@@ -1910,8 +1909,6 @@ body.exam-active .global-exam-controls .btn{
   padding:7px 9px;
   font-size:10px;
 }
-body.exam-active .pomodoro-meta{display:none}
-body.exam-active .pomodoro-widget{gap:0}
 body.exam-active .global-exam-timer{
   padding:6px 9px;
   font-size:11px;
@@ -2037,10 +2034,6 @@ body.exam-active #examView .actions{
     font-size:.9em;
     text-align:left;
   }
-.pomodoro-meta{display:grid;gap:3px;justify-items:end;color:var(--muted);font:800 9px/1 system-ui;text-transform:uppercase;letter-spacing:.06em}
-#pomodoroDots{display:flex;gap:3px}
-#pomodoroDots i{display:block;width:6px;height:6px;border-radius:50%;background:var(--line)}
-#pomodoroDots i.active{background:var(--primary)}
 body.exam-active #examView .question:has(.exam-finished){border-color:var(--good)}
 
 /* Planner workspace: persistent calendar and nearby study tasks. */
@@ -2153,7 +2146,6 @@ img,svg,textarea,pre,code{max-width:100%}
     background:var(--surface);color:var(--text);font-weight:750;font-size:12px;
   }
   .header-right,.global-exam-controls{gap:5px}
-  .global-exam-controls .pomodoro-widget select{max-width:110px}
   .home-json-input,.jsoninput{font-size:14px;line-height:1.5}
   #examView .qtop{display:grid;grid-template-columns:auto 1fr;gap:8px}
   #examView .qtop>div:nth-child(2){justify-self:end;grid-column:2;grid-row:1}
@@ -2185,7 +2177,6 @@ img,svg,textarea,pre,code{max-width:100%}
   .mobile-nav{position:fixed;inset:62px 10px auto 10px;z-index:10002;display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding:10px;background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
   body.mobile-nav-open .mobile-nav{display:grid}
   .mobile-nav button{border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:9px;padding:11px;text-align:left;font-weight:800}
-  .pomodoro-widget{min-width:max-content}
   #examView .question{width:100%;padding:18px 14px !important}
   #examView .actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 }
@@ -2210,6 +2201,7 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
 .home-stage .home-json-input{min-height:205px;font-family:ui-monospace,monospace}
 .home-stage .home-json-footer{display:grid;gap:12px}
 .home-stage .home-json-footer>div:last-child{display:flex;flex-wrap:wrap;justify-content:flex-end}
+#homeView .metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
 .hero-copy .hero-actions .btn,.json-home .btn{font-family:system-ui,sans-serif}
 @media(max-width:850px){
   .home-stage{grid-template-columns:1fr}
@@ -2222,6 +2214,108 @@ body:after{content:"";position:fixed;inset:auto -10vw -24vh auto;width:48vw;heig
   .home-stage .json-home{padding:19px}
   .home-stage .home-json-footer>div:last-child{justify-content:stretch}
   .home-stage .home-json-footer>div:last-child>*{flex:1 1 100%}
+}
+
+/* Keep the exam header compact, useful, and readable after removing focus timers. */
+body.exam-active header{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  height:58px;
+  min-height:58px;
+  padding:0 clamp(12px,3vw,28px);
+  gap:14px;
+  border-bottom:1px solid color-mix(in srgb,var(--primary) 14%,var(--line));
+  box-shadow:0 3px 14px rgba(24,33,47,.07);
+}
+body.exam-active header .brand,
+body.exam-active header .topnav,
+body.exam-active header .header-right{
+  display:none !important;
+}
+body.exam-active .global-exam-title{
+  display:block !important;
+  flex:1 1 auto;
+  min-width:0;
+  margin:0 auto 0 0;
+  color:var(--text);
+  font:700 14px/1.3 system-ui,sans-serif;
+  text-align:left;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+body.exam-active .global-exam-controls{
+  display:flex;
+  flex:0 0 auto;
+  align-items:center;
+  justify-content:flex-end;
+  width:auto;
+  min-width:0;
+  margin:0;
+  gap:8px;
+  overflow:visible;
+}
+body.exam-active .global-exam-controls .exam-home-btn{
+  min-height:38px;
+  padding:7px 12px;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--primary) 7%,var(--surface));
+  font-size:11px;
+  font-weight:800;
+}
+body.exam-active .global-exam-timer{
+  min-height:38px;
+  padding:7px 11px;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--bad) 6%,var(--surface));
+  border-color:color-mix(in srgb,var(--bad) 22%,var(--line));
+  font:800 12px/1 system-ui,sans-serif;
+}
+body.exam-active .global-exam-timer span{
+  font:800 14px/1 ui-monospace,SFMono-Regular,Consolas,monospace;
+}
+@media(max-width:600px){
+  body.exam-active header{
+    height:54px;
+    min-height:54px;
+    padding:0 9px;
+    gap:7px;
+  }
+  body.exam-active header .mobile-menu-toggle{
+    display:inline-flex !important;
+    order:1;
+    flex:0 0 auto;
+    min-height:38px;
+    padding:7px 10px;
+    border-radius:10px;
+    font-size:11px;
+  }
+  body.exam-active .global-exam-title{
+    order:2;
+    flex:1 1 auto;
+    font-size:12px;
+  }
+  body.exam-active .global-exam-controls{
+    order:3;
+    flex:0 0 auto;
+    width:auto;
+    gap:5px;
+  }
+  body.exam-active .global-exam-controls .exam-home-btn{
+    width:36px;
+    min-width:36px;
+    min-height:36px;
+    padding:6px;
+    justify-content:center;
+  }
+  body.exam-active .global-exam-timer{
+    min-height:36px;
+    padding:6px 8px;
+    font-size:10px;
+  }
+  body.exam-active .global-exam-timer span{font-size:12px}
 }
 
 /* Keep the mobile navigation completely out of the desktop layout. */
@@ -2434,7 +2528,7 @@ body.exam-active #globalExamProgressBtn{display:none !important}
   .stacked-list{grid-template-columns:1fr;gap:7px}
 }
 
-/* Exam toolbar controls: keep navigation reachable and the timer selector stable. */
+/* Exam toolbar controls: keep navigation and countdown reachable. */
 .exam-home-compact{display:none}
 body.exam-active .global-exam-controls .exam-home-btn{
   flex:0 0 auto;
@@ -2444,41 +2538,6 @@ body.exam-active .global-exam-controls .exam-home-btn{
   color:var(--primary);
   white-space:nowrap;
 }
-body.exam-active #pomodoroSelect{
-  appearance:none;
-  -webkit-appearance:none;
-  flex:0 0 116px;
-  width:116px;
-  min-width:116px;
-  min-height:36px;
-  margin:0;
-  padding:7px 28px 7px 10px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background-color:var(--surface);
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%23697386' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 9px center;
-  color:var(--text);
-  font-size:11px;
-  font-weight:700;
-  box-shadow:0 1px 3px rgba(24,33,47,.06);
-  cursor:pointer;
-}
-body.dark.exam-active #pomodoroSelect{
-  background-color:var(--surface2) !important;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='m2 4 4 4 4-4' fill='none' stroke='%23cbd5e1' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
-  color:var(--text) !important;
-  border-color:var(--line) !important;
-}
-body.exam-active #pomodoroSelect option{
-  background:var(--surface);
-  color:var(--text);
-}
-body.exam-active #pomodoroSelect:focus-visible{
-  outline:3px solid color-mix(in srgb,var(--primary) 32%,transparent);
-  outline-offset:1px;
-}
 @media(max-width:600px){
   body.exam-active .exam-home-full{display:none}
   body.exam-active .exam-home-compact{display:inline}
@@ -2487,13 +2546,6 @@ body.exam-active #pomodoroSelect:focus-visible{
     min-width:36px;
     padding:6px;
     justify-content:center;
-  }
-  body.exam-active #pomodoroSelect{
-    flex-basis:96px;
-    width:96px;
-    min-width:96px;
-    padding-left:7px;
-    font-size:10px;
   }
 }
 
