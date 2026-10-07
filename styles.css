@@ -1,4 +1,4 @@
-:root{--bg:#f5f7fb;--surface:#fff;--surface2:#f0f3f8;--text:#18212f;--muted:#697386;--line:#e2e7ef;--primary:#4f46e5;--good:#16a34a;--warn:#d97706;--bad:#dc2626;--shadow:0 12px 35px rgba(24,33,47,.08);--radius:18px;--exam-font:"IBM Plex Mono",Consolas,monospace}
+:root{--bg:#f5f7fb;--surface:#fff;--surface2:#f0f3f8;--text:#18212f;--muted:#697386;--line:#e2e7ef;--primary:#4f46e5;--good:#16a34a;--warn:#d97706;--bad:#dc2626;--shadow:0 12px 35px rgba(24,33,47,.08);--radius:18px;--exam-font:"DM Sans","Segoe UI",sans-serif}
 *{box-sizing:border-box}html,body{margin:0;min-height:100%;overflow-x:hidden}body{font-family:var(--exam-font);background:var(--bg);color:var(--text)}
 body.dark{--bg:#0f172a;--surface:#1e293b;--surface2:#334155;--text:#f8fafc;--muted:#94a3b8;--line:#475569;--primary:#818cf8;--good:#34d399;--warn:#fbbf24;--bad:#f87171;--shadow:0 14px 38px rgba(0,0,0,.28)}
 button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh}
@@ -3221,6 +3221,31 @@ body.dark #dashboardView .beautiful-dashboard .recent-quizzes-panel{
   #dashboardView .beautiful-dashboard .metric small{font-size:8px}
   #dashboardView .beautiful-dashboard .recent-quiz-row{align-items:flex-start;gap:6px}
   #dashboardView .beautiful-dashboard .recent-quiz-row .btn{padding:5px 7px}
+}
+
+/* Reader sizing affects quiz content while leaving navigation and controls stable. */
+body.question-text-small{--question-text-scale:.9}
+body.question-text-standard{--question-text-scale:1}
+body.question-text-large{--question-text-scale:1.12}
+body.question-text-extra-large{--question-text-scale:1.24}
+body[class*="question-text-"] #examView .question h2{
+  font-size:calc(clamp(20px,2.1vw,25px) * var(--question-text-scale)) !important;
+}
+body.exam-active[class*="question-text-"] #examView .question h2{
+  font-size:calc(clamp(17px,2vw,19px) * var(--question-text-scale)) !important;
+}
+body[class*="question-text-"] #examView .option-text{
+  font-size:calc(16px * var(--question-text-scale)) !important;
+}
+body[class*="question-text-"] #examView #explanation,
+body[class*="question-text-"] #examView #explanation .explanation-content,
+body[class*="question-text-"] #examView .practice-answer-panel,
+body[class*="question-text-"] #examView .hint-card{
+  font-size:calc(15px * var(--question-text-scale)) !important;
+}
+body[class*="question-text-"] #testResultsView .result-question-content,
+body[class*="question-text-"] #testResultsView .result-question-text{
+  font-size:calc(15px * var(--question-text-scale)) !important;
 }
 
 /* A subtle electric sweep makes the header divider feel alive. */

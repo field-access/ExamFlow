@@ -349,7 +349,9 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"IBM Plex Mono",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"DM Sans",questionTextSize:"standard",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ if(s.fontFamily==="IBM Plex Mono")s.fontFamily="DM Sans";
+ if(!["small","standard","large","extra-large"].includes(s.questionTextSize))s.questionTextSize="standard";
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
  return s;
 }
@@ -360,6 +362,7 @@ function saveSettings(){
   settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
   settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
   const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
+  const textSize=document.getElementById("questionTextSizeSelect");if(textSize)settings.questionTextSize=textSize.value;
   const cs=document.getElementById("colorSchemeSelect");if(cs)settings.colorScheme=cs.value;
   const cw=document.getElementById("examCardWidthSelect");if(cw)settings.examCardWidth=cw.value;
   put(K.settings,settings);applySettings();
@@ -368,7 +371,13 @@ function applySettings(){
  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(settings.defaultDuration))?Number(settings.defaultDuration):5;
  document.body.classList.toggle("dark",settings.theme==="dark");updateTheme();
  const d=document.getElementById("defaultDuration");if(d)d.value=String(settings.defaultDuration);
- const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"IBM Plex Mono";
+ const fs=document.getElementById("fontSelect");if(fs)fs.value=settings.fontFamily||"DM Sans";
+ const textSizes=["small","standard","large","extra-large"];
+ const textSize=textSizes.includes(settings.questionTextSize)?settings.questionTextSize:"standard";
+ settings.questionTextSize=textSize;
+ document.body.classList.remove(...textSizes.map(x=>`question-text-${x}`));
+ document.body.classList.add(`question-text-${textSize}`);
+ const textSizeSelect=document.getElementById("questionTextSizeSelect");if(textSizeSelect)textSizeSelect.value=textSize;
  const schemes=["classic","ocean","forest","sunset","slate"];
  document.body.classList.remove(...schemes.map(x=>`scheme-${x}`));
  const scheme=schemes.includes(settings.colorScheme)?settings.colorScheme:"classic";
@@ -385,8 +394,8 @@ function applySettings(){
  const soundToggle=document.getElementById("soundOnBtn"),soundMute=document.getElementById("soundOffBtn");
  if(soundToggle)soundToggle.classList.toggle("active",soundOn);
  if(soundMute)soundMute.classList.toggle("active",!soundOn);
- let fstr = "'IBM Plex Mono', Consolas, monospace";
- if(settings.fontFamily==="System Default") fstr = "'IBM Plex Mono', Consolas, monospace";
+ let fstr = "'DM Sans', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="System Default") fstr = "'DM Sans', 'Segoe UI', sans-serif";
  if(settings.fontFamily==="Serif Elegant") fstr = "'Latin Modern Roman', 'Computer Modern', 'STIX Two Text', 'Times New Roman', serif";
  if(settings.fontFamily==="Modern Rounded") fstr = "'Nunito', 'Quicksand', 'Arial Rounded MT Bold', sans-serif";
  if(settings.fontFamily==="Monospace") fstr = "'Cascadia Code', 'SFMono-Regular', Consolas, monospace";
@@ -395,7 +404,14 @@ function applySettings(){
  if(settings.fontFamily==="Lora") fstr = "'Lora', Georgia, serif";
  if(settings.fontFamily==="DM Sans") fstr = "'DM Sans', 'Segoe UI', sans-serif";
  if(settings.fontFamily==="Nunito Sans") fstr = "'Nunito Sans', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Inter") fstr = "'Inter', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Roboto") fstr = "'Roboto', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Open Sans") fstr = "'Open Sans', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Manrope") fstr = "'Manrope', 'Segoe UI', sans-serif";
+ if(settings.fontFamily==="Merriweather") fstr = "'Merriweather', Georgia, serif";
  if(settings.fontFamily==="IBM Plex Mono") fstr = "'IBM Plex Mono', Consolas, monospace";
+ if(settings.fontFamily==="JetBrains Mono") fstr = "'JetBrains Mono', Consolas, monospace";
+ if(settings.fontFamily==="Fira Code") fstr = "'Fira Code', Consolas, monospace";
  document.body.style.setProperty('--exam-font', fstr);
  mode=settings.defaultMode;updateModeUI()
 }
