@@ -2388,12 +2388,12 @@ function ensureExamAudio(){
   try{
     const AC=window.AudioContext||window.webkitAudioContext;
     if(!AC)return null;
-    if(!examAudioCtx)examAudioCtx=new AC();
-    if(examAudioCtx.state==="suspended")examAudioCtx.resume();
+    if(!examAudioCtx||examAudioCtx.state==="closed")examAudioCtx=new AC();
+    if(examAudioCtx.state==="suspended")examAudioCtx.resume().catch(()=>{});
     return examAudioCtx;
   }catch(e){return null}
 }
-function playExamTone(frequency,duration,volume=0.035,when=0){
+function playExamTone(frequency,duration,volume=0.07,when=0){
   const ctx=ensureExamAudio();
   if(!ctx)return false;
   try{
@@ -2403,7 +2403,7 @@ function playExamTone(frequency,duration,volume=0.035,when=0){
     osc.type="sine";
     osc.frequency.setValueAtTime(frequency,t);
     gain.gain.setValueAtTime(0.0001,t);
-    gain.gain.exponentialRampToValueAtTime(volume,t+0.025);
+    gain.gain.exponentialRampToValueAtTime(volume,t+0.018);
     gain.gain.exponentialRampToValueAtTime(0.0001,t+duration);
     osc.connect(gain);gain.connect(ctx.destination);
     osc.start(t);osc.stop(t+duration+0.03);
@@ -2412,18 +2412,18 @@ function playExamTone(frequency,duration,volume=0.035,when=0){
 }
 function playButtonSound(){
   if(settings.soundEnabled===false)return;
-  playExamTone(523,.065,.022,0);
+  playExamTone(523,.075,.065,0);
 }
 function playAnswerSound(correct){
   if(settings.soundEnabled===false)return;
   const ctx=ensureExamAudio();
   if(!ctx)return;
   if(correct){
-    playExamTone(523,.16,.038,0);
-    playExamTone(659,.18,.032,.14);
+    playExamTone(523,.16,.085,0);
+    playExamTone(659,.18,.075,.14);
   }else{
-    playExamTone(392,.14,.03,0);
-    playExamTone(330,.17,.025,.13);
+    playExamTone(392,.14,.07,0);
+    playExamTone(330,.17,.06,.13);
   }
 }
 function testAnswerSound(){
@@ -2431,8 +2431,8 @@ function testAnswerSound(){
     toast("Enable interface sounds first");
     return;
   }
-  const ok=playExamTone(523,.16,.038,0);
-  playExamTone(659,.18,.032,.14);
+  const ok=playExamTone(523,.16,.085,0);
+  playExamTone(659,.18,.075,.14);
   if(!ok)toast("This browser is blocking audio. Click the page once, then try again.");
 }
 
