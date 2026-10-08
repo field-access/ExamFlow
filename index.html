@@ -355,7 +355,13 @@
 <!-- PLANNER -->
 <section id="plannerView" class="view">
 <div class="planner-page">
-  <div class="planner-hero"><div><div class="hero-kicker">TEST PLANNER</div><h1>Upcoming tests, one place.</h1><p>Paste the CBQ JSON and ExamFlow keeps your planned tests separate from your performance dashboard.</p></div><button class="btn" onclick="showView('home')">⌂ Home</button></div>
+  <div class="planner-hero"><div><div class="hero-kicker">TEST PLANNER</div><h1>Plan a test</h1><p>Schedule CBQs, track important dates, and keep study tasks together.</p></div><button class="btn" onclick="showView('home')">⌂ Home</button></div>
+
+  <section class="card quick-plan planner-paste-card">
+    <div class="quick-plan-head"><div><h3>Paste quiz JSON</h3><small>Scheduling fields: <code>date</code>, <code>examDate</code>, <code>scheduledDate</code>, <code>time</code>.</small></div><button id="planPasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste</button></div>
+    <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
+    <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test · Ctrl/Cmd+Enter</div><div class="quick-plan-actions"><button class="btn" type="button" onclick="clearQuickPlan()">Clear</button><button class="btn primary" type="button" onclick="saveQuickPlan()"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan Test</button></div></div>
+  </section>
 
   <div class="planner-workspace">
   <div class="planner-column">
@@ -372,17 +378,12 @@
     </div>
     <div class="deadline-summary"><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate">Choose a date to start your countdown.</span></div>
   </section>
-  <section class="card quick-plan planner-paste-card">
-    <div class="quick-plan-head"><div><h3>Paste quiz JSON</h3><small>Scheduling fields: <code>date</code>, <code>examDate</code>, <code>scheduledDate</code>, <code>time</code>.</small></div><button id="planPasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste</button></div>
-    <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
-    <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test</div><button class="btn primary" type="button" onclick="saveQuickPlan()"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan Test</button></div>
-  </section>
+  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
   </div>
   <section class="panel card planner-todo-card"><div class="panel-heading"><div><h3>Study todo list</h3><small>Keep tasks beside your calendar.</small></div></div>
     <div class="planner-todo-form"><input type="text" id="plannerTodoInput" placeholder="Add a study task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><input type="date" id="plannerTodoDeadline"><button class="btn primary" type="button" onclick="addPlannerTodo()">Add task</button></div>
     <div id="plannerTodoList"></div>
   </section>
-  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
   </div>
 </div>
 </section>
@@ -448,7 +449,7 @@
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>X</kbd></span><span>Export data</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>S</kbd></span><span>Save session</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>D</kbd></span><span>Light / dark</span></div>
-<div><span class="shortcut-keys"><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Enter</kbd></span><span>Load quiz</span></div>
+<div><span class="shortcut-keys"><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Enter</kbd></span><span>Load quiz / plan test</span></div>
 <div><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Close</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>E</kbd> / <kbd>P</kbd></span><span>Exam / practice</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>G</kbd></span><span>Open ChatGPT</span></div>

@@ -1093,6 +1093,12 @@ function examflowKeyboardHandler(e){
     return;
   }
 
+  if((e.ctrlKey||e.metaKey)&&e.key==="Enter"&&document.getElementById("plannerView")?.classList.contains("active")){
+    e.preventDefault();
+    saveQuickPlan();
+    return;
+  }
+
   // Ctrl/Cmd+Enter is the single intentional exception to the browser guard.
   if((e.ctrlKey||e.metaKey)&&e.key==="Enter" && (document.getElementById("importer")?.classList.contains("show") || document.getElementById("homeView")?.classList.contains("active"))){
     e.preventDefault();
@@ -1926,6 +1932,15 @@ function planDateFromSource(source){
 function planTimeFromSource(source){
   const raw=source.time||source.examTime||source.scheduledTime;
   return raw ? String(raw).slice(0,5) : "";
+}
+function clearQuickPlan(){
+  const box=document.getElementById("planJson"),status=document.getElementById("planJsonStatus");
+  if(box)box.value="";
+  if(status){
+    status.textContent="Paste → Plan Test · Ctrl/Cmd+Enter";
+    status.style.color="";
+  }
+  box?.focus();
 }
 function saveQuickPlan(){
   const box=document.getElementById("planJson"),status=document.getElementById("planJsonStatus");

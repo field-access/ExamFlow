@@ -2080,9 +2080,10 @@ body.exam-active #examView .question:has(.exam-finished){border-color:var(--good
 /* Planner workspace: persistent calendar and nearby study tasks. */
 #plannerView .planner-page{max-width:1120px}
 #plannerView .planner-workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:16px;align-items:start}
-#plannerView .planner-column{min-width:0}
+#plannerView .planner-column{display:grid;min-width:0;gap:16px}
 #plannerView .planner-calendar-card,
 #plannerView .planner-todo-card{padding:22px;border-radius:16px}
+#plannerView .planner-list-card{margin-top:0}
 #plannerView .planner-card-head h2{margin:5px 0 4px;font-family:var(--serif);font-size:24px}
 #plannerView .planner-card-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
 #plannerView .calendar-toolbar{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:8px;margin:20px 0 10px}
@@ -3882,6 +3883,7 @@ header::after{
   line-height:1.4;
 }
 #plannerView .quick-plan-foot .btn{min-height:40px;padding:9px 15px}
+#plannerView .quick-plan-actions{display:flex;gap:8px;flex:0 0 auto}
 
 /* Keep the sound controls roomy instead of squeezing three labels into a
    narrow settings column. */
@@ -3954,6 +3956,7 @@ body.dark #settingsView .setting-duration .setting-control select{
     gap:8px;
   }
   #plannerView .quick-plan-foot .paste-status{text-align:center}
+  #plannerView .quick-plan-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
   #plannerView .quick-plan-foot .btn{width:100%}
   #settingsView .setting-sounds{
     grid-column:1;
