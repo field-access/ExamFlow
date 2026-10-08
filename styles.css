@@ -3410,6 +3410,31 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   gap:0;
 }
 #homeView #homeSessionsList .stack-column{gap:0}
+#homeView #homeSessionsList .home-session-groups{display:grid;gap:14px}
+#homeView #homeSessionsList .home-session-week{min-width:0}
+#homeView #homeSessionsList .home-session-week-heading{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:10px 0 7px;
+  color:var(--ux-primary);
+  font:700 10px/1.3 var(--exam-font,"DM Sans","Segoe UI",sans-serif);
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+#homeView #homeSessionsList .home-session-week-heading::after{
+  height:1px;
+  flex:1;
+  background:color-mix(in srgb,var(--ux-primary) 24%,var(--line));
+  content:"";
+}
+#homeView #homeSessionsList .home-session-day+.home-session-day{margin-top:5px}
+#homeView #homeSessionsList .home-session-date-heading{
+  margin:0;
+  padding:7px 2px 2px;
+  color:var(--muted);
+  font:600 10px/1.35 var(--exam-font,"DM Sans","Segoe UI",sans-serif);
+}
 #homeView .home-session-row{
   min-width:0;
   margin:0;

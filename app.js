@@ -1793,6 +1793,75 @@ function renderStackedRows(items,renderRow,emptyMessage){
  for(let i=0;i<list.length;i+=10)columns.push(list.slice(i,i+10));
  return `<div class="stacked-list">${columns.map(column=>`<div class="stack-column">${column.map(renderRow).join("")}</div>`).join("")}</div>`;
 }
+function renderContinueStudying(sessions,openedAtFor){
+ const items=(Array.isArray(sessions)?sessions:[]).map(session=>{
+  const candidates=[openedAtFor(session),session.updatedAt,session.createdAt];
+  let date=null;
+  for(const candidate of candidates){
+   if(!candidate)continue;
+   const parsed=new Date(candidate);
+   if(!Number.isNaN(parsed.getTime())){date=parsed;break}
+  }
+  return {session,date};
+ }).sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0));
+ if(!items.length)return '<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
+
+ const startOfWeek=date=>{
+  const start=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  start.setDate(start.getDate()-(start.getDay()+6)%7);
+  return start;
+ };
+ const today=new Date();
+ const thisWeek=startOfWeek(today);
+ const lastWeek=new Date(thisWeek);
+ lastWeek.setDate(lastWeek.getDate()-7);
+ const weekGroups=new Map();
+ items.forEach(item=>{
+  const weekStart=item.date?startOfWeek(item.date):null;
+  const weekKey=weekStart?weekStart.getTime():"undated";
+  if(!weekGroups.has(weekKey))weekGroups.set(weekKey,{weekStart,days:new Map()});
+  const week=weekGroups.get(weekKey);
+  const dayKey=item.date
+   ?`${item.date.getFullYear()}-${String(item.date.getMonth()+1).padStart(2,"0")}-${String(item.date.getDate()).padStart(2,"0")}`
+   :"undated";
+  if(!week.days.has(dayKey))week.days.set(dayKey,[]);
+  week.days.get(dayKey).push(item);
+ });
+
+ const weekLabel=weekStart=>{
+  if(!weekStart)return"Date unavailable";
+  if(weekStart.getTime()===thisWeek.getTime())return"This week";
+  if(weekStart.getTime()===lastWeek.getTime())return"Last week";
+  const end=new Date(weekStart);
+  end.setDate(end.getDate()+6);
+  const startText=weekStart.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+  const endText=end.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+  return`Week of ${startText} – ${endText}`;
+ };
+ const dayLabel=date=>{
+  const dayStart=new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const todayStart=new Date(today.getFullYear(),today.getMonth(),today.getDate());
+  const yesterdayStart=new Date(todayStart);
+  yesterdayStart.setDate(yesterdayStart.getDate()-1);
+  if(dayStart.getTime()===todayStart.getTime())return"Today";
+  if(dayStart.getTime()===yesterdayStart.getTime())return"Yesterday";
+  return date.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+ };
+ const renderRow=({session,date})=>{
+  const openedText=date
+   ?`Last opened ${date.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
+   :"Last opened time unavailable";
+  const answered=Array.isArray(session.answers)?session.answers.filter(Boolean).length:0;
+  const questionCount=Array.isArray(session.questions)?session.questions.length:0;
+  return `<div class="resultrow home-session-row"><div class="resultmain"><strong>${esc(session.name||"Untitled quiz")}</strong><small>${answered}/${questionCount} answered · ${session.mode==="practice"?"Practice":"Exam"}</small><small class="home-session-opened">${openedText}</small></div><div class="home-session-actions"><button class="btn" onclick="restoreSession(&apos;${esc(session.id)}&apos;)">Continue</button><button class="session-delete2" aria-label="Delete saved session" onclick="deleteSession(&apos;${esc(session.id)}&apos;)">×</button></div></div>`;
+ };
+ return `<div class="home-session-groups">${[...weekGroups.values()].map(week=>{
+  const days=[...week.days.entries()].map(([key,dayItems])=>({
+   key,items:dayItems,date:dayItems[0].date
+  })).sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0));
+  return `<section class="home-session-week"><h4 class="home-session-week-heading">${esc(weekLabel(week.weekStart))}</h4>${days.map(day=>`<section class="home-session-day"><h5 class="home-session-date-heading">${esc(day.date?dayLabel(day.date):"Date unavailable")}</h5>${day.items.map(renderRow).join("")}</section>`).join("")}</section>`;
+ }).join("")}</div>`;
+}
 function planSortNewestFirst(a,b){
  const created=String(b.createdAt||"").localeCompare(String(a.createdAt||""));
  if(created)return created;
@@ -1807,14 +1876,7 @@ function renderDashboard(){
  };
  const ss=get(K.sessions,[]).slice().sort((a,b)=>String(openedAtFor(b)).localeCompare(String(openedAtFor(a))));
  const ssl = document.getElementById("homeSessionsList");
- if(ssl)ssl.innerHTML=renderStackedRows(ss,s=>{
-  const openedAt=openedAtFor(s),openedDate=new Date(openedAt);
-  const openedText=openedAt&&!Number.isNaN(openedDate.getTime())
-   ?`Last opened ${openedDate.toLocaleString(undefined,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}`
-   :"Last opened time unavailable";
-  const answered=s.answers.filter(Boolean).length;
-  return `<div class="resultrow home-session-row"><div class="resultmain"><strong>${esc(s.name)}</strong><small>${answered}/${s.questions.length} answered · ${s.mode==="practice"?"Practice":"Exam"}</small><small class="home-session-opened">${openedText}</small></div><div class="home-session-actions"><button class="btn" onclick="restoreSession(&apos;${s.id}&apos;)">Continue</button><button class="session-delete2" aria-label="Delete saved session" onclick="deleteSession(&apos;${s.id}&apos;)">×</button></div></div>`;
- },`No saved sessions. Add a CBQ to begin.`);
+ if(ssl)ssl.innerHTML=renderContinueStudying(ss,openedAtFor);
  const rs=get(K.results,[]),avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const attempted=rs.reduce((a,r)=>a+(Number(r.correct)||0)+(Number(r.wrong)||0),0),solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
  document.getElementById("mTests").textContent=rs.length;document.getElementById("mAvg").textContent=avg+"%";document.getElementById("mBest").textContent=best+"%";document.getElementById("mQuestions").textContent=attempted;
