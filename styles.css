@@ -1062,7 +1062,7 @@ body.practice-active .practice-answer-btn{display:inline-flex}
 
 .practice-answer-panel{margin:12px 0;padding:15px 17px;border:1px solid var(--line);border-radius:12px;background:var(--surface2,#f8fafc)}
 .practice-answer-panel .answer-label{font:800 10px/1.2 system-ui;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
-.practice-answer-panel .answer-value{font:500 16px/1.7 Georgia,"Times New Roman",serif}
+.practice-answer-panel .answer-value{font:500 16px/1.7 var(--exam-font,"DM Sans","Segoe UI",sans-serif)}
 .practice-answer-panel .answer-pair{display:grid;grid-template-columns:24px minmax(0,1fr) 24px minmax(0,1fr);gap:7px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
 .practice-answer-panel .answer-pair:last-child{border-bottom:0}
 
@@ -3465,9 +3465,10 @@ body[class*="question-text-"] #testResultsView .result-question-text{
 /* Ordering questions use a stacked card layout with clear drag and tap controls. */
 #examView .ordering-list{
   display:grid;
+  width:100%;
   gap:9px;
   margin:18px auto;
-  max-width:min(760px,100%);
+  max-width:min(980px,100%);
 }
 #examView .order-item{
   display:grid;
@@ -3485,6 +3486,11 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   box-shadow:0 2px 8px color-mix(in srgb,var(--ux-primary) 6%,transparent);
   cursor:grab;
   transition:transform .18s ease,border-color .18s ease,background-color .18s ease,box-shadow .18s ease;
+}
+#examView .order-item.order-answer-item{
+  grid-template-columns:34px minmax(0,1fr);
+  width:100%;
+  cursor:default;
 }
 #examView .order-item:hover{
   transform:translateY(-1px);

@@ -1201,9 +1201,6 @@ Use ASD-STE100-inspired controlled English for about 80% of the wording.
 - Avoid unnecessary synonyms and decorative academic wording.
 - Keep mathematical and computer science terms precise.
 - Simplify the language, not the thinking. Keep the reasoning deep.
-Example:
-Avoid: "Determine the appropriate structural invariant governing candidate elimination."
-Prefer: "What must remain true about the candidates after each step?"
 
 TEXT FORMATTING:
 Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
@@ -1314,8 +1311,6 @@ function currentQuestionCopyText(q){
     lines.push(`Accepted answers:\n${q.acceptedAnswers.join("\n")}`);
   if(q.explanation)lines.push(`Explanation:\n${q.explanation}`);
   if(q.hint)lines.push(`Hint:\n${q.hint}`);
-  if(q.marks!==undefined)lines.push(`Marks: ${q.marks}`);
-  if(q.negativeMarks!==undefined)lines.push(`Negative marks: ${q.negativeMarks}`);
   if(q.image)lines.push(`Image: ${q.image}`);
   return lines.join("\n\n");
 }
@@ -2442,10 +2437,17 @@ function highlightCorrectAnswerForView(q){
     if(list&&Array.isArray(q.answer)){
       list.innerHTML="";
       q.answer.forEach((item,i)=>{
-        const b=document.createElement("div");
-        b.className="order-item answer-correct-reveal";
-        b.textContent=`${i+1}. ${item}`;
-        list.appendChild(b);
+        const card=document.createElement("div");
+        card.className="order-item order-answer-item answer-correct-reveal";
+        card.setAttribute("role","listitem");
+        const position=document.createElement("span");
+        position.className="order-position";
+        position.textContent=String(i+1);
+        const content=document.createElement("div");
+        content.className="order-content";
+        setQuizRichText(content,String(item));
+        card.append(position,content);
+        list.appendChild(card);
       });
       renderAllQuizMath(list);
     }
