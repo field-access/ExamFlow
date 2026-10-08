@@ -3414,6 +3414,10 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   border-color:color-mix(in srgb,var(--bad) 40%,var(--line));
   color:var(--bad);
 }
+#settingsView,
+#settingsView :where(*) {
+  font-family:var(--exam-font,"DM Sans","Segoe UI",sans-serif) !important;
+}
 @media(max-width:600px){
   #homeView .home-continue-panel{padding:13px 14px}
   #homeView .home-session-row{gap:8px;padding:11px 1px}
