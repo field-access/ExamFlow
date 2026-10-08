@@ -349,7 +349,9 @@ async function requestPersistentStorage(){
 /* EXAMFLOW_PERSISTENT_BACKUP_END */
 
 function loadSettings(){
- const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"DM Sans",questionTextSize:"standard",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5,defaultMarks:1,defaultNegative:0},get(K.settings,{}));
+ const s=Object.assign({theme:"light",defaultMode:"exam",fontFamily:"DM Sans",questionTextSize:"standard",colorScheme:"classic",soundEnabled:true,examCardWidth:"balanced",instantFeedback:false,defaultDuration:5},get(K.settings,{}));
+ delete s.defaultMarks;
+ delete s.defaultNegative;
  if(s.fontFamily==="IBM Plex Mono")s.fontFamily="DM Sans";
  if(!["small","standard","large","extra-large"].includes(s.questionTextSize))s.questionTextSize="standard";
  s.defaultDuration=[5,10,15,20,30,45,60].includes(Number(s.defaultDuration))?Number(s.defaultDuration):5;
@@ -358,9 +360,8 @@ function loadSettings(){
 function saveSettings(){
   const feedbackToggle=document.getElementById("instantFeedback");
   if(feedbackToggle)settings.instantFeedback=feedbackToggle.checked;
-  settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(document.getElementById("defaultDuration").value))?Number(document.getElementById("defaultDuration").value):5;
-  settings.defaultMarks=Number(document.getElementById("defaultMarks").value||1);
-  settings.defaultNegative=Number(document.getElementById("defaultNegative").value||0);
+  const duration=document.getElementById("defaultDuration");
+  if(duration)settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(duration.value))?Number(duration.value):5;
   const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
   const textSize=document.getElementById("questionTextSizeSelect");if(textSize)settings.questionTextSize=textSize.value;
   const cs=document.getElementById("colorSchemeSelect");if(cs)settings.colorScheme=cs.value;
@@ -489,8 +490,8 @@ function normalize(q,defaults={}){
  const type=String(q.type??q.questionType??"mcq").toLowerCase().replace(/[\s-]+/g,"_");
  const explanation=q.explanation??q.reason??q.solution??q.rationale??"";
  const hint=q.hint??"";
- const marks=Number(q.marks??q.points??defaults.marks??settings.defaultMarks??1);
- const negativeMarks=Number(q.negativeMarks??q.negative??defaults.negativeMarks??settings.defaultNegative??0);
+ const marks=Number(q.marks??q.points??defaults.marks??1);
+ const negativeMarks=Number(q.negativeMarks??q.negative??defaults.negativeMarks??0);
  const section=q.section??q.category??q.topic??defaults.name??"General";
  const image=normalizeImageSource(q.image??q.picture);
 
@@ -657,7 +658,7 @@ function loadQuiz(){
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
    quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
-   if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
+   if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON`;
    registerActiveExam();closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
  }catch(e){document.getElementById("jsonStatus").className="status err";document.getElementById("jsonStatus").textContent="✕ "+e.message}
 }
@@ -952,14 +953,58 @@ function renderSpecialQuestion(q,opts){
  }else if(q.type==="ordering"){
    const currentOrder=Array.isArray(answers[current])&&answers[current].length?answers[current]:[...q.options];
    const list=document.createElement("div");list.className="ordering-list";
+   list.setAttribute("role","list");
+   list.setAttribute("aria-label","Reorder the steps");
+   const moveItem=(from,to)=>{
+     if(from===to||to<0||to>=currentOrder.length)return;
+     const nextOrder=[...currentOrder];
+     const [moved]=nextOrder.splice(from,1);
+     nextOrder.splice(to,0,moved);
+     answers[current]=nextOrder;
+     checkedQuestions.delete(current);
+     render();
+     const updatedItems=document.querySelectorAll("#options .order-item");
+     updatedItems.forEach(el=>el.classList.add("order-item-updated"));
+     const status=document.querySelector("#options .ordering-status");
+     if(status)status.textContent=`${moved} moved to position ${to+1}.`;
+     saveSessionSoon();
+   };
    currentOrder.forEach((item,i)=>{
-     const b=document.createElement("button");b.type="button";b.className="order-item";b.draggable=true;b.textContent=`${i+1}. ${item}`;
-     b.ondragstart=e=>e.dataTransfer.setData("text/plain",String(i));
-     b.ondragover=e=>e.preventDefault();
-     b.ondrop=e=>{const from=Number(e.dataTransfer.getData("text/plain"));const arr=[...currentOrder];const [m]=arr.splice(from,1);arr.splice(i,0,m);answers[current]=arr;checkedQuestions.delete(current);render();saveSessionSoon()};
-     list.appendChild(b);
+     const card=document.createElement("div");
+     card.className="order-item";
+     card.draggable=true;
+     card.setAttribute("role","listitem");
+     card.dataset.orderIndex=String(i);
+     const position=document.createElement("span");position.className="order-position";position.textContent=String(i+1);
+     const content=document.createElement("div");content.className="order-content";setQuizRichText(content,String(item));
+     const handle=document.createElement("span");handle.className="order-handle";handle.setAttribute("aria-hidden","true");handle.textContent="⠿";
+     const controls=document.createElement("div");controls.className="order-controls";
+     const up=document.createElement("button");up.type="button";up.className="order-move";up.textContent="↑";up.setAttribute("aria-label",`Move item ${i+1} up`);up.disabled=i===0;up.onclick=()=>moveItem(i,i-1);
+     const down=document.createElement("button");down.type="button";down.className="order-move";down.textContent="↓";down.setAttribute("aria-label",`Move item ${i+1} down`);down.disabled=i===currentOrder.length-1;down.onclick=()=>moveItem(i,i+1);
+     controls.append(up,down);
+     card.append(handle,position,content,controls);
+     card.ondragstart=e=>{
+       e.dataTransfer.setData("text/plain",String(i));
+       e.dataTransfer.effectAllowed="move";
+       card.classList.add("is-dragging");
+     };
+     card.ondragend=()=>card.classList.remove("is-dragging");
+     card.ondragover=e=>{e.preventDefault();e.dataTransfer.dropEffect="move";card.classList.add("is-drop-target")};
+     card.ondragleave=e=>{if(!card.contains(e.relatedTarget))card.classList.remove("is-drop-target")};
+     card.ondrop=e=>{
+       e.preventDefault();
+       const from=Number(e.dataTransfer.getData("text/plain"));
+       card.classList.remove("is-drop-target");
+       moveItem(from,i);
+     };
+     list.appendChild(card);
    });
    opts.appendChild(list);
+   const status=document.createElement("div");
+   status.className="ordering-status";
+   status.setAttribute("role","status");
+   status.setAttribute("aria-live","polite");
+   opts.appendChild(status);
  }else{
    q.options.forEach((text,i)=>{
      const letter=String.fromCharCode(65+i),b=document.createElement("button");
@@ -2209,7 +2254,7 @@ function startHomeQuiz(){
    quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
-   if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON/settings`;
+   if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON`;
    registerActiveExam();saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
  }catch(e){status.textContent="✕ "+e.message;status.style.color="var(--bad)"}
 }
@@ -2261,8 +2306,6 @@ function showView(name){
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner"){renderPlans();renderPlannerCalendar();renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
- const marks=document.getElementById("defaultMarks");if(marks)marks.value=settings.defaultMarks??1;
- const negative=document.getElementById("defaultNegative");if(negative)negative.value=settings.defaultNegative??0;
  updateTheme();updateModeUI()}
 }
 function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}

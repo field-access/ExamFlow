@@ -2990,24 +2990,6 @@ body.dark #examView .option:hover:not(.correct):not(.answer-not-correct){
   grid-template-columns:repeat(3,minmax(0,1fr));
 }
 #settingsView .setting-sounds .setting-actions .btn:last-child{grid-column:auto}
-#settingsView .setting-scoring-fields{
-  grid-column:2;
-  grid-row:1 / span 2;
-  min-width:0;
-  gap:6px !important;
-  margin:0 !important;
-}
-#settingsView .setting-scoring-fields label{
-  display:block;
-  margin-bottom:2px;
-  font-size:9px !important;
-}
-#settingsView .setting-scoring-fields .goalinput{
-  min-height:34px;
-  margin:0;
-  padding:6px 8px;
-  font-size:12px;
-}
 #settingsView .setting-data #dataImportStatus{
   grid-column:1;
   grid-row:3;
@@ -3104,23 +3086,71 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
     gap:8px !important;
   }
   #settingsView .setting.card{
-    grid-template-columns:minmax(0,1fr) minmax(145px,42%);
-    gap:3px 10px;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto auto;
+    gap:5px;
+    min-height:0;
     padding:11px 12px !important;
     border-radius:11px;
   }
+  #settingsView .setting.card h3,
+  #settingsView .setting.card>p,
+  #settingsView .setting-control,
+  #settingsView .setting-actions{
+    grid-column:1;
+  }
+  #settingsView .setting.card h3{grid-row:1}
+  #settingsView .setting.card>p{grid-row:2;max-width:none;margin:0}
+  #settingsView .setting-control,
+  #settingsView .setting-actions{
+    grid-row:3;
+    width:100%;
+  }
   #settingsView .setting.card h3{font-size:11px}
-  #settingsView .setting.card>p{font-size:9px;line-height:1.4}
-  #settingsView .setting-control select{min-height:34px;font-size:10px}
+  #settingsView .setting.card>p{font-size:10px;line-height:1.45}
+  #settingsView .setting-control select{
+    min-width:0;
+    min-height:38px;
+    padding:8px 30px 8px 10px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-size:13px;
+  }
   #settingsView .setting-actions{gap:4px}
   #settingsView .setting-actions .btn,
   #settingsView .setting-actions .modebtn{
     min-height:32px;
     padding:5px 6px;
+    font-size:10px;
+  }
+  #settingsView .setting-appearance{
+    grid-template-rows:auto auto auto auto;
+  }
+  #settingsView .setting-appearance .setting-actions{
+    grid-column:1;
+    grid-row:3;
+    justify-content:flex-start;
+    flex-wrap:wrap;
+  }
+  #settingsView .setting-appearance #persistentStorageStatus{
+    grid-column:1;
+    grid-row:4;
+    margin:0 !important;
     font-size:9px;
   }
-  #settingsView .setting-appearance #persistentStorageStatus,
-  #settingsView .setting-data #dataImportStatus{font-size:8px}
+  #settingsView .setting-data{
+    grid-template-rows:auto auto auto auto;
+  }
+  #settingsView .setting-data .setting-actions{
+    grid-column:1;
+    grid-row:3;
+  }
+  #settingsView .setting-data #dataImportStatus{
+    grid-column:1;
+    grid-row:4;
+    margin:0 !important;
+    font-size:9px;
+  }
   #settingsView .keyboard-shortcuts-card .shortcut-grid{
     grid-template-columns:1fr !important;
     padding:0 10px 10px;
@@ -3136,17 +3166,21 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
     text-align:left;
   }
   #settingsView .setting-sounds .setting-actions,
-  #settingsView .setting-data .setting-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #settingsView .setting-data .setting-actions{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+  }
   #settingsView .setting-actions .btn,
   #settingsView .setting-actions .modebtn{
-    padding:5px 3px;
-    font-size:8px;
+    min-width:0;
+    padding:6px 5px;
+    font-size:10px;
     white-space:normal;
     line-height:1.2;
+    overflow-wrap:anywhere;
   }
 }
 @media(max-width:380px){
-  #settingsView .setting.card{grid-template-columns:minmax(0,1fr) minmax(120px,40%)}
   #settingsView .setting-sounds .setting-actions,
   #settingsView .setting-data .setting-actions{grid-template-columns:1fr}
   #settingsView .keyboard-shortcuts-card .shortcut-grid>div{grid-template-columns:minmax(0,1fr)}
@@ -3414,6 +3448,199 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   border-color:color-mix(in srgb,var(--bad) 40%,var(--line));
   color:var(--bad);
 }
+
+/* Ordering questions use a stacked card layout with clear drag and tap controls. */
+#examView .ordering-list{
+  display:grid;
+  gap:9px;
+  margin:18px auto;
+  max-width:min(760px,100%);
+}
+#examView .order-item{
+  display:grid;
+  grid-template-columns:22px 34px minmax(0,1fr) 34px;
+  align-items:center;
+  gap:11px;
+  min-width:0;
+  padding:12px 13px;
+  border:1px solid color-mix(in srgb,var(--ux-primary) 17%,var(--line));
+  border-radius:14px;
+  background:linear-gradient(110deg,
+    color-mix(in srgb,var(--ux-primary) 4%,var(--surface)),
+    var(--surface) 42%);
+  color:var(--text);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--ux-primary) 6%,transparent);
+  cursor:grab;
+  transition:transform .18s ease,border-color .18s ease,background-color .18s ease,box-shadow .18s ease;
+}
+#examView .order-item:hover{
+  transform:translateY(-1px);
+  border-color:color-mix(in srgb,var(--ux-primary) 40%,var(--line));
+  box-shadow:0 5px 14px color-mix(in srgb,var(--ux-primary) 10%,transparent);
+}
+#examView .order-item.is-dragging{opacity:.45;cursor:grabbing}
+#examView .order-item.is-drop-target{
+  transform:translateY(-3px);
+  border-color:var(--ux-primary);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--ux-primary) 15%,transparent);
+}
+#examView .order-position{
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border:1px solid color-mix(in srgb,var(--ux-primary) 22%,var(--line));
+  border-radius:10px;
+  background:color-mix(in srgb,var(--ux-primary) 10%,var(--surface));
+  color:var(--ux-primary);
+  font-size:12px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+#examView .order-handle{
+  color:var(--muted);
+  font-size:20px;
+  line-height:1;
+  text-align:center;
+  cursor:grab;
+}
+#examView .order-content{
+  min-width:0;
+  overflow-wrap:anywhere;
+  font:400 15px/1.55 var(--exam-font,"DM Sans","Segoe UI",sans-serif);
+}
+#examView .order-controls{display:grid;gap:4px}
+#examView .order-move{
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:30px;
+  padding:0;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  color:var(--text);
+  font-size:15px;
+  cursor:pointer;
+}
+#examView .order-move:hover:not(:disabled){
+  border-color:var(--ux-primary);
+  background:color-mix(in srgb,var(--ux-primary) 9%,var(--surface));
+  color:var(--ux-primary);
+}
+#examView .order-move:disabled{opacity:.38;cursor:not-allowed}
+#examView .order-move:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--ux-primary) 25%,transparent);
+  outline-offset:1px;
+}
+#examView .order-item-updated{animation:order-item-shift .32s ease-out}
+@keyframes order-item-shift{
+  0%{transform:translateY(4px);background-color:color-mix(in srgb,var(--ux-primary) 17%,var(--surface))}
+  100%{transform:translateY(0);background-color:var(--surface)}
+}
+@media(max-width:600px){
+  #examView .order-item{grid-template-columns:16px 30px minmax(0,1fr) 32px;gap:7px;padding:10px}
+  #examView .order-position{width:28px;height:28px;font-size:11px}
+  #examView .order-content{font-size:14px}
+  #examView .order-move{width:30px;height:30px}
+}
+@media(prefers-reduced-motion:reduce){
+  #examView .order-item,#examView .order-item-updated{animation:none;transition:none}
+}
+
+/* Question-type feedback follows the selected theme, including dark mode. */
+#examView .fill-answer,
+#examView .match-trigger,
+#examView .match-select{
+  border-color:color-mix(in srgb,var(--ux-primary) 20%,var(--line));
+  background:var(--surface);
+  color:var(--text);
+}
+#examView .fill-answer:focus,
+#examView .match-trigger:focus-visible,
+#examView .match-select:focus-visible{
+  border-color:var(--ux-primary);
+  outline:3px solid color-mix(in srgb,var(--ux-primary) 16%,transparent);
+  outline-offset:1px;
+}
+#examView .match-row.match-correct .match-trigger,
+#examView .match-row.match-correct .match-select{
+  border-color:color-mix(in srgb,var(--good) 58%,var(--line));
+  background:color-mix(in srgb,var(--good) 10%,var(--surface));
+}
+#examView .match-row.match-wrong .match-trigger,
+#examView .match-row.match-wrong .match-select{
+  border-color:color-mix(in srgb,var(--bad) 58%,var(--line));
+  background:color-mix(in srgb,var(--bad) 9%,var(--surface));
+}
+#examView .answer-correct-reveal{
+  background:color-mix(in srgb,var(--good) 12%,var(--surface)) !important;
+}
+#examView .answer-not-correct{opacity:.58}
+#examView .qbtn.answered{
+  background:color-mix(in srgb,var(--good) 13%,var(--surface));
+  border-color:color-mix(in srgb,var(--good) 38%,var(--line));
+  color:var(--good);
+}
+#examView .qbtn.review{
+  background:color-mix(in srgb,var(--warn) 14%,var(--surface));
+  border-color:color-mix(in srgb,var(--warn) 40%,var(--line));
+  color:var(--warn);
+}
+body.dark .cbq-original,
+body.dark .cbq-explanation{
+  border-color:var(--line);
+  background:var(--surface2);
+  color:var(--text);
+}
+body.dark .generated-cbq{
+  border-color:var(--line);
+  background:var(--surface);
+  color:var(--text);
+}
+.cbq-option.correct{
+  border-color:color-mix(in srgb,var(--good) 58%,var(--line));
+  background:color-mix(in srgb,var(--good) 10%,var(--surface));
+}
+.cbq-option.wrong{
+  border-color:color-mix(in srgb,var(--bad) 58%,var(--line));
+  background:color-mix(in srgb,var(--bad) 9%,var(--surface));
+}
+.cbq-feedback.good{color:var(--good)}
+.cbq-feedback.bad{color:var(--bad)}
+body.dark #settingsView select{
+  color-scheme:dark;
+  border-color:var(--line);
+  background-color:var(--surface);
+  color:var(--text);
+}
+
+/* Keep dark palettes coordinated with the user's selected color scheme. */
+body.dark.scheme-ocean{
+  --bg:#0d2029;--surface:#142d38;--surface2:#1d3c48;--text:#e4f4f6;--muted:#9bbbc1;--line:#31515b;
+  --primary:#72c8d2;--primary2:#45a8ba;--good:#5bc89b;--warn:#e9bb68;--bad:#f18483;
+  --accent:#72c8d2;--accent2:#45a8ba;--ux-primary:#65c1ce;--ux-primary-2:#438fae;
+  --shadow:0 16px 42px rgba(0,0,0,.32);--ux-shadow-sm:0 5px 18px rgba(0,0,0,.22);--ux-shadow-md:0 12px 32px rgba(0,0,0,.32);
+}
+body.dark.scheme-forest{
+  --bg:#142019;--surface:#1c2d22;--surface2:#293d2e;--text:#edf5e9;--muted:#a9bda9;--line:#3d5742;
+  --primary:#91c89a;--primary2:#6aaa78;--good:#6bd0a0;--warn:#e6bd70;--bad:#ef8980;
+  --accent:#91c89a;--accent2:#6aaa78;--ux-primary:#83bd8e;--ux-primary-2:#569a6b;
+  --shadow:0 16px 42px rgba(0,0,0,.32);--ux-shadow-sm:0 5px 18px rgba(0,0,0,.22);--ux-shadow-md:0 12px 32px rgba(0,0,0,.32);
+}
+body.dark.scheme-sunset{
+  --bg:#251a19;--surface:#342522;--surface2:#49312a;--text:#fff0e5;--muted:#d0aaa0;--line:#65463b;
+  --primary:#ff9c79;--primary2:#e97862;--good:#70c99a;--warn:#f1bd68;--bad:#ff8c8b;
+  --accent:#ff9c79;--accent2:#e97862;--ux-primary:#f28b73;--ux-primary-2:#c96568;
+  --shadow:0 16px 42px rgba(0,0,0,.34);--ux-shadow-sm:0 5px 18px rgba(0,0,0,.23);--ux-shadow-md:0 12px 32px rgba(0,0,0,.34);
+}
+body.dark.scheme-slate{
+  --bg:#151d29;--surface:#202b3b;--surface2:#2c394c;--text:#edf2fa;--muted:#abb8ca;--line:#425168;
+  --primary:#9ab8e4;--primary2:#769bd0;--good:#64c6a4;--warn:#e7bd70;--bad:#ed8992;
+  --accent:#9ab8e4;--accent2:#769bd0;--ux-primary:#8caedc;--ux-primary-2:#6d8fc2;
+  --shadow:0 16px 42px rgba(0,0,0,.32);--ux-shadow-sm:0 5px 18px rgba(0,0,0,.22);--ux-shadow-md:0 12px 32px rgba(0,0,0,.32);
+}
+
 #settingsView,
 #settingsView :where(*) {
   font-family:var(--exam-font,"DM Sans","Segoe UI",sans-serif) !important;
