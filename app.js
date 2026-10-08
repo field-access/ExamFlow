@@ -1146,15 +1146,19 @@ function examflowKeyboardHandler(e){
   const examActive=document.getElementById("examView")?.classList.contains("active");
   if(!examActive)return;
 
+  if(!e.shiftKey&&!e.altKey){
+    if(lower==="h"){e.preventDefault();toggleHint();return}
+    if(lower==="p"){e.preventDefault();toggleQuestionProgress();return}
+    if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
+    if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
+    if(lower==="r"){e.preventDefault();toggleReview();return}
+  }
+
   if(e.shiftKey){
     if(lower==="p"){e.preventDefault();setMode("practice");return}
     if(lower==="e"){e.preventDefault();setMode("exam");return}
-    if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
-    if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
     if(lower==="v"&&mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
-    if(lower==="q"){e.preventDefault();toggleQuestionProgress();return}
     if(lower==="s"){e.preventDefault();submitExam();return}
-    if(lower==="r"){e.preventDefault();toggleReview();return}
     return;
   }
 
