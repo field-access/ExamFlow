@@ -965,8 +965,6 @@ function renderSpecialQuestion(q,opts){
      render();
      const updatedItems=document.querySelectorAll("#options .order-item");
      updatedItems.forEach(el=>el.classList.add("order-item-updated"));
-     const status=document.querySelector("#options .ordering-status");
-     if(status)status.textContent=`${moved} moved to position ${to+1}.`;
      saveSessionSoon();
    };
    currentOrder.forEach((item,i)=>{
@@ -1000,11 +998,6 @@ function renderSpecialQuestion(q,opts){
      list.appendChild(card);
    });
    opts.appendChild(list);
-   const status=document.createElement("div");
-   status.className="ordering-status";
-   status.setAttribute("role","status");
-   status.setAttribute("aria-live","polite");
-   opts.appendChild(status);
  }else{
    q.options.forEach((text,i)=>{
      const letter=String.fromCharCode(65+i),b=document.createElement("button");
