@@ -369,8 +369,9 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 .drawer-head{display:flex;justify-content:space-between;align-items:center;font-size:14px;margin-bottom:14px}
 .drawer-close{border:0;background:transparent;font-size:22px;color:var(--muted);cursor:pointer}
 .drawer-legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px;color:var(--muted);font-size:9px}
-.drawer-legend span{display:flex;align-items:center;gap:4px}
-.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#e9edf2}
+.drawer-legend span{display:inline-flex;align-items:center;align-self:flex-start;gap:4px;min-height:12px;height:12px;padding:0;line-height:12px}
+.drawer-legend .legend-dot{flex:0 0 8px;width:8px;height:8px;min-width:8px;min-height:8px;border-radius:50%;display:inline-block;background:#e9edf2}
+.drawer-legend .legend-dot.empty{padding:0;text-align:initial}
 .legend-dot.current{background:var(--primary)}.legend-dot.answered{background:#3eb47a}.legend-dot.review{background:#d7a33b}
 .exam-progress-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .exam-progress-grid,
@@ -582,8 +583,12 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
   .exam-progress-drawer{
     width:min(320px,88vw) !important;
     right:calc(-1 * min(320px,88vw)) !important;
+    height:calc(100vh - 78px) !important;
     padding:16px !important;
+    border-radius:18px;
+    border-left:1px solid var(--line);
   }
+  .exam-progress-drawer.open{right:8px !important}
   .exam-progress-grid{grid-template-columns:repeat(4,1fr) !important;gap:6px !important}
   .progress-q{height:38px !important}
 }
