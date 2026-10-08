@@ -1223,22 +1223,6 @@ button,.btn,.modebtn,.preset-btn,.qbtn,.bookmark,.option,.session-load,.session-
 @media(max-width:850px){.home-hero{grid-template-columns:1fr}.main{grid-template-columns:1fr}.sidebar,.right{position:relative;top:auto}.dashboard{width:min(100% - 24px,700px)}.metrics{grid-template-columns:repeat(2,1fr)}.dashcols{grid-template-columns:1fr}}
 @media(max-width:600px){.cbq-intro{padding:23px 20px}.cbq-intro h1{font-size:31px}.cbq-intro p{font-size:14px}.hero-actions,.dashactions{display:grid;grid-template-columns:1fr;gap:7px}.hero-actions .btn,.dashactions .btn{width:100%}.exam-countdown-card{min-height:205px;padding:20px}.final-countdown{font-size:39px}.dashboard{width:calc(100% - 20px);margin:17px auto}.dashboard-countdown{align-items:flex-start;flex-wrap:wrap}.dashboard-countdown .btn{width:100%}.metrics{gap:8px}.metric{padding:13px}.metric b{font-size:22px}.planner-page{width:calc(100% - 20px);margin:18px auto}.planner-hero{display:block}.planner-hero>.btn{margin-top:12px;width:100%}.planner-paste-card,.planner-list-card{padding:14px}.quick-plan-head{display:block}.quick-plan-head .btn{margin-top:10px;width:100%}.quick-plan-foot{display:grid!important;grid-template-columns:1fr;gap:8px}}
 
-.schema-guide{margin:14px 0;padding:20px;border-radius:15px;border:1px solid color-mix(in srgb,#5865f2 18%,var(--line));background:linear-gradient(145deg,color-mix(in srgb,#5865f2 5%,var(--surface)),var(--surface))}
-.schema-guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px}
-.schema-guide h3{margin:4px 0 5px;font-size:17px}
-.schema-guide-head p{margin:0;max-width:720px;color:var(--muted);font-size:12px;line-height:1.55}
-.schema-code{margin:15px 0 10px;padding:16px;overflow:auto;border-radius:11px;border:1px solid var(--line);background:var(--surface2);font:400 12px/1.6 "Cascadia Code","SFMono-Regular",Consolas,monospace;color:var(--text);white-space:pre}
-.schema-code code{font:inherit}
-.schema-notes{display:flex;gap:7px;flex-wrap:wrap}
-.schema-notes span{padding:6px 8px;border-radius:7px;background:var(--surface2);color:var(--muted);font:500 10px/1.3 system-ui}
-.schema-notes b{color:var(--text)}
-@media(max-width:600px){
- .schema-guide{padding:15px}
- .schema-guide-head{display:block}
- .schema-guide-head .btn{margin-top:10px;width:100%}
- .schema-code{font-size:10px;padding:12px}
-}
-
 /* Final responsive shell fix */
 header{
   min-width:0;
@@ -1323,7 +1307,6 @@ header{
   .exam-head .timer{flex:0 0 auto}
   .actions{flex-wrap:wrap}
   .actions .btn{flex:1 1 120px}
-  .schema-guide{width:calc(100% - 16px);margin-left:auto;margin-right:auto}
 }
 
 @media(max-width:480px){
@@ -1331,7 +1314,7 @@ header{
   .topnav button:nth-child(5){display:none}
   .header-right .btn:first-of-type{font-size:0;padding:8px;width:37px}
   .header-right .btn:first-of-type::after{content:"＋";font-size:16px}
-  .home-hero,.schema-guide{width:calc(100% - 12px)}
+  .home-hero{width:calc(100% - 12px)}
   .metrics{grid-template-columns:1fr 1fr}
   .metric small{font-size:9px}
   .metric b{font-size:20px}
@@ -1353,7 +1336,7 @@ body:not(.exam-active) #globalExamProgressBtn {
 
 /* Prevent wide controls/cards from pushing the viewport horizontally. */
 .view,.card,.panel,.question,.options,.actions,.dashboard,.planner-page,
-.home-hero,.schema-guide,.results-page,.settings-page{max-width:100%;min-width:0}
+.home-hero,.results-page,.settings-page{max-width:100%;min-width:0}
 img,svg,canvas,pre,code{max-width:100%}
 pre{overflow:auto}
 
@@ -1819,7 +1802,7 @@ body.dark{
 @media(max-width:600px){.practice-timer-controls{gap:4px}.preset-btn{padding:6px 7px;font-size:9px}}
 
 /* Dark mode readable overrides */
-body.dark .schema-code, body.dark .quiz-code-block, body.dark .quiz-inline-code, body.dark kbd, body.dark button.qbtn, body.dark .preset-btn {
+body.dark .quiz-code-block, body.dark .quiz-inline-code, body.dark kbd, body.dark button.qbtn, body.dark .preset-btn {
   color: var(--text) !important;
   background: var(--surface2) !important;
   border-color: var(--line) !important;
