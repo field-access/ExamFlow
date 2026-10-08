@@ -1152,12 +1152,12 @@ function examflowKeyboardHandler(e){
     if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
     if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
     if(lower==="r"){e.preventDefault();toggleReview();return}
+    if(lower==="v"&&mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
   }
 
   if(e.shiftKey){
     if(lower==="p"){e.preventDefault();setMode("practice");return}
     if(lower==="e"){e.preventDefault();setMode("exam");return}
-    if(lower==="v"&&mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
     if(lower==="s"){e.preventDefault();submitExam();return}
     return;
   }

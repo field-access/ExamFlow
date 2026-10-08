@@ -1019,14 +1019,14 @@ body.practice-active .practice-answer-btn{display:inline-flex}
 /* Refined matching UI + KaTeX-safe content */
 .matching-grid{display:grid;gap:12px;margin:16px 0}
 .match-row{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr);gap:14px;align-items:center}
-.match-left{min-height:52px;display:flex;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);font:400 16px/1.55 Georgia,"Times New Roman",serif;color:var(--text)}
+.match-left{min-height:52px;display:flex;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);font:400 16px/1.55 var(--exam-font,"DM Sans","Segoe UI",sans-serif);color:var(--text)}
 .match-choice{position:relative;min-width:0}
-.match-trigger{width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);font:400 15px/1.45 Georgia,"Times New Roman",serif;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.match-trigger{width:100%;min-height:52px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--text);font:400 15px/1.45 var(--exam-font,"DM Sans","Segoe UI",sans-serif);cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.03)}
 .match-trigger:hover,.match-choice.open .match-trigger{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 10%,transparent)}
 .match-placeholder{color:var(--muted);font-style:italic}.match-chevron{font:800 16px system-ui;color:var(--muted);flex:0 0 auto}
 .match-menu{display:none;position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:80;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 35px rgba(20,25,35,.16);max-height:260px;overflow:auto}
 .match-choice.open .match-menu{display:grid;gap:3px}
-.match-menu-item{width:100%;display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start;text-align:left;border:0;border-radius:8px;padding:9px 10px;background:transparent;color:var(--text);font:400 14px/1.45 Georgia,"Times New Roman",serif;cursor:pointer}
+.match-menu-item{width:100%;display:grid;grid-template-columns:24px 1fr;gap:8px;align-items:start;text-align:left;border:0;border-radius:8px;padding:9px 10px;background:transparent;color:var(--text);font:400 14px/1.45 var(--exam-font,"DM Sans","Segoe UI",sans-serif);cursor:pointer}
 .match-menu-item>span:first-child{font:800 10px system-ui;color:var(--muted);padding-top:3px}
 .match-menu-item:hover,.match-menu-item.selected{background:var(--surface2)}
 .match-result-label{font:800 10px system-ui;white-space:nowrap}
@@ -4193,3 +4193,19 @@ body.dark #settingsView .setting-duration .setting-control select{
   #settingsView .setting-data .setting-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
   #settingsView .keyboard-shortcuts-card .shortcut-grid{grid-template-columns:1fr!important}
 }
+
+#examView .match-left,
+#examView .match-trigger,
+#examView .match-menu-item{
+  font-family:"DM Sans","Segoe UI",sans-serif!important;
+}
+#examView .match-left{font-size:17px!important}
+#examView .match-trigger{font-size:16px!important}
+#examView .match-menu-item{font-size:15px!important}
+#examView .question:has(.match-choice.open){
+  overflow:visible!important;
+  position:relative;
+  z-index:120;
+}
+#examView .match-choice.open{z-index:121}
+#examView .match-choice.open .match-menu{z-index:122}
