@@ -810,7 +810,7 @@ function setQuizRichText(element,text){
 }
 function setQuizExplanation(element,text){
   if(!element)return;
-  element.innerHTML="<strong>💡 Explanation</strong>";
+  element.innerHTML='<strong><svg class="ui-icon"><use href="#icon-lightbulb"/></svg> Explanation</strong>';
   const content=document.createElement("div");
   content.className="explanation-content";
   setQuizRichText(content,formatExplanationText(text));
@@ -1067,10 +1067,6 @@ async function examflowCtrlEnter(){
     setTimeout(()=>examflowCtrlEnter(),60);
   }
 }
-function examflowToggleThemeFast(){
-  setTheme(settings.theme==="dark"?"light":"dark");
-  toast(settings.theme==="dark"?"Dark mode ✓":"Light mode ✓");
-}
 function examflowSelectOptionByNumber(n){
   if(!questions.length||!document.getElementById("examView")?.classList.contains("active"))return;
   const q=questions[current];
@@ -1135,45 +1131,38 @@ function examflowKeyboardHandler(e){
       moveResultQuestion(e.key==="ArrowRight"?1:-1);
       return;
     }
-    if(lower==="r"){e.preventDefault();retakeLastTest();return}
-    if(lower==="s"){e.preventDefault();saveResultCopy();return}
-    if(lower==="c"){e.preventDefault();showView("home");return}
+    if(e.shiftKey&&lower==="r"){e.preventDefault();retakeLastTest();return}
+    if(e.shiftKey&&lower==="s"){e.preventDefault();saveResultCopy();return}
+    if(e.shiftKey&&lower==="c"){e.preventDefault();showView("home");return}
     return;
   }
 
   const examActive=document.getElementById("examView")?.classList.contains("active");
-
-
-
-  if(lower==="k"){e.preventDefault();examflowToggleThemeFast();return}
-  if(lower==="h"){e.preventDefault();showView("home");return}
   if(!examActive)return;
 
-  if(e.shiftKey && lower==="p"){e.preventDefault();setMode("practice");return}
-  if(e.shiftKey && lower==="e"){e.preventDefault();setMode("exam");return}
-  if(e.shiftKey && lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
-  if(e.shiftKey && lower==="q"){e.preventDefault();toggleQuestionProgress();return}
-  if(e.shiftKey && lower==="s"){e.preventDefault();submitExam();return}
+  if(e.shiftKey){
+    if(lower==="p"){e.preventDefault();setMode("practice");return}
+    if(lower==="e"){e.preventDefault();setMode("exam");return}
+    if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
+    if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
+    if(lower==="v"&&mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
+    if(lower==="q"){e.preventDefault();toggleQuestionProgress();return}
+    if(lower==="s"){e.preventDefault();submitExam();return}
+    if(lower==="r"){e.preventDefault();toggleReview();return}
+    return;
+  }
 
-  if(lower==="e"){e.preventDefault();setMode("exam");return}
-  if(lower==="m"){e.preventDefault();setMode("practice");return}
-  if(lower==="g"){e.preventDefault();redirectQuestionToChatGPT();return}
-  if(lower==="c"){e.preventDefault();copyCurrentQuestion();return}
-
-  if(e.key==="ArrowRight" || lower==="n"){
+  if(e.key==="ArrowRight"){
     e.preventDefault();
     nextQuestion();
     return;
   }
-  if(e.key==="ArrowLeft" || lower==="b"){
+  if(e.key==="ArrowLeft"){
     e.preventDefault();
     previousQuestion();
     return;
   }
   if(e.key==="Enter"){e.preventDefault();checkCurrentAnswer();return}
-  if(lower==="v" && mode==="practice"){e.preventDefault();viewPracticeAnswer();return}
-  if(lower==="p"){e.preventDefault();toggleQuestionProgress();return}
-  if(lower==="r"){e.preventDefault();toggleReview();return}
   if(e.key==="Delete" || e.key==="Backspace"){e.preventDefault();clearAnswer();return}
   if(/^[1-4]$/.test(e.key)){e.preventDefault();examflowSelectOptionByNumber(Number(e.key));return}
 }
@@ -1411,7 +1400,7 @@ function render(){
    hintCard.hidden=!hasHint;
    hintText.hidden=true;
    hintToggle.setAttribute("aria-expanded","false");
-   hintToggle.textContent="💡 Show hint";
+   hintToggle.innerHTML='<svg class="ui-icon"><use href="#icon-lightbulb"/></svg>Show hint';
    if(hasHint){setQuizRichText(hintText,q.hint);renderAllQuizMath(hintText)}
  }
  renderQuestionImage(q);
@@ -1434,7 +1423,9 @@ function render(){
      setQuizExplanation(ex,q.explanation);
    }else ex.style.display="none";
  }else{fb.textContent="";ex.style.display="none";}
- document.getElementById("bookmark").textContent=reviews.has(current)?"★ Review":"☆ Review";document.getElementById("bookmark").classList.toggle("saved",reviews.has(current));
+ const bookmark=document.getElementById("bookmark");
+ bookmark.innerHTML=`<svg class="ui-icon"><use href="#icon-bookmark"/></svg>${reviews.has(current)?"Marked":"Review"}`;
+ bookmark.classList.toggle("saved",reviews.has(current));
  document.getElementById("prevBtn").disabled=current===0;document.getElementById("nextBtn").textContent=current===questions.length-1?"Finish":"Next →";
  document.getElementById("answeredCount").textContent=count;document.getElementById("reviewCount").textContent=reviews.size;
  document.getElementById("progressText").textContent=`${count} / ${questions.length}`;document.getElementById("progressBar").style.width=(count/questions.length*100)+"%";
@@ -1451,7 +1442,8 @@ function toggleHint(){
  const hintText=document.getElementById("hintText"),hintToggle=document.getElementById("hintToggle");
  if(!hintText||!hintToggle)return;
  const open=hintText.hidden;
- hintText.hidden=!open;hintToggle.setAttribute("aria-expanded",String(open));hintToggle.textContent=open?"💡 Hide hint":"💡 Show hint";
+ hintText.hidden=!open;hintToggle.setAttribute("aria-expanded",String(open));
+ hintToggle.innerHTML=`<svg class="ui-icon"><use href="#icon-lightbulb"/></svg>${open?"Hide hint":"Show hint"}`;
  if(open)renderAllQuizMath(hintText);
 }
 function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();saveSessionSoon()}
@@ -1577,7 +1569,7 @@ function showGeneratedCBQs(cbqs){
  window.__generatedCBQs=cbqs;
  let modal=document.getElementById("cbqModal");
  if(!modal){modal=document.createElement("div");modal.id="cbqModal";modal.className="cbq-modal";document.body.appendChild(modal)}
- modal.innerHTML=`<div class="cbq-modal-card"><div class="cbq-modal-head"><div><div class="cbq-kicker">🧠 CONCEPT REPAIR</div><h2>5 CBQs for this question</h2></div><button class="btn" onclick="closeCBQModal()">✕</button></div><div class="cbq-original">${esc(questions[current].text||"")}</div><div class="cbq-list">${cbqs.map((q,i)=>`<article class="generated-cbq"><div class="cbq-number">CBQ ${i+1}</div><div class="cbq-question">${esc(q.question||"")}</div><div class="cbq-options">${(q.options||[]).map((o,j)=>`<button class="cbq-option" onclick="answerGeneratedCBQ(this,${i},'${String.fromCharCode(65+j)}')"><span>${String.fromCharCode(65+j)}</span>${esc(o)}</button>`).join("")}</div><div class="cbq-feedback"></div><div class="cbq-explanation" style="display:none">${esc(q.explanation||"")}</div></article>`).join("")}</div><div class="cbq-modal-foot"><span>Work through all five, then return to the original question.</span><button class="btn primary" onclick="closeCBQModal()">↩ Reattempt Original</button></div></div>`;
+ modal.innerHTML=`<div class="cbq-modal-card"><div class="cbq-modal-head"><div><div class="cbq-kicker"><svg class="ui-icon"><use href="#icon-brain"/></svg> CONCEPT REPAIR</div><h2>5 CBQs for this question</h2></div><button class="btn" onclick="closeCBQModal()">✕</button></div><div class="cbq-original">${esc(questions[current].text||"")}</div><div class="cbq-list">${cbqs.map((q,i)=>`<article class="generated-cbq"><div class="cbq-number">CBQ ${i+1}</div><div class="cbq-question">${esc(q.question||"")}</div><div class="cbq-options">${(q.options||[]).map((o,j)=>`<button class="cbq-option" onclick="answerGeneratedCBQ(this,${i},'${String.fromCharCode(65+j)}')"><span>${String.fromCharCode(65+j)}</span>${esc(o)}</button>`).join("")}</div><div class="cbq-feedback"></div><div class="cbq-explanation" style="display:none">${esc(q.explanation||"")}</div></article>`).join("")}</div><div class="cbq-modal-foot"><span>Work through all five, then return to the original question.</span><button class="btn primary" onclick="closeCBQModal()">↩ Reattempt Original</button></div></div>`;
  modal.style.display="flex";
  renderAllQuizMath(modal);
  modal.querySelectorAll(".cbq-question,.cbq-option,.cbq-explanation,.cbq-original").forEach(el=>renderAllQuizMath(el));
@@ -1750,7 +1742,7 @@ function renderResultQuestions(){
          ${q.image?`<img class="result-question-image" src="${esc(q.image)}" alt="Question image">`:""}
          <strong>Options / Items</strong>
          <div style="margin-top:5px">${optionsHtml(q)}</div>
-         ${q.explanation?`<div class="result-explanation"><strong>💡 Explanation</strong><br>${esc(q.explanation)}</div>`:""}
+         ${q.explanation?`<div class="result-explanation"><strong><svg class="ui-icon"><use href="#icon-lightbulb"/></svg> Explanation</strong><br>${esc(q.explanation)}</div>`:""}
        </div>
      </div>
      <div class="result-status-icon">${status==="correct"?"✓":status==="wrong"?"×":"−"}</div>
@@ -1962,12 +1954,14 @@ async function importDataFile(event){
     renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();
     await savePersistentBackup();
     if(status){
+      status.hidden=false;
       status.textContent="✓ Backup imported successfully.";
       status.style.color="var(--good)";
     }
     toast("ExamFlow data imported ✓");
   }catch(err){
     if(status){
+      status.hidden=false;
       status.textContent="✕ "+(err?.message||"Could not import this JSON.");
       status.style.color="var(--bad)";
     }
@@ -1989,9 +1983,9 @@ async function pasteFromClipboard(targetId,statusId,buttonId){
   const status=document.getElementById(statusId);
   const btn=document.getElementById(buttonId);
   if(!target)return;
-  const original=btn?btn.textContent:"📋 Paste from Clipboard";
+  const original=btn?btn.innerHTML:'<svg class="ui-icon"><use href="#icon-copy"/></svg>Paste from Clipboard';
   try{
-    if(btn){btn.disabled=true;btn.textContent="📋 Reading…";}
+    if(btn){btn.disabled=true;btn.innerHTML='<svg class="ui-icon"><use href="#icon-clock"/></svg>Reading…';}
     if(!window.isSecureContext || !navigator.clipboard || !navigator.clipboard.readText){
       throw new Error("secure clipboard unavailable");
     }
@@ -2015,7 +2009,7 @@ async function pasteFromClipboard(targetId,statusId,buttonId){
     }
     toast("Clipboard permission blocked");
   }finally{
-    if(btn){btn.disabled=false;btn.textContent=original;}
+    if(btn){btn.disabled=false;btn.innerHTML=original;}
   }
 }
 

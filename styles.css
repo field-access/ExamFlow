@@ -3969,3 +3969,216 @@ body.dark #settingsView .setting-duration .setting-control select{
   #plannerView .quick-plan-head .btn{width:100%;margin-top:2px}
   #settingsView .setting-sounds .setting-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
+
+/* A consistent line-icon system and compact, balanced Settings layout. */
+.icon-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.ui-icon{
+  display:inline-block;
+  width:1.15em;
+  height:1.15em;
+  flex:0 0 auto;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vertical-align:-.18em;
+}
+.logo .ui-icon{width:22px;height:22px;stroke-width:1.7}
+.topnav button,.mobile-nav button{display:inline-flex;align-items:center;justify-content:center;gap:7px}
+.topnav button .ui-icon,.mobile-nav button .ui-icon{width:15px;height:15px}
+.mobile-menu-toggle{align-items:center;gap:7px}
+#examView .modepicker .ui-icon,
+#examView .actions .ui-icon{width:15px;height:15px}
+#bookmark .ui-icon{width:13px;height:13px}
+#hintToggle .ui-icon{width:16px;height:16px}
+#settingsView{overflow-x:clip}
+#settingsView .dashboard{
+  width:min(1000px,calc(100% - 36px))!important;
+  max-width:1000px;
+  margin:22px auto 36px!important;
+  padding:0;
+  box-sizing:border-box;
+}
+#settingsView .dashhead{margin:0 0 14px}
+#settingsView .dashhead h1{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:0;
+  font-size:24px;
+}
+#settingsView .dashhead h1 .ui-icon{width:22px;height:22px}
+#settingsView .settings{
+  width:100%;
+  min-width:0;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(72px,auto);
+  align-items:stretch;
+  gap:11px!important;
+  margin:0;
+}
+#settingsView .setting.card{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)!important;
+  grid-template-rows:auto!important;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-width:0;
+  min-height:72px;
+  height:auto;
+  margin:0;
+  padding:12px 14px!important;
+  overflow:hidden;
+  border-radius:12px;
+}
+#settingsView .setting.card h3{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  grid-column:1;
+  grid-row:1;
+  min-width:0;
+  margin:0;
+  font-size:12px;
+  line-height:1.35;
+}
+#settingsView .setting.card h3 .ui-icon{width:16px;height:16px;color:var(--ux-primary)}
+#settingsView .setting.card>p{display:none}
+#settingsView .setting-control,
+#settingsView .setting-actions{
+  grid-column:2!important;
+  grid-row:1!important;
+  align-self:center;
+  width:100%;
+  min-width:0;
+  margin:0!important;
+}
+#settingsView .setting-control select{
+  width:100%;
+  min-width:0;
+  min-height:38px;
+  margin:0;
+  padding:7px 32px 7px 10px;
+  font-size:12px;
+}
+#settingsView .setting-actions{
+  display:flex;
+  justify-content:flex-end;
+  flex-wrap:nowrap;
+  gap:6px;
+}
+#settingsView .setting-actions>*{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:0;
+  min-height:36px;
+  padding:6px 9px;
+  white-space:nowrap;
+  line-height:1.2;
+}
+#settingsView .setting-actions .ui-icon{width:14px;height:14px}
+#settingsView .setting-appearance,
+#settingsView .setting-sounds,
+#settingsView .setting-data{
+  grid-column:auto!important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)!important;
+  grid-template-rows:auto!important;
+  min-height:72px;
+}
+#settingsView .setting-appearance .setting-actions,
+#settingsView .setting-sounds .setting-actions,
+#settingsView .setting-data .setting-actions{
+  grid-column:2!important;
+  grid-row:1!important;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+}
+#settingsView .setting-appearance .setting-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+#settingsView .setting-sounds .setting-actions{display:flex!important;grid-template-columns:none!important}
+#settingsView .setting-data{grid-column:1/-1!important}
+#settingsView .setting-sounds .setting-actions>*,
+#settingsView .setting-data .setting-actions>*{min-width:0;white-space:normal}
+#settingsView .setting-data #dataImportStatus[hidden]{display:none}
+#settingsView .setting-data #dataImportStatus:not([hidden]){
+  display:block;
+  grid-column:1/-1;
+  grid-row:2;
+  margin:2px 0 0!important;
+  font-size:10px;
+}
+#settingsView .keyboard-shortcuts-card{
+  grid-column:1/-1!important;
+  display:block!important;
+  min-height:0;
+  padding:9px!important;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+  width:100%;
+  padding:0;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-grid>div{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  align-items:center;
+  gap:7px;
+  min-width:0;
+  min-height:34px;
+  padding:6px 8px;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-grid span{
+  min-width:0;
+  font-size:10px;
+  overflow-wrap:anywhere;
+}
+#settingsView .keyboard-shortcuts-card .shortcut-keys{gap:3px}
+#settingsView .keyboard-shortcuts-card kbd{
+  min-width:19px;
+  padding:2px 4px;
+  font-size:9px;
+}
+@media(max-width:700px){
+  #settingsView .dashboard{
+    width:calc(100% - 28px)!important;
+    margin:14px auto 26px!important;
+  }
+  #settingsView .dashhead h1{font-size:21px}
+  #settingsView .settings{grid-template-columns:minmax(0,1fr)!important;gap:8px!important}
+  #settingsView .setting.card,
+  #settingsView .setting-appearance,
+  #settingsView .setting-sounds,
+  #settingsView .setting-data{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.05fr)!important;
+    min-height:68px;
+    padding:10px 12px!important;
+    gap:8px;
+  }
+  #settingsView .setting.card h3{font-size:11px}
+  #settingsView .setting-control select{min-height:40px;font-size:13px}
+  #settingsView .setting-actions{gap:5px}
+  #settingsView .setting-actions>*{min-height:38px;padding:6px;font-size:10px}
+  #settingsView .keyboard-shortcuts-card .shortcut-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    padding:0;
+  }
+}
+@media(max-width:430px){
+  #settingsView .dashboard{width:calc(100% - 24px)!important}
+  #settingsView .setting.card,
+  #settingsView .setting-appearance,
+  #settingsView .setting-sounds,
+  #settingsView .setting-data{
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px;
+  }
+  #settingsView .setting.card h3{grid-column:1;grid-row:1}
+  #settingsView .setting-control,
+  #settingsView .setting-actions{grid-column:1!important;grid-row:2!important}
+  #settingsView .setting-actions{justify-content:stretch}
+  #settingsView .setting-actions>*{flex:1}
+  #settingsView .setting-data .setting-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #settingsView .keyboard-shortcuts-card .shortcut-grid{grid-template-columns:1fr!important}
+}
