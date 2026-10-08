@@ -1450,6 +1450,7 @@ function render(){
  const copyQuestionBtn=document.getElementById("copyQuestionBtn");
  if(copyQuestionBtn)copyQuestionBtn.disabled=false;
  document.getElementById("questionText").classList.toggle("exam-finished",examFinished);
+ if(document.getElementById("examProgressDrawer")?.classList.contains("open"))renderQuestionProgress();
 }
 function toggleHint(){
  const hintText=document.getElementById("hintText"),hintToggle=document.getElementById("hintToggle");
@@ -1458,9 +1459,9 @@ function toggleHint(){
  hintText.hidden=!open;hintToggle.setAttribute("aria-expanded",String(open));hintToggle.textContent=open?"💡 Hide hint":"💡 Show hint";
  if(open)renderAllQuizMath(hintText);
 }
-function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();renderQuestionProgress();saveSessionSoon()}
+function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();saveSessionSoon()}
 function clearAnswer(){if(examFinished)return;answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
-function toggleReview(){if(examFinished)return;reviews.has(current)?reviews.delete(current):reviews.add(current);render();renderQuestionProgress();saveSessionSoon()}
+function toggleReview(){if(examFinished)return;reviews.has(current)?reviews.delete(current):reviews.add(current);render();saveSessionSoon()}
 function nextQuestion(){if(current<questions.length-1){current++;render();if(!examFinished)saveSessionSoon()}else if(!examFinished)submitExam()}
 function previousQuestion(){if(current>0){current--;render();if(!examFinished)saveSessionSoon()}}
 function submitExam(){
@@ -2073,10 +2074,10 @@ if(!window.examflowDeadlineInterval)window.examflowDeadlineInterval=setInterval(
 const QUESTION_SIDEBAR_KEY="examflow_question_sidebar_open";
 
 function getQuestionSidebarState(){
-  return localStorage.getItem(QUESTION_SIDEBAR_KEY)==="true";
+  try{return localStorage.getItem(QUESTION_SIDEBAR_KEY)==="true"}catch{return false}
 }
 function setQuestionSidebarState(open){
-  localStorage.setItem(QUESTION_SIDEBAR_KEY, open ? "true" : "false");
+  try{localStorage.setItem(QUESTION_SIDEBAR_KEY,open?"true":"false")}catch{}
 }
 function applyQuestionSidebarState(){
   const d=document.getElementById("examProgressDrawer");
@@ -2084,6 +2085,7 @@ function applyQuestionSidebarState(){
   if(!d)return;
   const open=getQuestionSidebarState();
   d.classList.toggle("open",open);
+  document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
   if(b)b.classList.toggle("open",open);
   if(open)renderQuestionProgress();
@@ -2096,13 +2098,14 @@ function toggleQuestionProgress(){
   const open=!d.classList.contains("open");
   setQuestionSidebarState(open);
   d.classList.toggle("open",open);
+  document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   const main=document.querySelector("#examView .main");if(main)main.classList.toggle("palette-shift",open);
   if(b)b.classList.toggle("open",open);
   if(open)renderQuestionProgress();
 }
 function renderQuestionProgress(){
   const grid=document.getElementById("examProgressGrid");
-  if(!grid||!questions.length)return;
+  if(!grid||!questions.length||!document.getElementById("examProgressDrawer")?.classList.contains("open"))return;
   renderQuestionNavigation(grid,"progress-q",jumpToQuestion);
 }
 
@@ -2139,7 +2142,6 @@ function shuffleAllQuestions(){
   matchOrders = newMatchOrders;
   current = 0;
   render();
-  renderQuestionProgress();
   saveSessionSoon();
   toast("Questions shuffled ✓");
 }
@@ -2181,7 +2183,6 @@ function _ignore_shuffleCurrentOptions(){
   // the visual order has changed.
   checkedQuestions.delete(current);
   render();
-  renderQuestionProgress();
   saveSessionSoon();
   toast("Options randomized ✓");
 }
@@ -2190,7 +2191,6 @@ function jumpToQuestion(i){
   if(i<0||i>=questions.length)return;
   current=i;
   render();
-  renderQuestionProgress();
   saveSessionSoon();
   if(window.innerWidth <= 800) {
     toggleQuestionProgress();
@@ -2517,9 +2517,6 @@ function flashKey(key){
  document.body.appendChild(el);
  setTimeout(()=>el.remove(),500);
 }
-
-setTimeout(()=>{if(document.getElementById("examProgressDrawer")?.classList.contains("open"))renderQuestionProgress()},0);
-setInterval(()=>{if(document.getElementById("examProgressDrawer")?.classList.contains("open"))renderQuestionProgress()},250);
 
 setInterval(()=>{
   if(!timerState || !timerState.running || examFinished)return;

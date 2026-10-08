@@ -357,8 +357,8 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 .exam-progress-btn:hover{border-color:var(--primary);color:var(--primary)}
 .exam-progress-drawer{
   position:fixed;top:68px;right:-340px;width:330px;height:calc(100vh - 68px);z-index:120;
-  background:var(--surface);border-left:1px solid var(--line);
-  box-shadow:-15px 0 45px rgba(20,25,35,.16);padding:20px;
+  box-sizing:border-box;border:1px solid var(--line);border-radius:18px;
+  background:var(--surface);box-shadow:-15px 0 45px rgba(20,25,35,.16);padding:20px;
   transition:right .2s ease;overflow:auto;
 }
 .exam-progress-drawer.open{right:0}
@@ -3009,17 +3009,12 @@ body.dark #examView .option:hover:not(.correct):not(.answer-not-correct){
   padding:0;
   margin:0;
 }
-#settingsView .keyboard-shortcuts-card>h3{
-  margin:0;
-  padding:13px 14px 8px;
-  font-size:12px;
-}
 #settingsView .keyboard-shortcuts-card .shortcut-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:5px 8px;
   margin:0;
-  padding:0 14px 14px;
+  padding:14px;
 }
 #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
   display:grid;
@@ -3566,6 +3561,20 @@ body[class*="question-text-"] #testResultsView .result-question-text{
   #examView .order-item,#examView .order-item-updated{animation:none;transition:none}
 }
 
+/* Rounded floating palette on wide desktop screens as well as mobile. */
+@media(min-width:801px){
+  #examView .exam-progress-drawer{
+    top:12px !important;
+    right:-340px !important;
+    width:min(320px,36vw) !important;
+    height:calc(100vh - 92px) !important;
+    box-sizing:border-box;
+    border:1px solid var(--line);
+    border-radius:18px;
+  }
+  #examView .exam-progress-drawer.open{right:12px !important}
+}
+
 /* Question-type feedback follows the selected theme, including dark mode. */
 #examView .fill-answer,
 #examView .match-trigger,
@@ -3794,4 +3803,163 @@ header::after{
   #testResultsView .results-page{
     width:calc(100% - 14px) !important;
   }
+}
+
+/* Give the planner JSON editor and its actions a clear, balanced hierarchy. */
+#plannerView .planner-paste-card{
+  padding:20px;
+  border-color:color-mix(in srgb,var(--primary) 17%,var(--line));
+  background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 97%,var(--primary)),var(--surface) 62%);
+  box-shadow:0 8px 26px color-mix(in srgb,var(--text) 7%,transparent);
+}
+#plannerView .quick-plan-head{
+  align-items:center;
+  gap:16px;
+  margin-bottom:14px;
+}
+#plannerView .quick-plan-head>div{min-width:0}
+#plannerView .quick-plan-head h3{
+  color:var(--text);
+  font-size:16px;
+  line-height:1.35;
+  letter-spacing:-.015em;
+}
+#plannerView .quick-plan-head small{
+  display:block;
+  max-width:58ch;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.6;
+}
+#plannerView .quick-plan-head code{
+  padding:1px 4px;
+  border:1px solid color-mix(in srgb,var(--primary) 16%,var(--line));
+  border-radius:4px;
+  background:color-mix(in srgb,var(--primary) 6%,var(--surface));
+  color:var(--text);
+  font-size:.92em;
+}
+#plannerView .quick-plan-head .btn{flex:0 0 auto;min-height:40px;padding:9px 15px}
+#plannerView .quick-plan-input{
+  display:block;
+  min-height:clamp(180px,24vh,250px)!important;
+  margin:0;
+  border-color:var(--line);
+  background:color-mix(in srgb,var(--surface2) 46%,var(--surface));
+  color:var(--text);
+  line-height:1.65;
+  transition:border-color .16s ease,box-shadow .16s ease,background .16s ease;
+}
+#plannerView .quick-plan-input:focus{
+  border-color:var(--primary);
+  background:var(--surface);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 15%,transparent);
+  outline:none;
+}
+#plannerView .quick-plan-foot{
+  min-height:42px;
+  margin-top:12px;
+}
+#plannerView .quick-plan-foot .paste-status{
+  padding:7px 10px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:color-mix(in srgb,var(--surface2) 42%,var(--surface));
+  line-height:1.4;
+}
+#plannerView .quick-plan-foot .btn{min-height:40px;padding:9px 15px}
+
+/* Keep the sound controls roomy instead of squeezing three labels into a
+   narrow settings column. */
+#settingsView .setting-sounds{
+  grid-column:1/-1;
+  grid-template-columns:minmax(0,1fr) minmax(300px,.9fr);
+  grid-template-rows:auto auto;
+  min-height:98px;
+}
+#settingsView .setting-sounds h3{grid-column:1;grid-row:1}
+#settingsView .setting-sounds>p{grid-column:1;grid-row:2}
+#settingsView .setting-sounds .setting-actions{
+  grid-column:2;
+  grid-row:1/span 2;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:center;
+  gap:8px;
+}
+#settingsView .setting-sounds .setting-actions>*{
+  min-width:0;
+  min-height:40px;
+  padding:8px 10px;
+  white-space:normal;
+  line-height:1.25;
+}
+
+/* A consistent, theme-aware native select with a larger, clearer hit target. */
+#settingsView .setting-duration .setting-control select{
+  min-height:42px;
+  padding:8px 36px 8px 12px;
+  border:1px solid color-mix(in srgb,var(--primary) 24%,var(--line));
+  border-radius:10px;
+  background-color:color-mix(in srgb,var(--surface2) 36%,var(--surface));
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px;
+  background-repeat:no-repeat;
+  background-size:5px 5px,5px 5px;
+  color:var(--text);
+  font-size:13px;
+  font-weight:650;
+  cursor:pointer;
+  appearance:none;
+  -webkit-appearance:none;
+  transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease;
+}
+#settingsView .setting-duration .setting-control select:hover{
+  border-color:color-mix(in srgb,var(--primary) 55%,var(--line));
+}
+#settingsView .setting-duration .setting-control select:focus-visible{
+  border-color:var(--primary);
+  outline:3px solid color-mix(in srgb,var(--primary) 18%,transparent);
+  outline-offset:1px;
+}
+body.dark #settingsView .setting-duration .setting-control select{
+  background-color:color-mix(in srgb,var(--surface2) 36%,var(--surface))!important;
+  background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%)!important;
+  background-position:calc(100% - 16px) 18px,calc(100% - 11px) 18px!important;
+  background-repeat:no-repeat!important;
+  background-size:5px 5px,5px 5px!important;
+}
+@media(max-width:700px){
+  #plannerView .planner-paste-card{padding:16px!important}
+  #plannerView .quick-plan-head{align-items:start;gap:10px}
+  #plannerView .quick-plan-head small{font-size:10px;line-height:1.5}
+  #plannerView .quick-plan-head .btn{min-height:38px;padding:8px 12px}
+  #plannerView .quick-plan-input{min-height:clamp(140px,28vh,180px)!important}
+  #plannerView .quick-plan-foot{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    gap:8px;
+  }
+  #plannerView .quick-plan-foot .paste-status{text-align:center}
+  #plannerView .quick-plan-foot .btn{width:100%}
+  #settingsView .setting-sounds{
+    grid-column:1;
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto auto;
+    gap:5px;
+  }
+  #settingsView .setting-sounds h3{grid-column:1;grid-row:1}
+  #settingsView .setting-sounds>p{grid-column:1;grid-row:2}
+  #settingsView .setting-sounds .setting-actions{
+    grid-column:1;
+    grid-row:3;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    margin-top:5px;
+  }
+  #settingsView .setting-sounds .setting-actions .btn:last-child{grid-column:1/-1}
+  #settingsView .setting-duration .setting-control select{min-height:42px;font-size:14px}
+}
+@media(max-width:430px){
+  #plannerView .quick-plan-head{grid-template-columns:minmax(0,1fr)!important}
+  #plannerView .quick-plan-head .btn{width:100%;margin-top:2px}
+  #settingsView .setting-sounds .setting-actions{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
