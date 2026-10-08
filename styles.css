@@ -373,6 +373,46 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 .legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block;background:#e9edf2}
 .legend-dot.current{background:var(--primary)}.legend-dot.answered{background:#3eb47a}.legend-dot.review{background:#d7a33b}
 .exam-progress-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.exam-progress-grid,
+#qgrid{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.question-palette-section{min-width:0}
+.question-palette-section-heading{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  min-width:0;
+  margin:0 0 7px;
+}
+.question-palette-section-heading strong{
+  min-width:0;
+  overflow-wrap:anywhere;
+  color:var(--text);
+  font-size:10px;
+  font-weight:700;
+  line-height:1.35;
+}
+.question-palette-section-heading small{
+  flex:0 0 auto;
+  color:var(--muted);
+  font-size:9px;
+  font-weight:500;
+}
+.question-palette-section-grid{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:7px;
+}
+.question-palette-section-grid .qbtn,
+.question-palette-section-grid .progress-q{
+  min-width:0;
+}
+.exam-progress-grid .question-palette-section-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.right #qgrid .question-palette-section-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
 .progress-q{
   height:40px;border:1px solid var(--line);border-radius:9px;background:var(--surface2);
   color:var(--text);font-size:11px;font-weight:800;cursor:pointer;
@@ -382,6 +422,9 @@ body:has(#examView.view.active) .topnav button:not(#navHome){display:none}
 .progress-q.review{box-shadow:inset 0 0 0 2px #d7a33b}
 .progress-q.current.answered{background:#eef1ff}
 @media(max-width:600px){.exam-progress-drawer{width:290px}.exam-progress-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:600px){
+  .exam-progress-grid .question-palette-section-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
 
 /* ===== Exam countdown ===== */
 #homeExamCountdown{font-size:24px;margin:5px 0 4px}
@@ -3261,11 +3304,27 @@ body.question-text-small{--question-text-scale:.9}
 body.question-text-standard{--question-text-scale:1}
 body.question-text-large{--question-text-scale:1.12}
 body.question-text-extra-large{--question-text-scale:1.24}
-body[class*="question-text-"] #examView .question h2{
+body[class*="question-text-"] #examView .question-prompt{
   font-size:calc(clamp(20px,2.1vw,25px) * var(--question-text-scale)) !important;
+  font-weight:400 !important;
 }
-body.exam-active[class*="question-text-"] #examView .question h2{
+body.exam-active[class*="question-text-"] #examView .question-prompt{
   font-size:calc(clamp(17px,2vw,19px) * var(--question-text-scale)) !important;
+}
+body[class*="question-text-"] #examView .question-prompt strong,
+body[class*="question-text-"] #examView .question-prompt b,
+body[class*="question-text-"] #examView .question-prompt h3,
+body[class*="question-text-"] #examView .question-prompt h4,
+body[class*="question-text-"] #examView .question-prompt h5{
+  font-weight:700 !important;
+}
+body[class*="question-text-"] #examView .question-prompt em,
+body[class*="question-text-"] #examView .question-prompt i{
+  font-style:italic;
+}
+body[class*="question-text-"] #examView .question-prompt s,
+body[class*="question-text-"] #examView .question-prompt del{
+  text-decoration:line-through;
 }
 body[class*="question-text-"] #examView .option-text{
   font-size:calc(16px * var(--question-text-scale)) !important;

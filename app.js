@@ -1298,6 +1298,63 @@ function copyCurrentQuestion(){
   else fallback();
 }
 
+function getQuestionSectionGroups(){
+  const groups=new Map();
+  questions.forEach((question,index)=>{
+    const name=String(question.section||"General").trim()||"General";
+    if(!groups.has(name))groups.set(name,[]);
+    groups.get(name).push(index);
+  });
+  const sectionOrder=(Array.isArray(sections)?sections:[])
+    .map(section=>String(section.name||"General").trim()||"General")
+    .filter((name,index,names)=>names.indexOf(name)===index);
+  return [...groups.entries()]
+    .map(([name,indices],index)=>({name,indices,index}))
+    .sort((a,b)=>{
+      const aOrder=sectionOrder.indexOf(a.name),bOrder=sectionOrder.indexOf(b.name);
+      if(aOrder<0&&bOrder<0)return a.index-b.index;
+      if(aOrder<0)return 1;
+      if(bOrder<0)return -1;
+      return aOrder-bOrder;
+    });
+}
+
+function renderQuestionNavigation(container,buttonClass,onSelect){
+  if(!container)return;
+  container.innerHTML="";
+  getQuestionSectionGroups().forEach(group=>{
+    const section=document.createElement("section");
+    section.className="question-palette-section";
+    const heading=document.createElement("div");
+    heading.className="question-palette-section-heading";
+    const title=document.createElement("strong");
+    title.textContent=group.name;
+    const count=document.createElement("small");
+    count.textContent=`${group.indices.length} question${group.indices.length===1?"":"s"}`;
+    heading.append(title,count);
+    const grid=document.createElement("div");
+    grid.className="question-palette-section-grid";
+    group.indices.forEach(index=>{
+      const button=document.createElement("button");
+      const isAnswered=answerIsPresent(answers[index],questions[index]);
+      const isCurrent=index===current;
+      const isReview=reviews.has(index);
+      button.className=buttonClass+
+        (isCurrent?" current":"")+
+        (isAnswered?" answered":"")+
+        (isReview?" review":"");
+      button.textContent=String(index+1);
+      const state=[isCurrent?"current":"",isAnswered?"answered":"unanswered",isReview?"marked for review":""].filter(Boolean).join(", ");
+      button.setAttribute("aria-label",`Question ${index+1}, ${group.name}, ${state}`);
+      button.title=`Question ${index+1} · ${group.name}`;
+      button.addEventListener("click",()=>onSelect(index));
+      grid.appendChild(button);
+    });
+    section.append(heading,grid);
+    container.appendChild(section);
+  });
+}
+
 function render(){
  updateModeUI();
  if(!questions.length){
@@ -1348,8 +1405,8 @@ function render(){
  document.getElementById("prevBtn").disabled=current===0;document.getElementById("nextBtn").textContent=current===questions.length-1?"Finish":"Next →";
  document.getElementById("answeredCount").textContent=count;document.getElementById("reviewCount").textContent=reviews.size;
  document.getElementById("progressText").textContent=`${count} / ${questions.length}`;document.getElementById("progressBar").style.width=(count/questions.length*100)+"%";
- const grid=document.getElementById("qgrid");grid.innerHTML="";
- questions.forEach((_,i)=>{let b=document.createElement("button");b.className="qbtn"+(i===current?" current":"")+(answerIsPresent(answers[i],questions[i])?" answered":"")+(reviews.has(i)?" review":"");b.textContent=i+1;b.onclick=()=>{current=i;render();saveSessionSoon()};grid.appendChild(b)});
+ const grid=document.getElementById("qgrid");
+ renderQuestionNavigation(grid,"qbtn",index=>{current=index;render();saveSessionSoon()});
  document.getElementById("options").querySelectorAll("button,input,select").forEach(el=>el.disabled=examFinished);
  ["prevBtn","viewAnswerBtn","nextBtn","bookmark"].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=examFinished});
  const copyQuestionBtn=document.getElementById("copyQuestionBtn");
@@ -2008,13 +2065,7 @@ function toggleQuestionProgress(){
 function renderQuestionProgress(){
   const grid=document.getElementById("examProgressGrid");
   if(!grid||!questions.length)return;
-  grid.innerHTML=questions.map((q,i)=>{
-    let cls="";
-    if(i===current)cls+=" current";
-    if(answers[i])cls+=" answered";
-    if(reviews.has(i))cls+=" review";
-    return `<button class="progress-q${cls}" onclick="jumpToQuestion(${i})">${i+1}</button>`;
-  }).join("");
+  renderQuestionNavigation(grid,"progress-q",jumpToQuestion);
 }
 
 
