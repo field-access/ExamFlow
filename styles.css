@@ -3685,3 +3685,108 @@ header::after{
 @keyframes header-divider-flow{
   to{background-position:0 0,0 0}
 }
+
+/* Mobile exam content should use the full question card instead of a narrow text column. */
+@media(max-width:760px){
+  body.exam-active #examView .main{
+    width:100% !important;
+    max-width:none !important;
+    padding-right:10px !important;
+    padding-left:10px !important;
+    box-sizing:border-box;
+  }
+  body.exam-active #examView .question{
+    width:100% !important;
+    max-width:none !important;
+    padding-right:16px !important;
+    padding-left:16px !important;
+    box-sizing:border-box;
+  }
+  body.exam-active #examView .question-prompt{
+    width:100% !important;
+    max-width:none !important;
+    margin-right:0 !important;
+    margin-left:0 !important;
+    box-sizing:border-box;
+  }
+  body.exam-active #examView .options,
+  body.exam-active #examView #explanation,
+  body.exam-active #examView .actions{
+    width:100% !important;
+    max-width:none !important;
+    box-sizing:border-box;
+  }
+  body.exam-active #examView .ordering-list{
+    width:100% !important;
+    max-width:none !important;
+    margin-right:0 !important;
+    margin-left:0 !important;
+    box-sizing:border-box;
+  }
+  body.exam-active #examView .order-item{
+    width:100% !important;
+    box-sizing:border-box;
+  }
+
+  /* Keep results cards and their contents aligned to the mobile page width. */
+  #testResultsView{
+    width:100%;
+    min-width:0;
+    overflow-x:hidden;
+  }
+  #testResultsView .results-page{
+    width:calc(100% - 20px) !important;
+    max-width:none !important;
+    margin:14px auto 30px !important;
+    padding:0;
+    box-sizing:border-box;
+  }
+  #testResultsView .results-topbar{
+    width:100%;
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  #testResultsView .results-actions{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    width:100%;
+    justify-content:stretch;
+  }
+  #testResultsView .results-actions .btn{
+    width:100%;
+    min-width:0;
+    white-space:normal;
+    overflow-wrap:anywhere;
+  }
+  #testResultsView .result-hero,
+  #testResultsView .result-section,
+  #testResultsView .result-bottom-grid{
+    width:100%;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  #testResultsView .result-bottom-grid{
+    grid-template-columns:minmax(0,1fr) !important;
+  }
+  #testResultsView .result-question{
+    grid-template-columns:28px minmax(0,1fr) 18px !important;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  #testResultsView .result-question-content,
+  #testResultsView .result-qtext,
+  #testResultsView .result-answer,
+  #testResultsView .result-detail{
+    min-width:0;
+    overflow-wrap:anywhere;
+  }
+}
+@media(max-width:430px){
+  body.exam-active #examView .question{
+    padding-right:12px !important;
+    padding-left:12px !important;
+  }
+  #testResultsView .results-page{
+    width:calc(100% - 14px) !important;
+  }
+}
