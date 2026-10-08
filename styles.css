@@ -1334,6 +1334,9 @@ body:not(.exam-active) #globalExamProgressBtn {
   display: none !important;
 }
 
+#dashboardView,
+#testResultsView{display:none!important}
+
 /* Prevent wide controls/cards from pushing the viewport horizontally. */
 .view,.card,.panel,.question,.options,.actions,.dashboard,.planner-page,
 .home-hero,.results-page,.settings-page{max-width:100%;min-width:0}

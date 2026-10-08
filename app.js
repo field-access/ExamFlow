@@ -1113,9 +1113,9 @@ function examflowKeyboardHandler(e){
   if(typing)return;
 
   // Alt+number navigation stays separate from quiz answer keys and browser tabs.
-  if(e.altKey && !e.shiftKey && /^[1-5]$/.test(e.key)){
+  if(e.altKey && !e.shiftKey && /^[1-4]$/.test(e.key)){
     e.preventDefault();
-    const page=["home","exam","dashboard","planner","settings"][Number(e.key)-1];
+    const page=["home","exam","planner","settings"][Number(e.key)-1];
     if(page)showView(page);
     return;
   }
@@ -2356,6 +2356,7 @@ function syncExamTitleBar(){
 
 function showView(name){
  closeMobileNav();
+ if(name==="dashboard"||name==="testResults")name="home";
  if(name==="exam" && (!questions || questions.length===0)){
   toast("No quiz loaded. Please open a CBQ first.");
   name="home";
@@ -2364,9 +2365,9 @@ function showView(name){
  document.body.classList.toggle("exam-active",name==="exam");
  window.scrollTo({top:0,behavior:"smooth"});
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
- ["navHome","navExam","navDashboard","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
- if(name!=="testResults")document.getElementById({home:"navHome",exam:"navExam",dashboard:"navDashboard",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
- if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="dashboard"){renderDashboard();renderExamDeadline();}if(name==="planner"){renderPlans();renderPlannerCalendar();renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
+ ["navHome","navExam","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
+ document.getElementById({home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
+ if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();renderPlannerCalendar();renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  updateTheme();updateModeUI()}

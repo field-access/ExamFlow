@@ -48,7 +48,6 @@
   <nav class="topnav">
     <button id="navHome" class="active" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
     <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button>
-    <button id="navDashboard" onclick="showView('dashboard')"><svg class="ui-icon"><use href="#icon-chart"/></svg>Results</button>
     <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
     <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
   </nav>
@@ -60,7 +59,7 @@
   </div>
 </header>
 <nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
-  <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button><button onclick="showView('dashboard')"><svg class="ui-icon"><use href="#icon-chart"/></svg>Results</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+  <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
 </nav>
 
 
@@ -79,7 +78,6 @@
       <div class="hero-actions">
         <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
         <button class="btn" type="button" onclick="copyBeginnerSchema()"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy schema</button>
-        <button class="btn" onclick="showView('dashboard')">📊 Results</button>
         <button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
       </div>
       <div class="cbq-flow"><span>One concept</span><i>→</i><span>Small reasoning steps</span><i>→</i><span>Confident solution</span></div>
@@ -210,7 +208,6 @@
   <div class="side-title">Navigate</div>
   <div class="nav"><button onclick="showView('home')">⌂ Home</button><div class="side-title" style="margin-top:13px">Exam</div>
     <button class="active"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
-    <button onclick="showView('dashboard')">📊 Results dashboard</button>
     <button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
     <button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
   </div>
@@ -443,7 +440,7 @@
 
 <section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
 <div class="shortcut-grid">
-<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>5</kbd></span><span>Home / exam / results / plan / settings</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>4</kbd></span><span>Home / exam / plan / settings</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>I</kbd></span><span>Import quiz</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>X</kbd></span><span>Export data</span></div>
