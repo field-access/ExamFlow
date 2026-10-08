@@ -189,7 +189,10 @@ const PLANNER_DATES_KEY="examflow_planner_dates_v1";
 let plannerCalendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 let plannerSelectedDate="";
 function plannerDateKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}-${String(date.getDate()).padStart(2,"0")}`}
-function getPlannerDates(){return get(PLANNER_DATES_KEY,{})}
+function getPlannerDates(){
+  const dates=get(PLANNER_DATES_KEY,{});
+  return dates&&typeof dates==="object"&&!Array.isArray(dates)?dates:{};
+}
 function selectPlannerDate(value){
   if(!value)return;
   plannerSelectedDate=value;
@@ -202,6 +205,9 @@ function selectPlannerDate(value){
 }
 function renderPlannerCalendar(){
   const root=document.getElementById("plannerCalendar");if(!root)return;
+  if(!(plannerCalendarMonth instanceof Date)||Number.isNaN(plannerCalendarMonth.getTime())){
+    plannerCalendarMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+  }
   const year=plannerCalendarMonth.getFullYear(),month=plannerCalendarMonth.getMonth();
   const title=document.getElementById("plannerCalendarTitle");
   if(title)title.textContent=plannerCalendarMonth.toLocaleDateString(undefined,{month:"long",year:"numeric"});
@@ -2367,7 +2373,7 @@ function showView(name){
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
  ["navHome","navExam","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  document.getElementById({home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
- if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();renderPlannerCalendar();renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
+ if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  updateTheme();updateModeUI()}
