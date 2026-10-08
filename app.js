@@ -2367,7 +2367,7 @@ function ensureExamAudio(){
     return examAudioCtx;
   }catch(e){return null}
 }
-function playExamTone(frequency,duration,volume=0.07,when=0){
+function playExamTone(frequency,duration,volume=0.035,when=0){
   const ctx=ensureExamAudio();
   if(!ctx)return false;
   try{
@@ -2377,7 +2377,7 @@ function playExamTone(frequency,duration,volume=0.07,when=0){
     osc.type="sine";
     osc.frequency.setValueAtTime(frequency,t);
     gain.gain.setValueAtTime(0.0001,t);
-    gain.gain.exponentialRampToValueAtTime(volume,t+0.015);
+    gain.gain.exponentialRampToValueAtTime(volume,t+0.025);
     gain.gain.exponentialRampToValueAtTime(0.0001,t+duration);
     osc.connect(gain);gain.connect(ctx.destination);
     osc.start(t);osc.stop(t+duration+0.03);
@@ -2386,18 +2386,18 @@ function playExamTone(frequency,duration,volume=0.07,when=0){
 }
 function playButtonSound(){
   if(settings.soundEnabled===false)return;
-  playExamTone(560,.075,.13,0);
+  playExamTone(523,.065,.022,0);
 }
 function playAnswerSound(correct){
   if(settings.soundEnabled===false)return;
   const ctx=ensureExamAudio();
   if(!ctx)return;
   if(correct){
-    playExamTone(660,.15,.16,0);
-    playExamTone(880,.2,.14,.13);
+    playExamTone(523,.16,.038,0);
+    playExamTone(659,.18,.032,.14);
   }else{
-    playExamTone(260,.17,.15,0);
-    playExamTone(180,.22,.13,.14);
+    playExamTone(392,.14,.03,0);
+    playExamTone(330,.17,.025,.13);
   }
 }
 function testAnswerSound(){
@@ -2405,8 +2405,8 @@ function testAnswerSound(){
     toast("Enable interface sounds first");
     return;
   }
-  const ok=playExamTone(660,.15,.16,0);
-  playExamTone(880,.2,.14,.13);
+  const ok=playExamTone(523,.16,.038,0);
+  playExamTone(659,.18,.032,.14);
   if(!ok)toast("This browser is blocking audio. Click the page once, then try again.");
 }
 
