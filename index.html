@@ -362,12 +362,12 @@
     <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
     <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test</div><button class="btn primary" type="button" onclick="saveQuickPlan()">🗓 Plan Test</button></div>
   </section>
-  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
   </div>
   <section class="panel card planner-todo-card"><div class="panel-heading"><div><h3>Study todo list</h3><small>Keep tasks beside your calendar.</small></div></div>
     <div class="planner-todo-form"><input type="text" id="plannerTodoInput" placeholder="Add a study task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><input type="date" id="plannerTodoDeadline"><button class="btn primary" type="button" onclick="addPlannerTodo()">Add task</button></div>
     <div id="plannerTodoList"></div>
   </section>
+  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
   </div>
 </div>
 </section>
@@ -425,7 +425,7 @@
 <option value="60">60 minutes</option>
 </select></div></section>
 
-<details class="setting card keyboard-shortcuts-card"><summary><h3>⌨️ Keyboard shortcuts</h3><p>Show all available keyboard controls.</p></summary>
+<section class="setting card keyboard-shortcuts-card"><h3>⌨️ Keyboard shortcuts</h3>
 <div class="shortcut-grid">
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>5</kbd></span><span>Home / Exam / Results / Plan / Settings</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Toggle mobile navigation</span></div>
@@ -452,7 +452,7 @@
 <div><span class="shortcut-keys"><kbd>H</kbd></span><span>Return to home</span></div>
 <div><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Close importer, submit dialog, sessions or palette</span></div>
 <div><span class="shortcut-keys"><kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd></span><span>Results: Retake / Save / Change exam</span></div>
-</div></details>
+</div></section>
 <section class="setting card setting-data"><h3>💾 Local data</h3><p>Quizzes, sessions, results, goals and plans stay in this browser.</p><div class="setting-actions">
 <button class="btn" onclick="exportData()">Export JSON</button>
 <label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>

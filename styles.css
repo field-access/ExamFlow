@@ -3004,27 +3004,11 @@ body.dark #examView .option:hover:not(.correct):not(.answer-not-correct){
   padding:0;
   margin:0;
 }
-#settingsView .keyboard-shortcuts-card summary{
-  position:relative;
-  display:block;
-  padding:13px 42px 13px 15px;
-  cursor:pointer;
-  list-style:none;
+#settingsView .keyboard-shortcuts-card>h3{
+  margin:0;
+  padding:13px 14px 8px;
+  font-size:12px;
 }
-#settingsView .keyboard-shortcuts-card summary::-webkit-details-marker{display:none}
-#settingsView .keyboard-shortcuts-card summary::after{
-  position:absolute;
-  top:50%;
-  right:16px;
-  color:var(--muted);
-  content:"⌄";
-  font-size:16px;
-  transform:translateY(-50%);
-  transition:transform .15s ease;
-}
-#settingsView .keyboard-shortcuts-card[open] summary::after{transform:translateY(-50%) rotate(180deg)}
-#settingsView .keyboard-shortcuts-card summary h3{margin:0;font-size:12px}
-#settingsView .keyboard-shortcuts-card summary p{margin:3px 0 0;font-size:10px}
 #settingsView .keyboard-shortcuts-card .shortcut-grid{
   display:grid;
   grid-template-columns:repeat(2,minmax(0,1fr));
@@ -3152,7 +3136,7 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
     font-size:9px;
   }
   #settingsView .keyboard-shortcuts-card .shortcut-grid{
-    grid-template-columns:1fr !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
     padding:0 10px 10px;
   }
   #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
@@ -3183,8 +3167,37 @@ body.dark #settingsView .keyboard-shortcuts-card .shortcut-grid>div{
 @media(max-width:380px){
   #settingsView .setting-sounds .setting-actions,
   #settingsView .setting-data .setting-actions{grid-template-columns:1fr}
+  #settingsView .keyboard-shortcuts-card .shortcut-grid{grid-template-columns:1fr !important}
   #settingsView .keyboard-shortcuts-card .shortcut-grid>div{grid-template-columns:minmax(0,1fr)}
   #settingsView .keyboard-shortcuts-card .shortcut-grid>div>span:last-child{grid-column:1}
+}
+
+/* Center action labels and give planner cards a balanced, full-width layout. */
+#examView #viewAnswerBtn{
+  justify-content:center;
+  text-align:center;
+}
+#settingsView .setting-sounds .setting-actions .btn,
+#settingsView .setting-sounds .setting-actions .modebtn,
+#settingsView .setting-data .setting-actions .btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+#settingsView .setting-data .setting-actions label.btn{
+  cursor:pointer;
+}
+#plannerView .planner-list-card{
+  grid-column:1/-1;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+@media(max-width:650px){
+  #plannerView .quick-plan-input{
+    min-height:clamp(130px,28vh,165px) !important;
+  }
 }
 
 /* Home dashboard: calm, Notion-inspired surfaces and compact information blocks. */
