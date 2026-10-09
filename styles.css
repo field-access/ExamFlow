@@ -4199,7 +4199,7 @@ body.dark #settingsView .setting-duration .setting-control select{
 #examView .match-choice.open{z-index:121}
 #examView .match-choice.open .match-menu{z-index:122}
 
-/* Keep the question palette independent from the clipped exam card. */
+/* Keep the question palette beside the question on desktop, not over the header. */
 #examProgressDrawer{
   position:fixed!important;
   inset:12px 12px auto auto!important;
@@ -4227,6 +4227,60 @@ body.dark #settingsView .setting-duration .setting-control select{
   box-shadow:0 16px 38px rgba(18,28,48,.18);
   transition:transform .22s ease,visibility 0s linear .22s;
 }
+#examView .main.palette-open{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 270px;
+  align-items:start;
+  gap:18px;
+}
+.exam-active #examView .main.palette-open{
+  width:min(1240px,calc(100vw - 48px))!important;
+  max-width:1240px!important;
+}
+#examView .main.palette-open>main{
+  grid-column:1;
+  grid-row:1;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  width:100%;
+  min-width:0;
+}
+#examView .main.palette-open>main .question{
+  align-self:flex-end;
+  margin-right:0!important;
+  margin-left:0!important;
+}
+#examView .main.palette-open #examProgressDrawer{
+  position:sticky!important;
+  inset:56px 0 auto auto!important;
+  grid-column:2;
+  grid-row:1;
+  align-self:start;
+  width:270px!important;
+  max-width:100%!important;
+  height:fit-content!important;
+  max-height:calc(100vh - 64px)!important;
+  max-height:calc(100dvh - 64px)!important;
+  margin-top:0;
+  padding:14px!important;
+  border-radius:16px!important;
+  transform:none;
+  visibility:visible;
+  pointer-events:auto;
+  box-shadow:0 12px 28px rgba(18,28,48,.12);
+  transition:box-shadow .18s ease;
+}
+#examView .main.palette-open #examProgressDrawer .drawer-head{
+  font-size:14px;
+  margin-bottom:10px;
+}
+#examView .main.palette-open #examProgressDrawer .drawer-legend{
+  gap:6px 8px;
+  margin-bottom:10px;
+  padding:8px;
+}
+#examView .main.palette-open #examProgressDrawer .progress-q{min-height:36px}
 #examProgressDrawer.open{
   right:12px!important;
   transform:translateX(0);
@@ -4330,6 +4384,30 @@ body:not(.exam-active) .exam-progress-backdrop{display:none!important}
   .exam-progress-backdrop.open{display:none!important}
 }
 @media(max-width:800px){
+  #examView .main.palette-open{
+    display:block!important;
+    width:calc(100% - 12px)!important;
+  }
+  #examView .main.palette-open>main{width:100%}
+  #examView .main.palette-open #examProgressDrawer{
+    position:fixed!important;
+    inset:48px 8px auto auto!important;
+    right:8px!important;
+    bottom:auto!important;
+    left:auto!important;
+    width:min(280px,calc(100vw - 16px))!important;
+    max-width:calc(100% - 16px)!important;
+    max-height:calc(100vh - 56px)!important;
+    max-height:calc(100dvh - 56px)!important;
+    margin:0;
+    padding:14px!important;
+    border-radius:18px!important;
+    transform:translateX(0);
+    box-shadow:0 16px 38px rgba(18,28,48,.18);
+  }
+  #examView .main.palette-open #examProgressDrawer .drawer-head{font-size:15px;margin-bottom:12px}
+  #examView .main.palette-open #examProgressDrawer .drawer-legend{gap:7px 10px;margin-bottom:12px;padding:10px}
+  #examView .main.palette-open #examProgressDrawer .progress-q{min-height:42px}
   #examProgressDrawer{
     inset:8px 8px auto auto!important;
     right:8px!important;

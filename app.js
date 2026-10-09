@@ -2208,6 +2208,7 @@ function applyQuestionSidebarState(){
   if(!d)return;
   const open=getQuestionSidebarState();
   d.classList.toggle("open",open);
+  document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
   d.setAttribute("aria-hidden",String(!open));
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
@@ -2222,6 +2223,7 @@ function toggleQuestionProgress(){
   const open=!d.classList.contains("open");
   setQuestionSidebarState(open);
   d.classList.toggle("open",open);
+  document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
   d.setAttribute("aria-hidden",String(!open));
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
