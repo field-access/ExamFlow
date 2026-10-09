@@ -1613,7 +1613,10 @@ function hydrateResult(saved){
   }
   source=Array.isArray(source)?cloneData(source):[];
   const savedAnswers=Array.isArray(saved.answers)?saved.answers:[];
-  result.questions=source.map((q,i)=>({...q,selected:savedAnswers[i]!==undefined?savedAnswers[i]:(q.selected??null)}));
+  const reviewIndices=new Set((Array.isArray(saved.reviews)?saved.reviews:[])
+    .filter(index=>Number.isInteger(index)&&index>=0&&index<source.length));
+  result.reviews=[...reviewIndices];
+  result.questions=source.map((q,i)=>({...q,selected:savedAnswers[i]!==undefined?savedAnswers[i]:(q.selected??null),isReview:reviewIndices.has(i)}));
   return result;
 }
 
@@ -1625,6 +1628,14 @@ function openSavedResult(resultId){
 function openDetailedResults(result){
  result=hydrateResult(result);
  lastResultSnapshot=result;
+ resultFilter="all";
+ document.querySelectorAll("#testResultsView .filter-btn").forEach(button=>button.classList.toggle("active",button.dataset.filter==="all"));
+ const reviewCount=result.reviews.length;
+ const practiceMarkedBtn=document.getElementById("practiceMarkedBtn");
+ if(practiceMarkedBtn){
+   practiceMarkedBtn.hidden=reviewCount===0;
+   practiceMarkedBtn.textContent=`Practice marked (${reviewCount})`;
+ }
  document.getElementById("resultSubtitle").textContent=`${result.name} · ${result.mode==="practice"?"Practice Mode":"Exam Mode"}`;
  document.getElementById("resultScore").textContent=Number(result.score).toFixed(result.score%1?1:0);
  document.getElementById("resultMax").textContent="/"+Number(result.max).toFixed(result.max%1?1:0);
@@ -1676,7 +1687,7 @@ function renderResultSections(result){
 
 function setResultFilter(f){
  resultFilter=f;
- document.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.filter===f));
+ document.querySelectorAll("#testResultsView .filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.filter===f));
  renderResultQuestions();
 }
 function moveResultQuestion(direction){
@@ -1739,18 +1750,20 @@ function renderResultQuestions(){
  const qs=result.questions.map((q,i)=>({...q,index:i})).filter(q=>{
    const selected=q.selected;
    const status=!answerIsPresent(selected,q)?"skipped":isQuestionCorrect(q,selected)?"correct":"wrong";
-   return (resultFilter==="all"||status===resultFilter)&&(section==="All Sections"||q.section===section);
+   const isReview=!!q.isReview;
+   return (resultFilter==="all"||resultFilter==="review"&&isReview||status===resultFilter)&&(section==="All Sections"||q.section===section);
  });
  document.getElementById("reviewShown").textContent=`(${qs.length} shown)`;
  const el=document.getElementById("resultQuestions");
  el.innerHTML=qs.length?qs.map(q=>{
    const status=!answerIsPresent(q.selected,q)?"skip":isQuestionCorrect(q,q.selected)?"correct":"wrong";
+   const isReview=!!q.isReview;
    const selected=resultValueText(q,q.selected);
    const correct=correctValueText(q);
    return `<div class="result-question ${status}" onclick="this.classList.toggle('open')">
      <div class="result-qno">${q.index+1}</div>
      <div>
-       <div class="result-qmeta">SECTION ${esc(q.section||"GENERAL")} <span style="margin-left:5px">· ${status==="correct"?"✓ Correct +"+q.marks:status==="wrong"?"× Wrong":"Skipped"}</span></div>
+       <div class="result-qmeta">SECTION ${esc(q.section||"GENERAL")} <span style="margin-left:5px">· ${status==="correct"?"✓ Correct +"+q.marks:status==="wrong"?"× Wrong":"Skipped"}</span>${isReview?'<span class="result-mark" aria-label="Marked for review">⚑ Marked for review</span>':""}</div>
        <div class="result-qtext">${esc(q.text)}</div>
        <div class="result-review-meta">Type: <strong>${esc(q.type||"mcq")}</strong> Â· Marks: <strong>${status==="correct"?"+"+Number(q.marks||0):status==="wrong"?"-"+Number(q.negativeMarks||0):"0"}</strong></div>
        <div class="result-answer">Your answer: <strong>${selected}</strong>${status!=="correct"?` · Correct: <strong>${correct}</strong>`:""}</div>
@@ -1765,6 +1778,39 @@ function renderResultQuestions(){
    </div>`;
  }).join(""):'<div class="empty">No questions match this filter.</div>';
  renderAllQuizMath(el);
+}
+
+function practiceMarkedQuestions(){
+ if(!lastResultSnapshot)return;
+ const marked=[...new Set(lastResultSnapshot.reviews||[])]
+   .filter(index=>Number.isInteger(index)&&index>=0&&index<lastResultSnapshot.questions.length)
+   .sort((a,b)=>a-b);
+ if(!marked.length){toast("No questions are marked for review");return}
+ questions=marked.map(index=>{
+   const question=cloneData(lastResultSnapshot.questions[index]);
+   delete question.selected;
+   return question;
+ });
+ answers=Array(questions.length).fill(null);
+ reviews=new Set(questions.map((_,index)=>index));
+ checkedQuestions=new Set();
+ matchOrders={};
+ sections=[...new Set(questions.map(question=>question.section||"General"))].map(name=>({name}));
+ current=0;
+ examName=`${lastResultSnapshot.name} · Marked review`;
+ examId=id();
+ sessionId=null;
+ mode="practice";
+ examFinished=false;
+ quizDurationMinutes=5;
+ seconds=quizDurationMinutes*60;
+ timerState.examSeconds=seconds;
+ timerState.practiceSeconds=5*60;
+ timerState.running=false;
+ showView("exam");
+ render();
+ saveSession();
+ toast(`Practice ready · ${questions.length} marked question${questions.length===1?"":"s"}`);
 }
 
 function saveResultCopy(){toast("Result is already saved locally ✓")}
@@ -1793,6 +1839,7 @@ function saveResult(){
   correct,wrong,unanswered,score,max,percent,durationMinutes:quizDurationMinutes,
   timeTaken:Math.max(0,(quizDurationMinutes*60)-seconds),
   examId:examId||null,
+  questions:cloneData(questions),
   answers:cloneData(answers),
   matchOrders:cloneData(matchOrders),
   reviews:[...reviews],
@@ -2364,7 +2411,7 @@ function syncExamTitleBar(){
 
 function showView(name){
  closeMobileNav();
- if(name==="dashboard"||name==="testResults")name="home";
+ if(name==="dashboard")name="home";
  if(name==="exam" && (!questions || questions.length===0)){
   toast("No quiz loaded. Please open a CBQ first.");
   name="home";
@@ -2374,7 +2421,8 @@ function showView(name){
  window.scrollTo({top:0,behavior:"smooth"});
  ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
  ["navHome","navExam","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
- document.getElementById({home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name]).classList.add("active");
+ const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name];
+ if(activeNav)document.getElementById(activeNav).classList.add("active");
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
