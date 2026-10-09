@@ -4206,14 +4206,17 @@ body.dark #settingsView .setting-duration .setting-control select{
   right:12px!important;
   bottom:auto!important;
   left:auto!important;
-  width:min(280px,calc(100vw - 24px))!important;
-  height:fit-content!important;
+  width:min(240px,calc(100vw - 24px))!important;
+  max-width:calc(100% - 24px)!important;
+  height:auto!important;
   max-height:min(70vh,620px)!important;
   max-height:min(70dvh,620px)!important;
   min-height:0;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden!important;
+  overflow-x:hidden!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain;
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb,var(--muted) 55%,transparent) transparent;
   padding:18px!important;
   border:1px solid color-mix(in srgb,var(--primary) 16%,var(--line));
   border-radius:20px!important;
@@ -4262,19 +4265,18 @@ body.dark #settingsView .setting-duration .setting-control select{
   font-size:10px;
 }
 #examProgressDrawer .exam-progress-grid{
-  flex:0 1 auto;
   min-height:0;
-  max-height:min(52vh,440px);
-  max-height:min(52dvh,440px);
-  overflow-x:hidden;
-  overflow-y:auto;
-  overscroll-behavior:contain;
-  scrollbar-width:none;
-  -ms-overflow-style:none;
-  touch-action:pan-y;
-  padding:2px 3px 2px 0;
+  overflow:visible;
+  padding:2px 0 2px 0;
 }
-#examProgressDrawer .exam-progress-grid::-webkit-scrollbar{display:none}
+#examProgressDrawer::-webkit-scrollbar{width:7px}
+#examProgressDrawer::-webkit-scrollbar-track{background:transparent}
+#examProgressDrawer::-webkit-scrollbar-thumb{
+  border:2px solid transparent;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--muted) 48%,transparent);
+  background-clip:padding-box;
+}
 #examProgressDrawer .question-palette-section-heading{
   margin:0 0 8px;
   padding:2px 1px;
@@ -4334,22 +4336,18 @@ body:not(.exam-active) .exam-progress-backdrop{display:none!important}
     bottom:auto!important;
     left:auto!important;
     width:min(280px,calc(100vw - 16px))!important;
+    max-width:calc(100% - 16px)!important;
     max-height:min(78vh,620px)!important;
     max-height:min(78dvh,620px)!important;
     padding:14px!important;
     border-radius:18px!important;
   }
   #examProgressDrawer.open{right:8px!important}
-  #examProgressDrawer .exam-progress-grid{
-    max-height:min(62vh,440px);
-    max-height:min(62dvh,440px);
-  }
 }
 @media(max-height:520px){
   #examProgressDrawer{padding:10px!important;max-height:calc(100dvh - 16px)!important}
   #examProgressDrawer .drawer-head{margin-bottom:7px}
   #examProgressDrawer .drawer-legend{margin-bottom:7px;padding:7px}
-  #examProgressDrawer .exam-progress-grid{max-height:45dvh}
 }
 
 /* Keep the post-test review in a comfortable reading column. */
