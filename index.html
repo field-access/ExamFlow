@@ -216,27 +216,13 @@
 </aside>
 
 <main>
-<div id="examProgressDrawer" class="exam-progress-drawer" aria-label="Question progress">
-  <div class="drawer-head">
-    <strong>Question Progress</strong>
-    <button class="drawer-close" type="button" onclick="toggleQuestionProgress()">×</button>
-  </div>
-  <div class="drawer-legend">
-    <span><i class="legend-dot current"></i> Current</span>
-    <span><i class="legend-dot answered"></i> Answered</span>
-    <span><i class="legend-dot review"></i> Review</span>
-    <span><i class="legend-dot empty"></i> Unanswered</span>
-  </div>
-  <div id="examProgressGrid" class="exam-progress-grid"></div>
-</div>
-<div class="exam-progress-backdrop" onclick="toggleQuestionProgress()"></div>
 <section class="question card">
   <div class="qtop">
 
     <div id="examTimerControl" class="timer" style="margin:0;"><svg class="ui-icon"><use href="#icon-clock"/></svg><span id="timer">30:00</span></div>
     <div><span class="qnum">Question <span id="currentLabel">0</span></span> <span>of <span id="totalLabel">0</span></span></div>
     <div class="modepicker">
-      <button id="examProgressBtn" class="modebtn" onclick="toggleQuestionProgress()"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
+      <button id="examProgressBtn" class="modebtn" type="button" aria-controls="examProgressDrawer" aria-expanded="false" onclick="toggleQuestionProgress()"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
       <button id="examMode" class="modebtn active" onclick="setMode('exam')"><svg class="ui-icon"><use href="#icon-clock"/></svg>Exam</button>
       <button id="practiceMode" class="modebtn" onclick="setMode('practice')"><svg class="ui-icon"><use href="#icon-brain"/></svg>Practice</button>
 
@@ -270,6 +256,21 @@
 </aside>
 </div>
 </section>
+
+<div id="examProgressDrawer" class="exam-progress-drawer" role="complementary" aria-label="Question progress" aria-hidden="true">
+  <div class="drawer-head">
+    <strong>Question Progress</strong>
+    <button class="drawer-close" type="button" onclick="toggleQuestionProgress()" aria-label="Close question palette">×</button>
+  </div>
+  <div class="drawer-legend">
+    <span><i class="legend-dot current"></i> Current</span>
+    <span><i class="legend-dot answered"></i> Answered</span>
+    <span><i class="legend-dot review"></i> Review</span>
+    <span><i class="legend-dot empty"></i> Unanswered</span>
+  </div>
+  <div id="examProgressGrid" class="exam-progress-grid"></div>
+</div>
+<div class="exam-progress-backdrop" onclick="toggleQuestionProgress()" aria-hidden="true"></div>
 
 <!-- DASHBOARD (RESULTS) -->
 <section id="dashboardView" class="view">
