@@ -1084,6 +1084,11 @@ function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
 
   if(e.key==="Escape"){
+    if(document.body.classList.contains("mobile-nav-open")){
+      e.preventDefault();closeMobileNav();
+      document.querySelector(".mobile-menu-toggle").focus();
+      return;
+    }
     closeImporter();closeSubmit();closeSessions();
     if(typeof closeCBQModal === "function") closeCBQModal();
     const drawer=document.getElementById("examProgressDrawer");
@@ -1198,94 +1203,72 @@ document.addEventListener("pointerdown",e=>{
   setTimeout(()=>b.classList.remove("click-pulse"),180);
 });
 
-const CBQ_MODE_GUIDE=`LANGUAGE STYLE:
-Use ASD-STE100-inspired controlled English for about 80% of the wording.
-- Use short sentences.
-- Use simple grammar and one idea at a time.
-- Use clear technical terms.
-- Avoid unnecessary synonyms and decorative academic wording.
-- Keep mathematical and computer science terms precise.
-- Simplify the language, not the thinking. Keep the reasoning deep.
+const CBQ_SEED_PROMPT="# astra prompt\nCreate a Concept Breakdown Quiz (CBQ) using the ExamFlow schema supplied after this prompt.\n\nTopic or source: [TOPIC / SOURCE]\nLearner’s existing knowledge: [KNOWN SKILLS, or UNKNOWN]\nTarget problem or desired ability: [TARGET, or INFER ONE]\nRequested CBQ modes: [MODES, or mental/depth]\nQuestion budget: [NUMBER, default 10]\n\nPurpose\n\nHelp the learner develop the reasoning needed to solve one meaningful problem. Reduce unnecessary reading, searching, and prerequisite confusion. Preserve the learner’s opportunity to predict, retrieve, explain, and apply.\n\nSuccess means the learner can attempt a related problem with less help. Completing the quiz alone does not establish mastery.\n\nChoose the scope\n\n1. Define one observable outcome: “After this lesson, the learner can…”\n2. If the topic is broad, select one useful starting skill. Make that narrower scope clear in the quiz name and opening question.\n3. Choose one concrete anchor problem that requires this skill.\n4. Identify the essential prerequisites. Use the supplied learner information. If knowledge is unknown, assume limited familiarity with the target concept, and state any prerequisite assumption briefly.\n5. Fit the outcome to the question budget. Do not compress an entire subject into five questions.\n\nDesign the sequence\n\nBefore writing questions, determine:\n- The essential solution steps.\n- The concept each step requires.\n- The likely mistake at each step.\n- The evidence that would show the learner understands that step.\n\nUse this plan to write the quiz. Do not output planning notes.\n\nFor a beginner and a five-question budget, use this default progression:\n\n1. Orient and predict.\n   Introduce the anchor problem and the minimum necessary idea. Show a small worked portion, then ask for one manageable prediction. Leave a meaningful inference for the learner.\n\n2. Complete a step.\n   Continue the same problem. Ask the learner to supply one missing operation, relationship, decision, or result.\n\n3. Explain or diagnose.\n   Ask why a previous step works, or which specific mistake would break it. Use plausible misconceptions as distractors.\n\n4. Reconstruct.\n   Ask the learner to combine earlier ideas to complete the anchor problem or reconstruct its essential procedure. Reduce the support.\n\n5. Transfer.\n   Present a fresh case that changes a meaningful feature. Require the learner to apply the principle or identify a condition under which it fails. Do not merely change the numbers. Do not introduce a major untaught concept. Omit the hint for this question.\n\nAdapt this progression when the supplied learner history justifies less support. For another question budget, preserve the movement from supported reasoning toward independent application.\n\nConnection rules\n\n- Every question must contribute to the stated outcome.\n- Reuse the anchor problem while developing its solution.\n- Each teaching step should introduce at most one major new idea.\n- Later questions should use earlier principles, not merely share the same topic.\n- The reconstruction or transfer question must combine ideas developed earlier.\n- Give the correct intermediate result when needed to continue. Do not assume the learner answered a previous question correctly.\n- Remove any question that adds no necessary reasoning, diagnosis, retrieval, or transfer.\n- Do not describe an unobserved learner response as correct, incorrect, or mastered.\n\nQuestion design\n\nChoose the format that best exposes the intended reasoning. Do not force variety.\n\n- MCQ: use one unambiguously correct answer. Make incorrect options plausible and associated with identifiable errors.\n- Fill-in-the-blank: test a meaningful missing step or relationship. Include reasonable equivalent accepted answers.\n- Matching: test useful relationships, with clear, unambiguous pairs.\n- Ordering: use only when the intended sequence is sufficiently determined.\n- True/false: use only for a meaningful distinction.\n- Image questions: use only supplied or verified accessible images.\n\nAvoid trivia, trick wording, irrelevant arithmetic, and answer clues caused by option length or repeated wording. Avoid “all of the above” and “none of the above.”\n\nFeedback\n\nFor every question, provide a concise explanation that:\n- States the correct answer.\n- Explains the principle that makes it correct.\n- Addresses the most likely misconception when relevant.\n\nHints should direct attention to a useful feature or principle. They must not state the answer.\n\nKeep material that teaches prerequisites separate from material that reveals the current answer. Put the former in the question when needed and the latter in the explanation.\n\nLanguage and sources\n\nUse plain, precise English. Prefer one idea per sentence. Keep terms consistent and define unfamiliar technical terms before using them. Preserve mathematical precision.\n\nWhen source material is supplied, ground the lesson in it. Do not invent claims, quotations, page references, or resource URLs. Identify source gaps instead of silently filling them with unsupported details.\n\nTreat requested modes as emphasis within the same learning goal. A request for multiple modes must not produce unrelated mini-quizzes.\n\nOutput\n\nFollow the supplied ExamFlow structure and answer conventions exactly. Do not add unsupported fields.\n\nUse a section marks value of 1 and negativeMarks of 0 for learning practice. Treat timeMinutes as an estimated duration.\n\nInclude an explanation for every question. Keep all learner-facing text inside JSON values. Escape JSON and inline KaTeX correctly.\n\nBefore returning, check:\n- Answer correctness and ambiguity.\n- Prerequisite coverage.\n- Connection to the anchor problem.\n- Gradual reduction of support.\n- Absence of answer leakage within each question.\n- Whether the final question tests the stated outcome.\n- Compatibility with the supplied schema.\n\nReturn only one JSON code block containing the complete quiz.\n\n\n\nYour task:\n- Replace [TOPIC] with the topic or source material I provide.\n- Create a coherent quiz that tests understanding and step-by-step reasoning.\n- Include useful explanations for every question.\n- Add an optional \"hint\" for questions where a small nudge would help, without giving away the answer.\n- Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.\n- Give every question a correct answer and marks. Use negativeMarks only when appropriate.\n- Keep all question and answer text inside the JSON values.\n- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.\n\nMath and LaTeX:\n- Use inline LaTeX such as $E=mc^2$ inside JSON strings when helpful.\n- Use display LaTeX such as $$\\int_0^1 x^2 dx$$ when a separate equation is needed.\n- ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.\n- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.\n\nOutput rules:\n- Generate the CBQ inside a JSON code block using the ```json ... ``` format.\n- Return only that JSON code block. Do not include commentary or headings outside the code block.\n- Follow the complete ExamFlow schema below.\n- Make the JSON directly usable by pasting it into ExamFlow's CBQ loader.\n\nExamFlow CBQ schema:\n{\n  \"name\": \"My Exam\",\n  \"sections\": [\n    {\n      \"name\": \"Physics\",\n      \"timeMinutes\": 30,\n      \"marks\": 4,\n      \"negativeMarks\": 1,\n      \"questions\": [\n        {\n          \"type\": \"mcq\",\n          \"question\": \"What is the SI unit of force?\",\n          \"options\": [\"Joule\", \"Newton\", \"Watt\", \"Pascal\"],\n          \"answer\": \"B\",\n          \"hint\": \"Think about the unit named after a person associated with classical mechanics.\",\n          \"explanation\": \"The SI unit of force is the newton (N).\"\n        },\n        {\n          \"type\": \"true_false\",\n          \"question\": \"Acceleration is the rate of change of velocity.\",\n          \"answer\": \"True\",\n          \"explanation\": \"Acceleration is defined as the rate of change of velocity with respect to time.\"\n        },\n        {\n          \"type\": \"fill_blank\",\n          \"question\": \"The acceleration due to gravity near Earth's surface is approximately ____.\",\n          \"acceptedAnswers\": [\"9.8 m/s²\", \"9.8 m/s^2\", \"9.8\"],\n          \"explanation\": \"The standard approximate value is $g = 9.8\\\\,m/s^2$.\"\n        },\n        {\n          \"type\": \"match\",\n          \"question\": \"Match each quantity with its SI unit.\",\n          \"pairs\": [\n            {\"left\": \"Force\", \"right\": \"Newton\"},\n            {\"left\": \"Energy\", \"right\": \"Joule\"},\n            {\"left\": \"Power\", \"right\": \"Watt\"}\n          ],\n          \"explanation\": \"Each physical quantity has its corresponding SI unit.\"\n        },\n        {\n          \"type\": \"drag_drop\",\n          \"question\": \"Match each concept with its definition.\",\n          \"pairs\": [\n            {\"left\": \"Velocity\", \"right\": \"Rate of change of displacement\"},\n            {\"left\": \"Acceleration\", \"right\": \"Rate of change of velocity\"},\n            {\"left\": \"Momentum\", \"right\": \"Mass × velocity\"}\n          ]\n        },\n        {\n          \"type\": \"ordering\",\n          \"question\": \"Arrange the following steps of the scientific method in the correct order.\",\n          \"items\": [\n            \"Make an observation\",\n            \"Form a hypothesis\",\n            \"Conduct an experiment\",\n            \"Analyze the results\"\n          ],\n          \"answer\": [\n            \"Make an observation\",\n            \"Form a hypothesis\",\n            \"Conduct an experiment\",\n            \"Analyze the results\"\n          ]\n        },\n        {\n          \"type\": \"image_choice\",\n          \"question\": \"Which diagram represents a projectile following a parabolic trajectory?\",\n          \"image\": \"https://example.com/projectile.png\",\n          \"options\": [\"Diagram A\", \"Diagram B\", \"Diagram C\", \"Diagram D\"],\n          \"answer\": \"C\",\n          \"explanation\": \"Ignoring air resistance, projectile motion follows a parabolic path.\"\n        }\n      ]\n    }\n  ]\n}\n";
 
-TEXT FORMATTING:
-Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
+const DEFAULT_QUESTION_GPT_PROMPT="Create 5 connected Concept Breakdown Quiz questions that build reasoning toward this problem, ending with transfer. Use plain English. Honor CBQ/ modes in the source (default mental/depth; 5x25 means 5 core ideas + 25 questions). Include answers and concise explanations; optional hints. Return only a JSON code block using this ExamFlow structure (MCQs: 2 options, answer A or B). Escape LaTeX backslashes in JSON.\n{\"name\":\"CBQ\",\"sections\":[{\"name\":\"Reasoning\",\"timeMinutes\":10,\"marks\":1,\"negativeMarks\":0,\"questions\":[{\"type\":\"mcq\",\"question\":\"…\",\"options\":[\"…\",\"…\"],\"answer\":\"A\",\"explanation\":\"…\"}]}]}\nSource: {{question}}";
 
-CBQ COMMAND MODES:
-Read any CBQ command included with the topic, source, or question. A command starts with CBQ/. Commands can be combined. Apply every requested mode together.
-- CBQ/mental: mental-set and problem-solving aptitude.
-- CBQ/depth: deep conceptual understanding.
-- CBQ/math: mathematical derivation and reasoning.
-- CBQ/bloom: progress through Bloom's taxonomy.
-- CBQ/normal: use mixed question formats.
-- CBQ/code: reason about code or pseudocode.
-- CBQ/RQ: reconstruct code line by line.
-- CBQ/hint: link hints across a chain of reasoning.
-- CBQ/active: use active recall and many fill-in-the-blank questions.
-- CBQ/match: match related items, relationships, or formulas.
-- CBQ/5x25: teach 5 core ideas, then create 25 reinforcement questions.
-- CBQ/leetcode: transfer the concept to a LeetCode-style problem.
-- CBQ/source: ground coverage in the supplied source, slides, or notes.
-- CBQ/diagnose: detect misconceptions and repair them.
-- CBQ/transfer: apply the concept to novel situations.
-- CBQ/reconstruct: rebuild an algorithm or process from reasoning.
-
-PRIMARY MODES:
-CBQ/mental, CBQ/depth, CBQ/math, CBQ/code, CBQ/RQ, CBQ/hint, CBQ/leetcode, CBQ/source, CBQ/diagnose, and CBQ/transfer are the main specialized modes.
-
-COMBINED MODES:
-- CBQ/mental/depth: build a mental model and deepen understanding step by step.
-- CBQ/mental/code: build problem-solving skill through code.
-- CBQ/mental/leetcode: teach problem-solving patterns, then transfer them to a LeetCode-style problem.
-- CBQ/depth/math: derive the mathematical idea instead of memorizing a formula.
-- CBQ/source/mental: use the supplied source while training problem-solving aptitude.
-- CBQ/code/RQ: understand an implementation, then reconstruct it line by line.
-- CBQ/mental/diagnose/transfer: identify the reasoning pattern, find mistakes, then apply the idea to a new problem.
-For other combinations, combine their intentions without dropping a requested mode.
-
-DEFAULT MODE:
-If the user says only "CBQ" and gives no specialized command, use CBQ/mental/depth: deep understanding plus problem-solving aptitude. A supplied CBQ/ command replaces this default or adds specialized modes.
-Unless CBQ/5x25 is requested, create exactly 5 connected, progressively deeper questions. CBQ/5x25 instead requires 5 core ideas followed by 25 reinforcement questions.`;
+function promptConfig(kind){
+ return kind==="seed"
+   ?{key:"seedPrompt",editor:"seedPromptEditor",status:"seedPromptStatus",defaultText:CBQ_SEED_PROMPT}
+   :{key:"questionPrompt",editor:"questionPromptEditor",status:"questionPromptStatus",defaultText:DEFAULT_QUESTION_GPT_PROMPT};
+}
+function getPromptText(kind){
+ const config=promptConfig(kind),value=settings[config.key];
+ return typeof value==="string"&&value.trim()?value:config.defaultText;
+}
+function renderPromptSettings(){
+ renderGPTDestination();
+ for(const kind of ["seed","question"]){
+   const config=promptConfig(kind),editor=document.getElementById(config.editor);
+   // Preserve unsaved drafts when navigating away or changing appearance.
+   if(!editor||editor.dataset.dirty==="true")continue;
+   editor.value=getPromptText(kind);
+   editor.setAttribute("aria-invalid","false");
+   const status=document.getElementById(config.status);
+   status.style.color="var(--muted)";
+   status.textContent=`${editor.value.length.toLocaleString()} characters · ${editor.value===config.defaultText?"Using default":"Saved custom prompt"}`;
+ }
+}
+function editPrompt(kind){
+ const config=promptConfig(kind),editor=document.getElementById(config.editor);
+ editor.dataset.dirty="true";
+ editor.setAttribute("aria-invalid","false");
+ const status=document.getElementById(config.status);
+ status.style.color="var(--muted)";
+ status.textContent=`${editor.value.length.toLocaleString()} characters · Unsaved changes`;
+}
+function savePrompt(kind){
+ const config=promptConfig(kind),editor=document.getElementById(config.editor),status=document.getElementById(config.status);
+ if(!editor.value.trim()){
+   editor.setAttribute("aria-invalid","true");
+   status.style.color="var(--bad)";status.textContent="Enter a prompt or restore the default before saving.";
+   editor.focus();return;
+ }
+ const next={...settings};
+ if(editor.value===config.defaultText)delete next[config.key];
+ else next[config.key]=editor.value;
+ try{localStorage.setItem(K.settings,JSON.stringify(next))}
+ catch(error){
+   status.style.color="var(--bad)";
+   status.textContent="Could not save to this browser. Your edits are still here; free up storage and try again.";
+   return;
+ }
+ settings=next;schedulePersistentBackup();
+ editor.dataset.dirty="false";
+ renderPromptSettings();
+ status.textContent=`Saved · ${editor.value.length.toLocaleString()} characters`;
+ toast(kind==="seed"?"Copy prompt updated":"GPT question prompt updated");
+}
+function restorePromptDefault(kind){
+ const config=promptConfig(kind),editor=document.getElementById(config.editor);
+ editor.value=config.defaultText;editPrompt(kind);
+ document.getElementById(config.status).textContent="Default restored in editor. Save prompt to apply.";
+ editor.focus();
+}
 
 function copyBeginnerSchema(){
-  const source=document.getElementById("beginnerSchema");
-  if(!source)return;
-  const schema=source.value||source.textContent||"";
-  const text=`Create a Concept Breakdown Quiz (CBQ) about: [TOPIC]
-
-What a CBQ means:
-A CBQ breaks one difficult topic into a sequence of small, connected questions. Each question should build the reasoning needed for the next step, moving from core ideas to application and finally to a clear solution. Do not make a list of unrelated recall questions.
-
-${CBQ_MODE_GUIDE}
-
-Your task:
-- Replace [TOPIC] with the topic or source material I provide.
-- Create a coherent quiz that tests understanding and step-by-step reasoning.
-- Include useful explanations for every question.
-- Add an optional "hint" for questions where a small nudge would help, without giving away the answer.
-- Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.
-- Give every question a correct answer and marks. Use negativeMarks only when appropriate.
-- Keep all question and answer text inside the JSON values.
-- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
-
-Math and LaTeX:
-- Use inline LaTeX such as $E=mc^2$ inside JSON strings when helpful.
-- Use display LaTeX such as $$\\int_0^1 x^2 dx$$ when a separate equation is needed.
-- ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.
-- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
-
-Images:
-- For image questions, use a publicly accessible HTTPS image URL in the "image" field.
-- Do not use a local computer path. Example: "image": "https://your-site.example/diagram.png".
-
-Output rules:
-- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
-- Return only that JSON code block. Do not include commentary or headings outside the code block.
-- Follow the complete ExamFlow schema below.
-- Make the JSON directly usable by pasting it into ExamFlow's CBQ loader.
-
-ExamFlow CBQ schema:
-${schema}`;
-  const done=()=>toast("AI CBQ prompt and schema copied ✓");
+  const text=getPromptText("seed");
+  const done=()=>toast("CBQ seed prompt copied ✓");
   if(navigator.clipboard?.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>{
       const ta=document.createElement("textarea");
@@ -1501,85 +1484,107 @@ function restoreSession(sid){
 function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
 
 
-async function redirectQuestionToChatGPT(){
- const q=questions[current];if(!q){toast("No question loaded");return}
- const question=q.text||"";
- let source=`Question: ${question}`;
- if(Array.isArray(q.options)&&q.options.length)
-   source+=`\nOptions: ${q.options.map((x,i)=>`${String.fromCharCode(65+i)}. ${x}`).join(" | ")}`;
- if(q.answer!==undefined)source+=`\nAnswer: ${typeof q.answer==="string"?q.answer:JSON.stringify(q.answer)}`;
- if(q.explanation)source+=`\nExplanation: ${q.explanation}`;
- if(q.hint)source+=`\nHint: ${q.hint}`;
- if(Array.isArray(q.pairs)&&q.pairs.length)
-   source+=`\nPairs: ${q.pairs.map(p=>`${p.left} → ${p.right}`).join(" | ")}`;
-
- const prompt=`Create a Concept Breakdown Quiz (CBQ) for the question below.
-
-WHAT IS A CBQ:
-A CBQ is a sequence of step-by-step questions that breaks the original problem into smaller conceptual reasoning steps. It should guide the learner from basic understanding toward the original question, rather than simply asking recall questions or giving the answer. Follow the selected command for the number and style of questions.
-
-${CBQ_MODE_GUIDE}
-
-REQUIREMENTS:
-- Follow the question count required by the selected command. Create exactly 5 questions by default, or 25 reinforcement questions after 5 core ideas for CBQ/5x25.
-- Make them progressively more challenging.
-- Follow the reasoning path needed to solve the original question.
-- Do not simply repeat the original question.
-- Each CBQ should help establish a concept or reasoning step needed for the next one.
-- Use the same subject terminology as the original question.
-- Include explanations for each CBQ.
-- Add a short optional "hint" when useful; hints should guide reasoning without revealing the answer.
-- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
-- Use exactly 2 options for MCQs by default.
-- Put mathematical expressions in $...$ or $$...$$.
-- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
-- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
-- Return only that JSON code block. Do not include prose outside the code block.
-- The JSON must be valid JSON.
-
-USE THIS CBQ JSON SCHEMA:
-{
-  "name": "CBQ — <topic>",
-  "sections": [
-    {
-      "name": "Concept Breakdown",
-      "timeMinutes": 10,
-      "marks": 1,
-      "negativeMarks": 0,
-      "questions": [
-        {
-          "type": "mcq",
-          "question": "Question text or $LaTeX$",
-          "options": ["Option A", "Option B"],
-          "answer": "A",
-          "hint": "A short optional nudge toward the underlying concept.",
-          "explanation": "Explanation with $LaTeX$ where needed."
-        }
-      ]
-    }
-  ]
+function buildQuestionGPTPrompt(q){
+ const source={question:q.text||""};
+ if(q.type)source.type=q.type;
+ if(Array.isArray(q.options)&&q.options.length){
+   source[q.type==="ordering"?"items":"options"]=q.options;
+ }
+ if(q.answer!==undefined)source.answer=q.answer;
+ if(Array.isArray(q.acceptedAnswers)&&q.acceptedAnswers.length)source.acceptedAnswers=q.acceptedAnswers;
+ if(Array.isArray(q.pairs)&&q.pairs.length)source.pairs=q.pairs.map(({left,right})=>({left,right}));
+ if(q.image)source.image=q.image;
+ const template=getPromptText("question");
+ const payload=JSON.stringify(source);
+ return template.includes("{{question}}")
+   ?template.replaceAll("{{question}}",()=>payload)
+   :template+"\nSource: "+payload;
 }
 
-SUPPORTED QUESTION TYPES:
-- mcq: question, options, answer, optional hint and explanation
-- true_false: question, answer (True or False), optional hint and explanation
-- fill_blank: question, acceptedAnswers, optional hint and explanation
-- match: question, pairs, optional hint and explanation
-- drag_drop: question, pairs, optional hint and explanation
-- ordering: question, items, answer, optional hint and explanation
-- image: question, image (prefer a publicly accessible HTTPS URL), options, answer, optional hint and explanation
-- image_choice: question, image, options, answer, optional hint and explanation
-
-ALIASES MAY INCLUDE:
-text, choices, correct, points, negative, duration, category, topic, reason, solution, rationale, hint.
-
-Generate the CBQ from this original question:
-
-${source}`;
-
- const url="https://chatgpt.com/?q="+encodeURIComponent(prompt);
- const w=window.open(url,"_blank");
- if(!w)toast("Allow pop-ups to open ChatGPT");
+function normalizeGPTDestination(value){
+ const text=typeof value==="string"?value.trim():"";
+ if(!text)return "";
+ let url;
+ try{url=new URL(text)}catch{throw Error("Paste a complete ChatGPT HTTPS link.")}
+ if(url.protocol!=="https:"||!["chatgpt.com","www.chatgpt.com","chat.openai.com"].includes(url.hostname)||url.username||url.password||url.port){
+   throw Error("Use an HTTPS link from chatgpt.com or chat.openai.com.");
+ }
+ url.searchParams.delete("q");
+ return url.href;
+}
+function renderGPTDestination(){
+ const input=document.getElementById("gptDestination");
+ if(!input||input.dataset.dirty==="true")return;
+ input.value=typeof settings.gptDestination==="string"?settings.gptDestination:"";
+ input.setAttribute("aria-invalid","false");
+ const status=document.getElementById("gptDestinationStatus");
+ status.style.color="var(--muted)";
+ status.textContent=input.value?"Saved link · prompt copied for pasting":"Default · open a new chat with the prompt";
+}
+function editGPTDestination(){
+ const input=document.getElementById("gptDestination");
+ input.dataset.dirty="true";input.setAttribute("aria-invalid","false");
+ const status=document.getElementById("gptDestinationStatus");
+ status.style.color="var(--muted)";status.textContent="Unsaved changes";
+}
+function saveGPTDestination(){
+ const input=document.getElementById("gptDestination"),status=document.getElementById("gptDestinationStatus");
+ let destination;
+ try{destination=normalizeGPTDestination(input.value)}catch(error){
+   input.setAttribute("aria-invalid","true");status.style.color="var(--bad)";
+   status.textContent=error.message;input.focus();return;
+ }
+ const next={...settings};
+ if(destination)next.gptDestination=destination;else delete next.gptDestination;
+ try{localStorage.setItem(K.settings,JSON.stringify(next))}catch{
+   status.style.color="var(--bad)";status.textContent="Could not save to this browser. Your previous destination is unchanged.";return;
+ }
+ settings=next;schedulePersistentBackup();input.dataset.dirty="false";
+ renderGPTDestination();toast(destination?"ChatGPT link saved":"GPT button will open a new chat");
+}
+function resetGPTDestination(){
+ document.getElementById("gptDestination").value="";
+ editGPTDestination();saveGPTDestination();
+}
+async function copyGPTPayload(text){
+ try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(text);return true}}catch{}
+ const previous=document.activeElement,area=document.createElement("textarea");
+ area.value=text;area.readOnly=true;area.style.cssText="position:fixed;top:0;left:0;opacity:0";
+ document.body.appendChild(area);area.select();
+ let copied=false;
+ try{copied=document.execCommand("copy")}catch{}
+ area.remove();previous?.focus();return copied;
+}
+async function redirectQuestionToChatGPT(){
+ const q=questions[current];if(!q){toast("No question loaded");return}
+ const prompt=buildQuestionGPTPrompt(q);
+ let destination;
+ try{destination=normalizeGPTDestination(settings.gptDestination)}catch{
+   toast("Fix the ChatGPT link in Settings before continuing.");return;
+ }
+ const panel=document.getElementById("gptTransferPanel");
+ panel.hidden=true;
+ if(!destination){
+   const w=window.open("https://chatgpt.com/?q="+encodeURIComponent(prompt),"_blank");
+   if(!w)toast("Allow pop-ups to open ChatGPT");
+   return;
+ }
+ // Start copying and open the tab within the click event, before awaiting clipboard access.
+ const copying=copyGPTPayload(prompt);
+ const w=window.open(destination,"examflow-gpt");
+ const copied=await copying;
+ const status=document.getElementById("gptTransferStatus");
+ const manual=document.getElementById("gptTransferPayload");
+ const link=document.getElementById("gptTransferLink");
+ link.href=destination;
+ manual.value=prompt;manual.hidden=copied;
+ document.getElementById("gptTransferLabel").hidden=copied;
+ status.textContent=copied
+   ?(w?"Prompt and question copied. Paste them into your saved ChatGPT chat.":"Prompt and question copied. Pop-up blocked; open your saved chat below and paste.")
+   :"Clipboard copying was blocked. Copy the text below, then paste it into your saved ChatGPT chat.";
+ panel.hidden=false;
+ if(!copied){manual.focus();manual.select();}
+ toast(copied?"Prompt copied — paste into your saved chat":"Copy the prompt from the panel below");
 }
 function showGeneratedCBQs(cbqs){
  window.__generatedCBQs=cbqs;
@@ -2085,7 +2090,7 @@ async function importDataFile(event){
     }
 
     settings=loadSettings();
-    renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();
+    renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();renderPromptSettings();
     await savePersistentBackup();
     if(status){
       status.hidden=false;
@@ -2208,7 +2213,8 @@ function applyQuestionSidebarState(){
   if(!d)return;
   const open=getQuestionSidebarState();
   d.classList.toggle("open",open);
-  document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
+  document.querySelector("#examView .main")?.classList.remove("palette-open");
+  d.inert=!open;
   d.setAttribute("aria-hidden",String(!open));
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
@@ -2223,7 +2229,9 @@ function toggleQuestionProgress(){
   const open=!d.classList.contains("open");
   setQuestionSidebarState(open);
   d.classList.toggle("open",open);
-  document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
+  document.querySelector("#examView .main")?.classList.remove("palette-open");
+  if(!open&&d.contains(document.activeElement))document.getElementById("examProgressBtn")?.focus();
+  d.inert=!open;
   d.setAttribute("aria-hidden",String(!open));
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
@@ -2367,7 +2375,8 @@ function prepareShuffledQuiz(qs){
 function startHomeQuiz(){
  const raw=document.getElementById("homeJson").value.trim();
  const status=document.getElementById("homeJsonStatus");
- if(!raw){status.textContent="Paste your CBQ JSON first.";status.style.color="var(--bad)";return}
+ if(!raw){showHomeQuizError("Paste your quiz JSON or choose a file to begin.");return}
+ resetHomeQuizFeedback();
  try{
    const parsed=parseQuiz(parseQuizInput(raw));
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
@@ -2376,15 +2385,40 @@ function startHomeQuiz(){
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON`;
    registerActiveExam();saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
- }catch(e){status.textContent="✕ "+e.message;status.style.color="var(--bad)"}
+ }catch(e){showHomeQuizError(e.message)}
 }
 function pasteAndStart(){
  document.getElementById("homeJson").focus();
  document.getElementById("homeJson").scrollIntoView({behavior:"smooth",block:"center"});
 }
+function resetHomeQuizFeedback(){
+ const input=document.getElementById("homeJson"),status=document.getElementById("homeJsonStatus");
+ input.setAttribute("aria-invalid","false");
+ status.textContent=input.value.trim()?"Quiz added. Select Start quiz when you’re ready.":"Your quiz stays in this browser. Ready when you are.";
+ status.style.color="var(--muted)";
+}
+function showHomeQuizError(message){
+ const input=document.getElementById("homeJson"),status=document.getElementById("homeJsonStatus");
+ input.setAttribute("aria-invalid","true");
+ status.textContent=message;status.style.color="var(--bad)";
+ input.focus();
+}
+function clearHomeQuizInput(){
+ document.getElementById("homeJson").value="";
+ resetHomeQuizFeedback();
+ document.getElementById("homeJson").focus();
+}
 function readHomeFile(e){
  const f=e.target.files[0];if(!f)return;
- const r=new FileReader();r.onload=()=>{document.getElementById("homeJson").value=r.result;document.getElementById("homeJsonStatus").textContent="JSON loaded — click Load & Start.";document.getElementById("homeJsonStatus").style.color="var(--good)"};r.readAsText(f)
+ const r=new FileReader();
+ r.onload=()=>{
+   document.getElementById("homeJson").value=r.result;
+   resetHomeQuizFeedback();
+   document.getElementById("homeJsonStatus").textContent=`${f.name} added. Select Start quiz to begin.`;
+   e.target.value="";
+ };
+ r.onerror=()=>{showHomeQuizError("This file could not be read. Try again or paste your quiz JSON.");e.target.value="";};
+ r.readAsText(f);
 }
 
 function renderHome(){
@@ -2425,13 +2459,32 @@ function showView(name){
  ["navHome","navExam","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
  const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name];
  if(activeNav)document.getElementById(activeNav).classList.add("active");
+ document.querySelectorAll(".topnav button, #mobileNav button").forEach(button=>{
+   const selected=button.getAttribute("onclick")===`showView('${name}')`;
+   if(selected)button.setAttribute("aria-current","page");
+   else button.removeAttribute("aria-current");
+ });
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
- if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
+ if(name==="settings"){renderPromptSettings();const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  updateTheme();updateModeUI()}
 }
-function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
-function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
+function toggleMobileNav(){
+ const open=document.body.classList.toggle("mobile-nav-open");
+ const toggle=document.querySelector(".mobile-menu-toggle");
+ toggle.setAttribute("aria-expanded",String(open));
+ toggle.setAttribute("aria-label",open?"Close navigation":"Open navigation");
+ if(open)document.querySelector("#mobileNav button").focus();
+}
+function closeMobileNav(){
+ document.body.classList.remove("mobile-nav-open");
+ const toggle=document.querySelector(".mobile-menu-toggle");
+ toggle.setAttribute("aria-expanded","false");
+ toggle.setAttribute("aria-label","Open navigation");
+}
+document.addEventListener("click",event=>{
+ if(!event.target.closest("#mobileNav, .mobile-menu-toggle"))closeMobileNav();
+});
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
 
@@ -2674,3 +2727,4 @@ window.addEventListener("beforeunload",saveSession);
 applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
 
 initPersistentBackup();
+

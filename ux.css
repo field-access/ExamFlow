@@ -1,0 +1,104 @@
+/* Home and navigation refinements; keep exam typography preferences intact. */
+/* One coordinate system and one edge for both directions; no page reflow. */
+body.exam-active #examView #examProgressDrawer{
+  position:fixed!important;inset:56px 12px auto auto!important;
+  width:min(280px,calc(100vw - 24px))!important;max-width:calc(100vw - 24px)!important;
+  height:auto!important;max-height:calc(100dvh - 68px)!important;
+  margin:0!important;padding:14px!important;border-radius:16px!important;
+  transform:translateX(calc(100% + 24px));visibility:hidden;pointer-events:none;
+  transition:transform 160ms cubic-bezier(.2,.8,.2,1),visibility 0s linear 160ms;
+}
+body.exam-active #examView #examProgressDrawer.open{
+  transform:translateX(0);visibility:visible;pointer-events:auto;
+  transition:transform 160ms cubic-bezier(.2,.8,.2,1),visibility 0s;
+}
+@media(max-width:800px){
+  body.exam-active #examView .exam-progress-backdrop{
+    display:block!important;opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity 160ms ease,visibility 0s linear 160ms;
+  }
+  body.exam-active #examView .exam-progress-backdrop.open{
+    opacity:1;visibility:visible;pointer-events:auto;
+    transition:opacity 160ms ease,visibility 0s;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  body.exam-active #examView #examProgressDrawer,
+  body.exam-active #examView .exam-progress-backdrop{transition:none!important}
+}
+#settingsView .setting.card.prompt-setting{grid-column:1/-1;display:flex!important;flex-direction:column;align-items:stretch;gap:0}
+#settingsView .setting.card.prompt-setting>p{display:block;font-size:13px;line-height:1.65;max-width:850px}
+#settingsView .prompt-setting .setting-actions{order:0;display:flex!important;flex-wrap:wrap;gap:8px;margin-top:12px}
+#settingsView .prompt-setting .setting-actions .btn{min-height:44px;font-size:12px;flex:0 1 auto;padding:10px 14px}
+#settingsView .prompt-setting label{display:block;font-size:13px;font-weight:700;margin:18px 0 8px}
+#settingsView .prompt-setting textarea{display:block;width:100%;min-height:260px;resize:vertical;padding:16px;border:1px solid var(--line);border-radius:12px;background:var(--surface2);color:var(--text);font:13px/1.65 ui-monospace,Consolas,monospace;tab-size:2}
+#settingsView .prompt-setting textarea[aria-invalid="true"]{border-color:var(--bad)}
+#settingsView .prompt-status{min-height:24px;margin-top:8px;font-size:12px;color:var(--muted)}
+#settingsView #gptDestination{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2);color:var(--text);font:14px/1.5 system-ui,sans-serif}
+#settingsView #gptDestination[aria-invalid="true"]{border-color:var(--bad)}
+#gptTransferPanel[hidden],#gptTransferPayload[hidden],#gptTransferLabel[hidden]{display:none!important}
+.gpt-transfer-panel{margin:16px 0;padding:16px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;font:14px/1.6 system-ui,sans-serif}
+.gpt-transfer-panel p{margin:0 0 10px}
+.gpt-transfer-panel textarea{width:100%;min-height:180px;padding:12px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:8px;font:14px/1.6 monospace;resize:vertical}
+.gpt-transfer-panel a{text-decoration:none;display:inline-flex;align-items:center}
+@media(max-width:600px){#settingsView .prompt-setting textarea{font-size:16px;min-height:240px;padding:12px}}
+#homeView .dashboard{width:min(1180px,calc(100% - 40px));margin:32px auto 48px}
+#homeView .home-stage{gap:24px;grid-template-columns:minmax(0,1.1fr) minmax(340px,1fr)}
+#homeView .home-stage .home-hero{width:100%;margin:0}
+#homeView .home-stage .hero-copy{
+  padding:40px;height:100%;border-color:var(--line);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--primary) 7%,var(--surface)),var(--surface));
+  box-shadow:none;
+}
+#homeView .home-stage .hero-copy h1{font-size:clamp(34px,3.8vw,50px);line-height:1.12;max-width:510px;letter-spacing:-.035em}
+#homeView .home-stage .hero-copy p{font-family:inherit;font-size:16px;line-height:1.75;max-width:440px}
+#homeView .hero-kicker,.import-eyebrow{font:750 10px/1.5 system-ui,sans-serif;letter-spacing:.12em;color:var(--primary)}
+#homeView .hero-actions{gap:10px;margin-top:16px}
+#homeView .hero-actions .btn{min-height:44px}
+#homeView .home-hero .hero-actions .btn.primary{box-shadow:none}
+#homeView .cbq-flow{margin-top:24px;flex-wrap:wrap;gap:8px}
+#homeView .home-stage .json-home{padding:28px;background:var(--surface);border-color:var(--line);box-shadow:var(--ux-shadow-sm)}
+#homeView .json-home h3{font-family:inherit;font-size:25px;margin:6px 0}
+#homeView .json-home small{font-size:13px}
+#homeView .json-home-head>div:last-child{margin-top:18px;flex-wrap:wrap}
+#homeView .home-stage .home-json-input{min-height:180px;margin-top:14px;border-color:var(--line);background:var(--surface2);font-size:13px;line-height:1.7}
+#homeView .home-json-input[aria-invalid="true"]{border-color:var(--bad)}
+#homeView .home-json-footer{gap:16px}
+#homeView .paste-status{font-size:12px;line-height:1.6;overflow-wrap:anywhere}
+.quiz-format-help{margin-top:10px;font-size:12px;color:var(--muted)}
+.quiz-format-help summary{cursor:pointer;min-height:32px;padding:7px 0}
+.quiz-format-help .question-types-hint{line-height:1.8;margin-top:4px}
+.quiz-file-control{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;overflow:hidden}
+.quiz-file-control input[type="file"]{display:block;position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+:is(button,input,textarea,select,summary):focus-visible,.quiz-file-control:focus-within{outline:3px solid var(--primary);outline-offset:3px}
+.mobile-nav button[aria-current="page"]{color:var(--primary);border-color:var(--primary)}
+#homeView .metric.card{border:1px solid var(--line);background:var(--surface);box-shadow:none;padding:20px 24px}
+#homeView .metric small{font-size:12px}
+#homeView .panel.card{border-color:var(--line)}
+#todoApp>div:first-child{flex-wrap:wrap}
+#todoInput{min-width:180px;background:var(--surface);color:var(--text)}
+#todoDeadline{background:var(--surface);color:var(--text)!important}
+@media(max-width:900px){
+  #homeView .home-stage{grid-template-columns:1fr}
+  #homeView .home-stage .hero-copy{padding:30px;min-height:0}
+  #homeView .home-stage .hero-copy h1{max-width:620px}
+  #homeView .home-stage .hero-copy p{max-width:620px}
+}
+@media(max-width:600px){
+  body:not(.exam-active) header{display:flex!important;flex-wrap:nowrap;justify-content:space-between;min-height:64px;height:64px;padding:10px 14px;gap:12px}
+  body:not(.exam-active) header .brand span{display:inline;font-size:17px}
+  body:not(.exam-active) header .mobile-menu-toggle{display:inline-flex!important;position:static!important;inset:auto!important;transform:none!important;align-items:center;justify-content:center;flex:0 0 44px;width:44px;min-height:44px;margin:0}
+  body:not(.exam-active) header .topnav{display:none!important}
+  body:not(.exam-active) #mobileNav{top:70px}
+  #homeView .dashboard{width:calc(100% - 24px);margin:18px auto 32px}
+  #homeView .home-stage{gap:16px}
+  #homeView .home-stage .hero-copy,#homeView .home-stage .json-home{padding:22px}
+  #homeView .home-stage .hero-copy h1{font-size:34px}
+  #homeView .hero-actions .btn{flex:1 1 140px}
+  #homeView .home-stage .home-json-input{font-size:16px}
+  #homeView .home-json-footer>div:last-child{display:grid;grid-template-columns:1fr;width:100%}
+  #homeView .json-home .btn,.mobile-nav button{min-height:44px}
+  #homeView .metric.card{padding:16px}
+  #todoInput{flex-basis:100%!important}
+  #todoDeadline{min-width:0;flex:1}
+}

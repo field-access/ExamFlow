@@ -4456,3 +4456,4 @@ body:not(.exam-active) .exam-progress-backdrop{display:none!important}
   #testResultsView .filters select{grid-column:1/-1;width:100%}
   #testResultsView .filters button{width:100%;min-width:0}
 }
+

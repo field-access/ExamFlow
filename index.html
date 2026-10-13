@@ -11,6 +11,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
 
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="ux.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -44,9 +45,9 @@
 </svg>
 <header>
   <button class="brand home-brand" onclick="showView('home')" aria-label="Go to ExamFlow home"><div class="logo"><svg class="ui-icon"><use href="#icon-brain"/></svg></div><span>ExamFlow</span></button>
-  <button class="mobile-menu-toggle" type="button" onclick="toggleMobileNav()" aria-label="Open navigation" aria-controls="mobileNav"><svg class="ui-icon"><use href="#icon-menu"/></svg></button>
-  <nav class="topnav">
-    <button id="navHome" class="active" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
+  <button class="mobile-menu-toggle" type="button" onclick="toggleMobileNav()" aria-label="Open navigation" aria-controls="mobileNav" aria-expanded="false"><svg class="ui-icon"><use href="#icon-menu"/></svg></button>
+  <nav class="topnav" aria-label="Main navigation">
+    <button id="navHome" class="active" aria-current="page" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
     <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button>
     <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
     <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
@@ -73,11 +74,12 @@
   </div>
     <section class="hero-copy card cbq-intro">
       <div class="hero-kicker"><svg class="ui-icon"><use href="#icon-brain"/></svg> CONCEPT BREAKDOWN QUIZ</div>
-      <h1>Turn difficult ideas into clear reasoning.</h1>
-      <p>A Concept Breakdown Quiz takes one complex topic and walks you through five small questions, each building the next step of understanding until the solution makes sense.</p>
+      <h1>Small steps.
+      Deeper understanding.</h1>
+      <p>Work through a difficult concept one question at a time. Import your quiz, practice the reasoning, and pick up where you left off.</p>
       <div class="hero-actions">
-        <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
-        <button class="btn" type="button" onclick="copyBeginnerSchema()"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy schema</button>
+        <button class="btn primary" onclick="pasteAndStart()">Start a quiz →</button>
+        <button class="btn" type="button" onclick="copyBeginnerSchema()"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy prompt</button>
         <button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
       </div>
       <div class="cbq-flow"><span>One concept</span><i>→</i><span>Small reasoning steps</span><i>→</i><span>Confident solution</span></div>
@@ -89,16 +91,16 @@
 
 <section class="json-home card">
     <div class="json-home-head">
-      <div><h3>Paste your CBQ</h3><small>Copy your quiz JSON → click the button → start.</small></div>
+      <div><div class="import-eyebrow">YOUR NEXT STUDY SESSION</div><h3><label for="homeJson">Add your quiz</label></h3><small>Paste quiz JSON below or choose a JSON file.</small></div>
       <div style="display:flex;gap:7px">
         <button id="homePasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('homeJson','homeJsonStatus','homePasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste from Clipboard</button>
-        <button class="btn" type="button" onclick="document.getElementById('homeJson').value=''">Clear</button>
+        <button class="btn" type="button" onclick="clearHomeQuizInput()">Clear</button>
       </div>
     </div>
-    <textarea id="homeJson" class="home-json-input" spellcheck="false" placeholder='Paste your CBQ JSON directly here...'></textarea>
+    <textarea id="homeJson" class="home-json-input" aria-describedby="homeJsonStatus" aria-invalid="false" oninput="resetHomeQuizFeedback()" spellcheck="false" placeholder='Paste your quiz JSON here…'></textarea>
     <div class="home-json-footer">
-      <div><div id="homeJsonStatus" class="paste-status">Supports flat lists, sections, aliases, LaTeX and HTTPS image links.</div><div class="question-types-hint"><b>Question types:</b> <code>mcq</code> · <code>fill_blank</code> · <code>true_false</code> · <code>match</code> · <code>drag_drop</code> · <code>ordering</code> · <code>image</code></div></div>
-      <div style="display:flex;gap:7px"><label class="filelabel"><svg class="ui-icon"><use href="#icon-file"/></svg>JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
+      <div><div id="homeJsonStatus" class="paste-status" role="status" aria-live="polite" aria-atomic="true">Your quiz stays in this browser. Ready when you are.</div><details class="quiz-format-help"><summary>Supported question types</summary><div class="question-types-hint"> <code>mcq</code> · <code>fill_blank</code> · <code>true_false</code> · <code>match</code> · <code>drag_drop</code> · <code>ordering</code> · <code>image</code></div></details></div>
+      <div style="display:flex;gap:7px"><label class="filelabel quiz-file-control"><svg class="ui-icon"><use href="#icon-file"/></svg>Choose file<input aria-label="Choose quiz JSON file" type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Start quiz →</button></div>
     </div>
   </section>
   </div>
@@ -112,8 +114,8 @@
     <section class="panel card advice-panel" style="grid-column: 1 / -1;"><div class="panel-heading"><div><h3><svg class="ui-icon"><use href="#icon-file"/></svg> Study Todo List</h3></div></div>
       <div id="todoApp" style="margin-top: 10px;">
         <div style="display:flex;gap:8px;">
-          <input type="text" id="todoInput" placeholder="What needs to be done?" style="flex:1; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px;" onkeypress="if(event.key==='Enter') addTodo()">
-          <input type="date" id="todoDeadline" style="border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px; color:var(--ink);">
+          <input type="text" id="todoInput" aria-label="Study task" placeholder="What needs to be done?" style="flex:1; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px;" onkeypress="if(event.key==='Enter') addTodo()">
+          <input type="date" id="todoDeadline" aria-label="Task deadline" style="border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px; color:var(--ink);">
           <button class="btn primary" onclick="addTodo()" style="background:var(--accent); color:#fff; font-weight:600; border:none;">Add</button>
         </div>
         <div id="todoListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:12px;"></div>
@@ -238,6 +240,12 @@
   </div>
   <div id="options" class="options"></div>
   <div id="feedback" class="feedback"></div><div id="explanation" class="exam-summary" style="display:none"></div>
+  <section id="gptTransferPanel" class="gpt-transfer-panel" hidden aria-label="Continue in ChatGPT">
+    <p id="gptTransferStatus" role="status" aria-live="polite"></p>
+    <label id="gptTransferLabel" for="gptTransferPayload" hidden>Prompt and question to copy</label>
+    <textarea id="gptTransferPayload" readonly hidden></textarea>
+    <div class="setting-actions"><a id="gptTransferLink" class="btn" target="examflow-gpt" rel="noopener">Open saved ChatGPT page</a><button type="button" class="btn" onclick="document.getElementById('gptTransferPanel').hidden=true">Dismiss</button></div>
+  </section>
   <div class="actions">
     <button class="btn" id="prevBtn" onclick="previousQuestion()">← Previous</button>
     <div style="display:flex;gap:7px;flex-wrap:wrap">
@@ -254,7 +262,7 @@
   <div class="stats"><div class="stat"><small>Answered</small><b id="answeredCount">0</b></div><div class="stat"><small>Review</small><b id="reviewCount">0</b></div></div>
   <div id="qgrid" class="qgrid"></div>
 </aside>
-<div id="examProgressDrawer" class="exam-progress-drawer" role="complementary" aria-label="Question progress" aria-hidden="true">
+<div id="examProgressDrawer" class="exam-progress-drawer" role="complementary" aria-label="Question progress" aria-hidden="true" inert>
   <div class="drawer-head">
     <strong>Question Progress</strong>
     <button class="drawer-close" type="button" onclick="toggleQuestionProgress()" aria-label="Close question palette">×</button>
@@ -441,6 +449,31 @@
 <option value="60">60 minutes</option>
 </select></div></section>
 
+<section class="setting card prompt-setting" aria-labelledby="seedPromptHeading">
+  <h3 id="seedPromptHeading">Copy prompt</h3>
+  <p id="seedPromptHelp">Edit the full seed copied by the home page’s Copy prompt button. Include any instructions, schema, and examples you want to copy. Changes are saved in this browser.</p>
+  <label for="seedPromptEditor">Default seed prompt</label>
+  <textarea id="seedPromptEditor" spellcheck="false" aria-describedby="seedPromptHelp seedPromptStatus" oninput="editPrompt('seed')"></textarea>
+  <div id="seedPromptStatus" class="prompt-status" role="status" aria-live="polite"></div>
+  <div class="setting-actions"><button type="button" class="btn primary" onclick="savePrompt('seed')">Save seed prompt</button><button type="button" class="btn" onclick="restorePromptDefault('seed')">Restore default seed</button></div>
+</section>
+<section class="setting card prompt-setting" aria-labelledby="questionPromptHeading">
+  <h3 id="questionPromptHeading">GPT question prompt</h3>
+  <p id="questionPromptHelp">Edit the prompt opened by a question’s GPT button. Use <code>{{question}}</code> to insert the compact question data. If you leave it out, the question data is added at the end. The full seed above is not added.</p>
+  <label for="questionPromptEditor">Question prompt template</label>
+  <textarea id="questionPromptEditor" spellcheck="false" aria-describedby="questionPromptHelp questionPromptStatus" oninput="editPrompt('question')"></textarea>
+  <div id="questionPromptStatus" class="prompt-status" role="status" aria-live="polite"></div>
+  <div class="setting-actions"><button type="button" class="btn primary" onclick="savePrompt('question')">Save question prompt</button><button type="button" class="btn" onclick="restorePromptDefault('question')">Restore default question prompt</button></div>
+</section>
+
+<section class="setting card prompt-setting" aria-labelledby="gptDestinationHeading">
+  <h3 id="gptDestinationHeading">Where the GPT button opens</h3>
+  <p id="gptDestinationHelp">Leave this empty to open a new chat with your prompt. Or paste a ChatGPT conversation or GPT link. With a saved link, the button opens that page and copies the prompt plus question data for you to paste.</p>
+  <label for="gptDestination">ChatGPT link (optional)</label>
+  <input id="gptDestination" type="url" placeholder="https://chatgpt.com/c/…" autocomplete="off" spellcheck="false" aria-describedby="gptDestinationHelp gptDestinationStatus" oninput="editGPTDestination()">
+  <div id="gptDestinationStatus" class="prompt-status" role="status" aria-live="polite"></div>
+  <div class="setting-actions"><button type="button" class="btn primary" onclick="saveGPTDestination()">Save ChatGPT link</button><button type="button" class="btn" onclick="resetGPTDestination()">Use new chat</button></div>
+</section>
 <section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
 <div class="shortcut-grid">
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>4</kbd></span><span>Home / exam / plan / settings</span></div>
@@ -496,8 +529,9 @@
 <!-- SESSIONS -->
 <div id="sessionsModal" class="modal"><div class="modalbox" style="width:min(560px,100%)"><h2><svg class="ui-icon"><use href="#icon-database"/></svg> Saved sessions</h2><p>Restore a quiz exactly where you left it.</p><div id="mobileSessions"></div><div class="modalactions"><button class="btn" onclick="closeSessions()">Close</button></div></div></div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
 </body>
 </html>
+
