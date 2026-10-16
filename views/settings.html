@@ -1,0 +1,87 @@
+<!-- SETTINGS -->
+<section id="settingsView" class="view">
+<div class="dashboard">
+  <div class="dashhead"><div><h1><svg class="ui-icon"><use href="#icon-settings"/></svg> Settings</h1></div></div>
+  <div class="settings">
+    <section class="setting card setting-appearance"><h3><svg class="ui-icon"><use href="#icon-sun"/></svg> Appearance</h3>
+<div class="setting-actions"><button id="lightBtn" class="modebtn" onclick="setTheme('light')"><svg class="ui-icon"><use href="#icon-sun"/></svg>Light</button><button id="darkBtn" class="modebtn" onclick="setTheme('dark')"><svg class="ui-icon"><use href="#icon-moon"/></svg>Dark</button></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-brain"/></svg> Default mode</h3><div class="setting-actions"><button id="defaultPractice" class="modebtn" onclick="setDefaultMode('practice')">Practice</button><button id="defaultExam" class="modebtn" onclick="setDefaultMode('exam')">Exam</button></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-type"/></svg> Font</h3><div class="setting-control"><select id="fontSelect" onchange="saveSettings()">
+<option value="System Default">System default</option>
+<option value="Serif Elegant">Serif Elegant</option>
+<option value="Modern Rounded">Modern Rounded</option>
+<option value="Monospace">Monospace</option>
+<option value="Source Serif">Source Serif 4</option>
+<option value="Libre Baskerville">Libre Baskerville</option>
+<option value="Lora">Lora</option>
+<option value="DM Sans">DM Sans</option>
+<option value="Nunito Sans">Nunito Sans</option>
+<option value="Inter">Inter</option>
+<option value="Roboto">Roboto</option>
+<option value="Open Sans">Open Sans</option>
+<option value="Manrope">Manrope</option>
+<option value="Merriweather">Merriweather</option>
+<option value="IBM Plex Mono">IBM Plex Mono</option>
+<option value="JetBrains Mono">JetBrains Mono</option>
+<option value="Fira Code">Fira Code</option>
+</select></div></section>
+    <section class="setting card setting-text-size"><h3><svg class="ui-icon"><use href="#icon-text"/></svg> Text size</h3><div class="setting-control"><select id="questionTextSizeSelect" onchange="saveSettings()">
+<option value="small">Small</option>
+<option value="standard">Standard</option>
+<option value="large">Large</option>
+<option value="extra-large">Extra large</option>
+</select></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-width"/></svg> Exam width</h3><div class="setting-control"><select id="examCardWidthSelect" onchange="saveSettings()">
+<option value="compact">Compact</option>
+<option value="balanced">Balanced</option>
+<option value="spacious">Spacious</option>
+</select></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-palette"/></svg> Color scheme</h3><div class="setting-control"><select id="colorSchemeSelect" onchange="saveSettings()">
+<option value="classic">ExamFlow Classic</option>
+<option value="ocean">Ocean Blue</option>
+<option value="forest">Forest Study</option>
+<option value="sunset">Warm Sunset</option>
+<option value="slate">Slate Ink</option>
+</select></div></section>
+    <section class="setting card setting-sounds"><h3><svg class="ui-icon"><use href="#icon-volume"/></svg> Sounds</h3><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)"><svg class="ui-icon"><use href="#icon-volume"/></svg>On</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test</button></div></section>
+    <section class="setting card setting-duration"><h3><svg class="ui-icon"><use href="#icon-clock"/></svg> Default duration</h3><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
+<option value="5">5 minutes</option><option value="10">10 minutes</option>
+<option value="15">15 minutes</option><option value="20">20 minutes</option>
+<option value="30">30 minutes</option><option value="45">45 minutes</option>
+<option value="60">60 minutes</option>
+</select></div></section>
+
+<!-- include: partials/prompt-library.html -->
+<section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
+<div class="shortcut-grid">
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>4</kbd></span><span>Home / exam / plan / settings</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>I</kbd></span><span>Import quiz</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>X</kbd></span><span>Export data</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>S</kbd></span><span>Save session</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>D</kbd></span><span>Light / dark</span></div>
+<div><span class="shortcut-keys"><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Enter</kbd></span><span>Load quiz / plan test</span></div>
+<div><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Close</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>E</kbd> / <kbd>P</kbd></span><span>Exam / practice</span></div>
+<div><span class="shortcut-keys"><kbd>H</kbd></span><span>Show / hide hint</span></div>
+<div><span class="shortcut-keys"><kbd>P</kbd></span><span>Question palette</span></div>
+<div><span class="shortcut-keys"><kbd>G</kbd></span><span>Open ChatGPT</span></div>
+<div><span class="shortcut-keys"><kbd>C</kbd></span><span>Copy question</span></div>
+<div><span class="shortcut-keys"><kbd>V</kbd></span><span>View answer in practice</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>S</kbd></span><span>Submit quiz</span></div>
+<div><span class="shortcut-keys"><kbd>R</kbd></span><span>Mark for review</span></div>
+<div><span class="shortcut-keys"><kbd>1</kbd>–<kbd>4</kbd></span><span>Select answer</span></div>
+<div><span class="shortcut-keys"><kbd>Enter</kbd></span><span>Check / confirm</span></div>
+<div><span class="shortcut-keys"><kbd>←</kbd> / <kbd>→</kbd></span><span>Previous / next</span></div>
+<div><span class="shortcut-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></span><span>Clear answer</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd></span><span>Retake / save / home</span></div>
+</div></section>
+<section class="setting card setting-data"><h3><svg class="ui-icon"><use href="#icon-database"/></svg> Local data</h3><div class="setting-actions">
+<button class="btn" onclick="exportData()">Export JSON</button>
+<label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>
+<button class="btn" onclick="resetData()">Reset data</button>
+</div>
+<div id="dataImportStatus" class="paste-status" style="margin-top:8px" hidden></div></section>
+  </div>
+</div>
+</section>

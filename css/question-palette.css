@@ -1,0 +1,92 @@
+/* Keep each breakpoint's anchor identical in both open and closed states. */
+#examView {
+  --palette-duration: 280ms;
+  --palette-ease: cubic-bezier(.22, .8, .25, 1);
+}
+#examView #examProgressDrawer {
+  display: block;
+  box-sizing: border-box;
+  min-height: 0;
+  height: fit-content !important;
+  padding: 14px !important;
+  border: 1px solid var(--line);
+  border-radius: 16px !important;
+  background: var(--surface);
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+  z-index: 10001 !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(calc(100% + 18px));
+  box-shadow: 0 12px 28px rgba(18, 28, 48, .12);
+  transition: transform var(--palette-duration) var(--palette-ease),
+    opacity var(--palette-duration) ease,
+    visibility 0s linear var(--palette-duration);
+}
+#examView #examProgressDrawer.open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(0);
+  transition-delay: 0s;
+}
+body:not(.exam-active) #examProgressDrawer,
+body:not(.exam-active) .exam-progress-backdrop { display: none !important; }
+
+@media (min-width: 801px) {
+  body.exam-active #examView .main {
+    display: block !important;
+    width: min(940px, calc(100vw - 48px)) !important;
+    max-width: 940px !important;
+  }
+  #examView .main > main {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+  }
+  #examView .main > main .question { margin-left: auto !important; margin-right: auto !important; }
+  #examView #examProgressDrawer {
+    position: fixed !important;
+    inset: 56px 12px auto auto !important;
+    width: 270px !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 64px) !important;
+  }
+  .exam-progress-backdrop { display: none !important; }
+}
+@media (max-width: 800px) {
+  #examView #examProgressDrawer {
+    position: fixed !important;
+    inset: 56px 8px auto auto !important;
+    width: min(280px, calc(100vw - 16px)) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 64px) !important;
+  }
+  .exam-progress-backdrop {
+    display: block !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 10000 !important;
+    background: rgba(12, 18, 30, .28);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 280ms ease, visibility 0s linear 280ms;
+  }
+  .exam-progress-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.exam-active #examView .main,
+  #examView #examProgressDrawer,
+  .exam-progress-backdrop { transition: none !important; }
+}

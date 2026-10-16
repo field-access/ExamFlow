@@ -1246,45 +1246,110 @@ DEFAULT MODE:
 If the user says only "CBQ" and gives no specialized command, use CBQ/mental/depth: deep understanding plus problem-solving aptitude. A supplied CBQ/ command replaces this default or adds specialized modes.
 Unless CBQ/5x25 is requested, create exactly 5 connected, progressively deeper questions. CBQ/5x25 instead requires 5 core ideas followed by 25 reinforcement questions.`;
 
-function copyBeginnerSchema(){
-  const source=document.getElementById("beginnerSchema");
-  if(!source)return;
-  const schema=source.value||source.textContent||"";
-  const text=`Create a Concept Breakdown Quiz (CBQ) about: [TOPIC]
+let promptLibrary={version:1,activeId:null,prompts:[]};
+const promptDrafts=new Map();
+const fixedQuestionPrompt="Create 5 connected Concept Breakdown Quiz questions that build reasoning toward this problem, ending with transfer. Use plain English. Honor CBQ/ modes in the source (default mental/depth; 5x25 means 5 core ideas + 25 questions). Include answers and concise explanations; optional hints. Return only a JSON code block using this ExamFlow structure (MCQs: 2 options, answer A or B). Escape LaTeX backslashes in JSON.\n{\"name\":\"CBQ\",\"sections\":[{\"name\":\"Reasoning\",\"timeMinutes\":10,\"marks\":1,\"negativeMarks\":0,\"questions\":[{\"type\":\"mcq\",\"question\":\"…\",\"options\":[\"…\",\"…\"],\"answer\":\"A\",\"explanation\":\"…\"}]}]}\nSource: {{question}}";
+function validPromptLibrary(data){
+ if(!data||data.version!==1||!Array.isArray(data.prompts)||!data.prompts.length)throw Error("No prompt slots found.");
+ const ids=new Set();
+ for(const p of data.prompts){
+  if(!p||typeof p.id!=="string"||ids.has(p.id)||typeof p.name!=="string"||!p.name.trim()||typeof p.text!=="string")throw Error("Each slot needs a unique ID, name and prompt.");
+  ids.add(p.id);
+ }
+ return {version:1,prompts:data.prompts.map(p=>({id:p.id,name:p.name,text:p.text})),activeId:ids.has(data.activeId)?data.activeId:data.prompts[0].id};
+}
+function activePrompt(){return promptLibrary.prompts.find(p=>p.id===promptLibrary.activeId)}
+function getPromptText(){return activePrompt()?.text||""}
+function promptStatus(message,error=false){
+ const status=document.getElementById("seedPromptStatus");
+ status.textContent=message;status.style.color=error?"var(--bad)":"var(--muted)";
+}
+function renderPromptSlots(){
+ const list=document.getElementById("promptSlotList");if(!list)return;
+ list.replaceChildren();
+ for(const p of promptLibrary.prompts){
+  const draft=promptDrafts.get(p.id),name=draft?.name||p.name,text=draft?.text??p.text;
+  const button=document.createElement("button");button.type="button";button.className="prompt-slot"+(p.id===promptLibrary.activeId?" is-active":"");button.setAttribute("aria-pressed",String(p.id===promptLibrary.activeId));
+  const title=document.createElement("strong");title.textContent=name;
+  const meta=document.createElement("span");meta.textContent=`${text.length.toLocaleString()} chars${draft?" · Draft":""}${p.id===promptLibrary.activeId&&p.text.trim()?" · Used for copying":""}`;
+  button.append(title,meta);button.onclick=()=>selectPromptSlot(p.id);list.append(button);
+ }
+ if(!list.children.length){const empty=document.createElement("p");empty.className="prompt-empty";empty.textContent="No prompts yet.";list.append(empty)}
+ document.getElementById("promptSlotCount").textContent=`${promptLibrary.prompts.length} slots`;
+}
+function renderPromptSettings(){
+ const editor=document.getElementById("seedPromptEditor");if(!editor)return;
+ const p=activePrompt(),draft=p&&promptDrafts.get(p.id);
+ document.getElementById("promptSlotName").value=draft?.name??p?.name??"";
+ editor.value=draft?.text??p?.text??"";
+ document.querySelectorAll(".prompt-library-edit").forEach(el=>el.disabled=!p);
+ const remove=document.getElementById("deletePromptBtn");if(remove)remove.disabled=promptLibrary.prompts.length<2;
+ renderPromptSlots();
+ promptStatus(p?`${editor.value.length.toLocaleString()} characters · ${draft?"Draft preserved":"Saved slot"}`:"No prompts loaded. Serve the project over HTTP to load the prompt library.");
+}
+function editPrompt(){
+ const p=activePrompt();if(!p)return;
+ promptDrafts.set(p.id,{name:document.getElementById("promptSlotName").value,text:document.getElementById("seedPromptEditor").value});
+ backupPromptLibrary();renderPromptSlots();promptStatus(`${document.getElementById("seedPromptEditor").value.length.toLocaleString()} characters · Draft preserved`);
+}
+function selectPromptSlot(value){if(!promptLibrary.prompts.some(p=>p.id===value))return;promptLibrary.activeId=value;backupPromptLibrary();renderPromptSettings()}
+function backupPromptLibrary(){put("examflow_prompt_library_v1",{...promptLibrary,drafts:Object.fromEntries(promptDrafts)})}
+function savePrompt(){
+ const p=activePrompt();if(!p)return false;
+ const name=document.getElementById("promptSlotName").value.trim(),text=document.getElementById("seedPromptEditor").value;
+ if(!name||!text.trim()){promptStatus("Enter a slot name and prompt.",true);return false}
+ p.name=name;p.text=text;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();promptStatus("Prompt saved.");return true;
+}
+function addPromptSlot(duplicate=false){
+ const current=activePrompt(),draft=current&&promptDrafts.get(current.id);
+ if(!current){promptStatus("Load the prompt library first.",true);return}
+ const p={id:id(),name:duplicate?`${draft?.name||current?.name||"Prompt"} copy`:`New prompt ${promptLibrary.prompts.length+1}`,text:duplicate?(draft?.text??current.text):""};
+ promptLibrary.prompts.push(p);promptLibrary.activeId=p.id;
+ if(!duplicate)promptDrafts.set(p.id,{name:p.name,text:""});
+ backupPromptLibrary();renderPromptSettings();document.getElementById("promptSlotName").focus();
+}
+function discardPromptDraft(){
+ const p=activePrompt();if(!p)return;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();
+}
+function deletePromptSlot(){
+ const p=activePrompt();if(!p||promptLibrary.prompts.length<2)return;
+ if(!confirm(`Delete “${p.name}” and its draft?`))return;
+ promptLibrary.prompts=promptLibrary.prompts.filter(item=>item.id!==p.id);promptDrafts.delete(p.id);promptLibrary.activeId=promptLibrary.prompts[0].id;backupPromptLibrary();renderPromptSettings();
+}
+function copyPromptDraft(){
+ const text=document.getElementById("seedPromptEditor").value;if(!text.trim()){promptStatus("Write a prompt before copying.",true);return}
+ copyBeginnerSchema(text);
+}
+async function initPromptLibrary(){
+ try{
+  const response=await fetch("seed-prompts.json");if(!response.ok)throw Error("Prompt file unavailable");
+  const defaults=validPromptLibrary(await response.json());
+  promptLibrary=defaults;
+ }catch(error){}
+ try{
+  const backup=get("examflow_prompt_library_v1",null);
+  if(backup){
+   const saved=validPromptLibrary(backup);
+   // Add newly shipped slots without overwriting existing custom prompts.
+   for(const p of promptLibrary.prompts)if(!saved.prompts.some(item=>item.id===p.id)){saved.prompts.push(p);}
+   promptLibrary={version:1,activeId:saved.activeId,prompts:saved.prompts};
 
-What a CBQ means:
-A CBQ breaks one difficult topic into a sequence of small, connected questions. Each question should build the reasoning needed for the next step, moving from core ideas to application and finally to a clear solution. Do not make a list of unrelated recall questions.
+   for(const [slotId,draft] of Object.entries(backup.drafts||{}))if(saved.prompts.some(p=>p.id===slotId)&&typeof draft?.text==="string"&&typeof draft?.name==="string")promptDrafts.set(slotId,draft);
+  }
+ }catch(error){}
+ // Repair blank slots made by the previous version, which copied saved text behind an empty draft.
+ for(const p of promptLibrary.prompts){
+  if(/^New prompt \d+$/.test(p.name)&&promptDrafts.get(p.id)?.text==="")p.text="";
+ }
+ if(settings.seedPrompt&&promptLibrary.prompts.length&&!promptLibrary.prompts.some(p=>p.id==="legacy")){
+  promptLibrary.prompts.push({id:"legacy",name:"Previous custom prompt",text:settings.seedPrompt});promptLibrary.activeId="legacy";backupPromptLibrary();
+ }
+ renderPromptSettings();
+}
 
-${CBQ_MODE_GUIDE}
-
-Your task:
-- Replace [TOPIC] with the topic or source material I provide.
-- Create a coherent quiz that tests understanding and step-by-step reasoning.
-- Include useful explanations for every question.
-- Add an optional "hint" for questions where a small nudge would help, without giving away the answer.
-- Use the question types that best fit the topic: mcq, true_false, fill_blank, match, drag_drop, ordering, or image_choice.
-- Give every question a correct answer and marks. Use negativeMarks only when appropriate.
-- Keep all question and answer text inside the JSON values.
-- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
-
-Math and LaTeX:
-- Use inline LaTeX such as $E=mc^2$ inside JSON strings when helpful.
-- Use display LaTeX such as $$\\int_0^1 x^2 dx$$ when a separate equation is needed.
-- ExamFlow renders this math with KaTeX, so keep LaTeX valid and do not use HTML for equations.
-- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
-
-Images:
-- For image questions, use a publicly accessible HTTPS image URL in the "image" field.
-- Do not use a local computer path. Example: "image": "https://your-site.example/diagram.png".
-
-Output rules:
-- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
-- Return only that JSON code block. Do not include commentary or headings outside the code block.
-- Follow the complete ExamFlow schema below.
-- Make the JSON directly usable by pasting it into ExamFlow's CBQ loader.
-
-ExamFlow CBQ schema:
-${schema}`;
+function copyBeginnerSchema(override){
+  const text=typeof override==="string"?override:getPromptText();
+  if(!text){toast("Choose a saved prompt with text in Settings first");return}
   const done=()=>toast("AI CBQ prompt and schema copied ✓");
   if(navigator.clipboard?.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>{
@@ -1513,69 +1578,11 @@ async function redirectQuestionToChatGPT(){
  if(Array.isArray(q.pairs)&&q.pairs.length)
    source+=`\nPairs: ${q.pairs.map(p=>`${p.left} → ${p.right}`).join(" | ")}`;
 
- const prompt=`Create a Concept Breakdown Quiz (CBQ) for the question below.
-
-WHAT IS A CBQ:
-A CBQ is a sequence of step-by-step questions that breaks the original problem into smaller conceptual reasoning steps. It should guide the learner from basic understanding toward the original question, rather than simply asking recall questions or giving the answer. Follow the selected command for the number and style of questions.
-
-${CBQ_MODE_GUIDE}
-
-REQUIREMENTS:
-- Follow the question count required by the selected command. Create exactly 5 questions by default, or 25 reinforcement questions after 5 core ideas for CBQ/5x25.
-- Make them progressively more challenging.
-- Follow the reasoning path needed to solve the original question.
-- Do not simply repeat the original question.
-- Each CBQ should help establish a concept or reasoning step needed for the next one.
-- Use the same subject terminology as the original question.
-- Include explanations for each CBQ.
-- Add a short optional "hint" when useful; hints should guide reasoning without revealing the answer.
-- Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
-- Use exactly 2 options for MCQs by default.
-- Put mathematical expressions in $...$ or $$...$$.
-- Double every LaTeX backslash in JSON strings: write \\\\lambda, \\\\epsilon, and \\\\|, not a single backslash.
-- Generate the CBQ inside a JSON code block using the \`\`\`json ... \`\`\` format.
-- Return only that JSON code block. Do not include prose outside the code block.
-- The JSON must be valid JSON.
-
-USE THIS CBQ JSON SCHEMA:
-{
-  "name": "CBQ — <topic>",
-  "sections": [
-    {
-      "name": "Concept Breakdown",
-      "timeMinutes": 10,
-      "marks": 1,
-      "negativeMarks": 0,
-      "questions": [
-        {
-          "type": "mcq",
-          "question": "Question text or $LaTeX$",
-          "options": ["Option A", "Option B"],
-          "answer": "A",
-          "hint": "A short optional nudge toward the underlying concept.",
-          "explanation": "Explanation with $LaTeX$ where needed."
-        }
-      ]
-    }
-  ]
-}
-
-SUPPORTED QUESTION TYPES:
-- mcq: question, options, answer, optional hint and explanation
-- true_false: question, answer (True or False), optional hint and explanation
-- fill_blank: question, acceptedAnswers, optional hint and explanation
-- match: question, pairs, optional hint and explanation
-- drag_drop: question, pairs, optional hint and explanation
-- ordering: question, items, answer, optional hint and explanation
-- image: question, image (prefer a publicly accessible HTTPS URL), options, answer, optional hint and explanation
-- image_choice: question, image, options, answer, optional hint and explanation
-
-ALIASES MAY INCLUDE:
-text, choices, correct, points, negative, duration, category, topic, reason, solution, rationale, hint.
-
-Generate the CBQ from this original question:
-
-${source}`;
+ const template=fixedQuestionPrompt;
+ if(!template){toast("Load seed-prompts.json in Settings first");return}
+ const prompt=template.includes("{{question}}")
+   ?template.split("{{question}}").join(source)
+   :`${template}\n\nSource: ${source}`;
 
  const url="https://chatgpt.com/?q="+encodeURIComponent(prompt);
  const w=window.open(url,"_blank");
@@ -2210,6 +2217,7 @@ function applyQuestionSidebarState(){
   d.classList.toggle("open",open);
   document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
   d.setAttribute("aria-hidden",String(!open));
+  d.inert=!open;
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
   if(b)b.setAttribute("aria-hidden",String(!open));
@@ -2225,6 +2233,8 @@ function toggleQuestionProgress(){
   d.classList.toggle("open",open);
   document.querySelector("#examView .main")?.classList.toggle("palette-open",open);
   d.setAttribute("aria-hidden",String(!open));
+  if(!open&&d.contains(document.activeElement))document.getElementById("examProgressBtn")?.focus({preventScroll:true});
+  d.inert=!open;
   document.getElementById("examProgressBtn")?.setAttribute("aria-expanded",String(open));
   if(b)b.classList.toggle("open",open);
   if(b)b.setAttribute("aria-hidden",String(!open));
@@ -2428,7 +2438,7 @@ function showView(name){
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
- updateTheme();updateModeUI()}
+ renderPromptSettings();updateTheme();updateModeUI()}
 }
 function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
 function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
@@ -2671,6 +2681,6 @@ setInterval(()=>{
 
 window.addEventListener("beforeunload",saveSession);
 
-applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
+initPromptLibrary();applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
 
 initPersistentBackup();

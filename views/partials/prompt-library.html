@@ -1,0 +1,12 @@
+<section id="promptLibrary" class="prompt-settings-card">
+<div class="prompt-library-head"><div><span class="prompt-eyebrow">CBQ LAB</span><h3>Your prompt collection</h3><p>Choose a saved prompt for copying, or experiment with a draft.</p></div><span id="promptSlotCount" class="prompt-count">0 slots</span></div>
+<div class="prompt-workspace">
+<div class="prompt-slot-sidebar" aria-label="Prompt slots"><div id="promptSlotList" class="prompt-slot-list"></div><button class="btn prompt-new-slot" type="button" onclick="addPromptSlot()">+ New prompt</button></div>
+<div class="prompt-edit-pane">
+<div class="prompt-name-row"><label for="promptSlotName">Prompt name<input id="promptSlotName" class="prompt-library-edit" oninput="editPrompt()" placeholder="Name this experiment"></label><div class="prompt-slot-tools"><button class="btn prompt-library-edit" type="button" onclick="addPromptSlot(true)">Duplicate</button><button id="deletePromptBtn" class="btn" type="button" onclick="deletePromptSlot()">Delete</button></div></div>
+<label class="prompt-editor-label" for="seedPromptEditor">Seed prompt <span>Paste your instructions and schema</span></label>
+<textarea id="seedPromptEditor" class="prompt-editor prompt-library-edit" rows="14" spellcheck="false" placeholder="Write your CBQ prompt here…" aria-describedby="seedPromptStatus" oninput="editPrompt()"></textarea>
+<div id="seedPromptStatus" class="prompt-status" role="status"></div>
+<div class="prompt-editor-actions"><button class="btn primary prompt-library-edit" type="button" onclick="savePrompt()">Save slot</button><button class="btn prompt-library-edit" type="button" onclick="copyPromptDraft()">Copy draft</button><button class="btn prompt-library-edit" type="button" onclick="copyBeginnerSchema()">Copy saved</button><button class="btn prompt-library-edit" type="button" onclick="discardPromptDraft()">Discard edits</button></div>
+</div></div>
+</section>
