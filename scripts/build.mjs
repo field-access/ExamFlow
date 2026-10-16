@@ -1,4 +1,4 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,5 +19,12 @@ async function render(file, ancestors = []) {
   return output;
 }
 
-await writeFile(path.join(root, 'index.html'), await render('index.html'));
-console.log('Built index.html from views/');
+const html = await render('index.html');
+const output = path.join(root, 'public');
+await mkdir(output, { recursive: true });
+await writeFile(path.join(root, 'index.html'), html);
+await writeFile(path.join(output, 'index.html'), html);
+for (const asset of ['app.js', 'styles.css', 'seed-prompts.json', 'css', 'js']) {
+  await cp(path.join(root, asset), path.join(output, asset), { recursive: true });
+}
+console.log('Built index.html and static assets in public/');

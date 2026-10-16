@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",study:"examflow_study_activity_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -1551,7 +1551,7 @@ function saveSession(){
  const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
  const item={id:sid,examId:examId||sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
  const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
- put(K.sessions,sessions);renderSessions()
+ put(K.sessions,sessions);recordStudyActivity(item);renderSessions()
 }
 let saveTimer;function saveSessionSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(saveSession,120)}
 function renderSessions(){
@@ -1863,75 +1863,7 @@ function renderStackedRows(items,renderRow,emptyMessage){
  for(let i=0;i<list.length;i+=10)columns.push(list.slice(i,i+10));
  return `<div class="stacked-list">${columns.map(column=>`<div class="stack-column">${column.map(renderRow).join("")}</div>`).join("")}</div>`;
 }
-function renderContinueStudying(sessions,openedAtFor){
- const items=(Array.isArray(sessions)?sessions:[]).map(session=>{
-  const candidates=[openedAtFor(session),session.updatedAt,session.createdAt];
-  let date=null;
-  for(const candidate of candidates){
-   if(!candidate)continue;
-   const parsed=new Date(candidate);
-   if(!Number.isNaN(parsed.getTime())){date=parsed;break}
-  }
-  return {session,date};
- }).sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0));
- if(!items.length)return '<div class="empty">No saved sessions. Add a CBQ to begin.</div>';
-
- const startOfWeek=date=>{
-  const start=new Date(date.getFullYear(),date.getMonth(),date.getDate());
-  start.setDate(start.getDate()-(start.getDay()+6)%7);
-  return start;
- };
- const today=new Date();
- const thisWeek=startOfWeek(today);
- const lastWeek=new Date(thisWeek);
- lastWeek.setDate(lastWeek.getDate()-7);
- const weekGroups=new Map();
- items.forEach(item=>{
-  const weekStart=item.date?startOfWeek(item.date):null;
-  const weekKey=weekStart?weekStart.getTime():"undated";
-  if(!weekGroups.has(weekKey))weekGroups.set(weekKey,{weekStart,days:new Map()});
-  const week=weekGroups.get(weekKey);
-  const dayKey=item.date
-   ?`${item.date.getFullYear()}-${String(item.date.getMonth()+1).padStart(2,"0")}-${String(item.date.getDate()).padStart(2,"0")}`
-   :"undated";
-  if(!week.days.has(dayKey))week.days.set(dayKey,[]);
-  week.days.get(dayKey).push(item);
- });
-
- const weekLabel=weekStart=>{
-  if(!weekStart)return"Date unavailable";
-  if(weekStart.getTime()===thisWeek.getTime())return"This week";
-  if(weekStart.getTime()===lastWeek.getTime())return"Last week";
-  const end=new Date(weekStart);
-  end.setDate(end.getDate()+6);
-  const startText=weekStart.toLocaleDateString(undefined,{month:"short",day:"numeric"});
-  const endText=end.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
-  return`Week of ${startText} – ${endText}`;
- };
- const dayLabel=date=>{
-  const dayStart=new Date(date.getFullYear(),date.getMonth(),date.getDate());
-  const todayStart=new Date(today.getFullYear(),today.getMonth(),today.getDate());
-  const yesterdayStart=new Date(todayStart);
-  yesterdayStart.setDate(yesterdayStart.getDate()-1);
-  if(dayStart.getTime()===todayStart.getTime())return"Today";
-  if(dayStart.getTime()===yesterdayStart.getTime())return"Yesterday";
-  return date.toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
- };
- const renderRow=({session,date})=>{
-  const openedText=date
-   ?`Last opened ${date.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
-   :"Last opened time unavailable";
-  const answered=Array.isArray(session.answers)?session.answers.filter(Boolean).length:0;
-  const questionCount=Array.isArray(session.questions)?session.questions.length:0;
-  return `<div class="resultrow home-session-row"><div class="resultmain"><strong>${esc(session.name||"Untitled quiz")}</strong><small>${answered}/${questionCount} answered · ${session.mode==="practice"?"Practice":"Exam"}</small><small class="home-session-opened">${openedText}</small></div><div class="home-session-actions"><button class="btn" onclick="restoreSession(&apos;${esc(session.id)}&apos;)">Continue</button><button class="session-delete2" aria-label="Delete saved session" onclick="deleteSession(&apos;${esc(session.id)}&apos;)">×</button></div></div>`;
- };
- return `<div class="home-session-groups">${[...weekGroups.values()].map(week=>{
-  const days=[...week.days.entries()].map(([key,dayItems])=>({
-   key,items:dayItems,date:dayItems[0].date
-  })).sort((a,b)=>(b.date?.getTime()||0)-(a.date?.getTime()||0));
-  return `<section class="home-session-week"><h4 class="home-session-week-heading">${esc(weekLabel(week.weekStart))}</h4>${days.map(day=>`<section class="home-session-day"><h5 class="home-session-date-heading">${esc(day.date?dayLabel(day.date):"Date unavailable")}</h5>${day.items.map(renderRow).join("")}</section>`).join("")}</section>`;
- }).join("")}</div>`;
-}
+function renderContinueStudying(sessions){return renderStudyWorkspace(sessions)}
 function planSortNewestFirst(a,b){
  const created=String(b.createdAt||"").localeCompare(String(a.createdAt||""));
  if(created)return created;
@@ -2066,7 +1998,7 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions","exams","recent"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent","study"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
 
@@ -2084,6 +2016,7 @@ async function importDataFile(event){
     if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
     if(parsed.plans!==undefined)put(K.plans,Array.isArray(parsed.plans)?parsed.plans:[]);
     if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
+    if(parsed.study!==undefined)put(K.study,Array.isArray(parsed.study)?parsed.study:[]);
     if(parsed.exams!==undefined)put(K.exams,Array.isArray(parsed.exams)?parsed.exams:[]);
     if(parsed.recent!==undefined)put(K.recent,Array.isArray(parsed.recent)?parsed.recent:[]);
     if(parsed.examDeadline!==undefined){
@@ -2113,7 +2046,7 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
 }
 function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
 
@@ -2400,6 +2333,8 @@ function readHomeFile(e){
 function renderHome(){
  renderRecentQuizzes();
  const rs=get(K.results,[]),ss=get(K.sessions,[]),ps=get(K.plans,[]);
+ const studyList=document.getElementById("homeSessionsList");
+ if(studyList)studyList.innerHTML=renderContinueStudying(ss.slice().sort((a,b)=>String(b.updatedAt||"").localeCompare(String(a.updatedAt||""))));
  const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.percent,0)/rs.length):0,best=rs.length?Math.max(...rs.map(r=>r.percent)):0;
  const solved=rs.reduce((a,r)=>a+(Number(r.correct)||0),0);
  const homeMetrics={homeTests:rs.length,homeQuestions:solved};
