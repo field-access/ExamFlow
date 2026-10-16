@@ -1,0 +1,67 @@
+/* Small, restrained accents distinguish actions without coloring the surfaces. */
+body {
+  --control-info:#536d97;
+  --control-study:#75618c;
+  --control-plan:#4b775d;
+  --control-warm:#92672f;
+  --control-danger:#ad514c;
+}
+body.dark {
+  --control-info:#a9bad7;
+  --control-study:#bdacd0;
+  --control-plan:#a4c2ad;
+  --control-warm:#d2b58b;
+  --control-danger:#dca29b;
+}
+body .btn:not(.primary) {
+  color:var(--primary);
+  border-color:color-mix(in srgb,var(--primary) 22%,var(--line));
+  background:linear-gradient(145deg,color-mix(in srgb,var(--primary) 3%,var(--surface)),var(--surface));
+  box-shadow:0 1px 2px rgba(20,30,26,.035);
+}
+body .btn:not(.primary):hover {
+  border-color:color-mix(in srgb,var(--primary) 45%,var(--line));
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface));
+}
+body .btn, body .modebtn, body .bookmark { font-weight:650; }
+body .modebtn {
+  background:var(--surface);
+  border-color:var(--line);
+  color:var(--muted);
+}
+body .modebtn.active, #examView .modepicker .modebtn.active {
+  color:var(--primary);
+  background:color-mix(in srgb,var(--primary) 10%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
+  box-shadow:none;
+}
+body .ui-icon { color:var(--icon-tone,var(--primary))!important; }
+.ui-icon:has(use[href="#icon-brain"]) { --icon-tone:var(--control-study); }
+.ui-icon:has(use[href="#icon-copy"]), .ui-icon:has(use[href="#icon-external"]),
+.ui-icon:has(use[href="#icon-file"]) { --icon-tone:var(--control-info); }
+.ui-icon:has(use[href="#icon-calendar"]), .ui-icon:has(use[href="#icon-chart"]) { --icon-tone:var(--control-plan); }
+.ui-icon:has(use[href="#icon-bookmark"]), .ui-icon:has(use[href="#icon-lightbulb"]),
+.ui-icon:has(use[href="#icon-sun"]) { --icon-tone:var(--control-warm); }
+body :is(.btn.primary,.logo) .ui-icon,
+body :is(.modebtn.active,.topnav button.active,.nav button.active) .ui-icon { color:inherit!important; }
+#examView #copyQuestionBtn {
+  color:var(--control-info);
+  background:color-mix(in srgb,var(--control-info) 5%,var(--surface));
+  border-color:color-mix(in srgb,var(--control-info) 25%,var(--line));
+}
+#examView #viewAnswerBtn, #examView #bookmark {
+  color:var(--control-warm)!important;
+  background:color-mix(in srgb,var(--control-warm) 5%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--control-warm) 25%,var(--line));
+}
+#examView #bookmark.saved {
+  background:color-mix(in srgb,var(--control-warm) 13%,var(--surface));
+  border-color:var(--control-warm);
+}
+#promptLibrary #deletePromptBtn, body .session-delete, body .session-delete2 {
+  color:var(--control-danger);
+  background:color-mix(in srgb,var(--control-danger) 4%,var(--surface));
+  border-color:color-mix(in srgb,var(--control-danger) 24%,var(--line));
+}
+body .btn:disabled, body .modebtn:disabled { opacity:.45; box-shadow:none; }
+body.dark .header-right .btn:not(.primary) { color:var(--primary)!important; }

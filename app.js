@@ -887,7 +887,7 @@ function renderSpecialQuestion(q,opts){
    const input=document.createElement("input");
    input.className="fill-answer";input.placeholder="Type your answer…";input.autocomplete="off";
    input.value=answers[current]||"";
-   input.oninput=()=>{answers[current]=input.value;checkedQuestions.delete(current);saveSessionSoon()};
+   input.oninput=()=>{answers[current]=input.value;checkedQuestions.delete(current);clearVerifiedFeedback();saveSessionSoon()};
    input.onkeydown=e=>{
      if(e.key==="Enter"&&!e.shiftKey&&!e.ctrlKey&&!e.metaKey){
        e.preventDefault();e.stopPropagation();checkCurrentAnswer();
@@ -936,7 +936,7 @@ function renderSpecialQuestion(q,opts){
      };
      wrap.append(trigger,menu);
 
-     if(checkedQuestions.has(current)){
+     if(mode==="practice"&&checkedQuestions.has(current)){
        const ok=String(chosen[i]??"").trim().toLowerCase()===String(pair.right??"").trim().toLowerCase();
        row.classList.add(ok?"match-correct":"match-wrong");
        const label=document.createElement("div");label.className="match-result-label";label.textContent=ok?"✓ Correct":"✕ Incorrect";
@@ -1485,7 +1485,7 @@ function render(){
    if(hasHint){setQuizRichText(hintText,q.hint);renderAllQuizMath(hintText)}
  }
  renderQuestionImage(q);
- const opts=document.getElementById("options");opts.innerHTML="";
+ const opts=document.getElementById("options");opts.innerHTML="";opts.classList.remove("answer-revealed");
  renderSpecialQuestion(q,opts);
  if(q.type==="fill_blank")opts.querySelector(".fill-answer")?.focus({preventScroll:true});
  renderMath();
@@ -1494,16 +1494,16 @@ function render(){
  const fb=document.getElementById("feedback");
  const ex=document.getElementById("explanation");
  const ap=document.getElementById("practiceAnswerPanel");
- if(ap && !checkedQuestions.has(current))ap.style.display="none";
- if(mode==="practice"&&answers[current]&&checkedQuestions.has(current)){
-   const correct=isQuestionCorrect(q,answers[current]);
-   fb.textContent=correct?"✓ Correct":"✕ Incorrect — review the concept";
-   fb.style.color=correct?"var(--good)":"var(--bad)";
-   if(q.explanation){
-     ex.style.display="block";
-     setQuizExplanation(ex,q.explanation);
-   }else ex.style.display="none";
- }else{fb.textContent="";ex.style.display="none";}
+ fb.removeAttribute("data-result");
+ if(mode==="practice"&&checkedQuestions.has(current)){
+   const hasAnswer=answerIsPresent(answers[current],q),correct=hasAnswer&&isQuestionCorrect(q,answers[current]);
+   fb.textContent=hasAnswer?(correct?"✓ Correct":"✕ Incorrect — check the answer below"):"";
+   fb.style.color="";
+   if(hasAnswer)fb.dataset.result=correct?"correct":"wrong";
+   applyVerifiedAnswerStyles(q,answers[current]);
+   showPracticeAnswerPanel(q);
+   if(q.explanation){ex.style.display="block";setQuizExplanation(ex,q.explanation)}else ex.style.display="none";
+ }else{fb.textContent="";ex.style.display="none";if(ap)ap.style.display="none";}
  const bookmark=document.getElementById("bookmark");
  bookmark.innerHTML=`<svg class="ui-icon"><use href="#icon-bookmark"/></svg>${reviews.has(current)?"Marked":"Review"}`;
  bookmark.classList.toggle("saved",reviews.has(current));
@@ -2461,27 +2461,44 @@ function viewPracticeAnswer(){
   checkedQuestions.add(current);
   render();
 
-  // Create a real answer card if it does not already exist.
+  highlightCorrectAnswerForView(q);
+  saveSessionSoon();
+}
+function showPracticeAnswerPanel(q){
   let panel=document.getElementById("practiceAnswerPanel");
   if(!panel){
-    panel=document.createElement("div");
-    panel.id="practiceAnswerPanel";
-    panel.className="practice-answer-panel";
-    const ex=document.getElementById("explanation");
-    if(ex&&ex.parentNode)ex.parentNode.insertBefore(panel,ex);
-    else document.getElementById("options").after(panel);
+    panel=document.createElement("div");panel.id="practiceAnswerPanel";panel.className="practice-answer-panel";
+    document.getElementById("explanation").before(panel);
   }
   panel.dataset.question=String(current);
-  panel.innerHTML=`<div class="answer-label">Correct Answer</div><div class="answer-value">${practiceCorrectAnswerHTML(q)}</div>`;
-  panel.style.display="block";
-  renderAllQuizMath(panel);
-
-  const ex=document.getElementById("explanation");
-  if(ex&&q.explanation){
-    ex.style.display="block";
-    setQuizExplanation(ex,q.explanation);
+  panel.innerHTML=`<div class="answer-label"><span aria-hidden="true">✓</span> Correct answer</div><div class="answer-value quiz-rich-text">${practiceCorrectAnswerHTML(q)}</div>`;
+  const correctIndex=getCorrectOptionIndex(q);
+  if(correctIndex>=0&&q.type!=="ordering"){
+    const value=panel.querySelector(".answer-value");value.replaceChildren();value.classList.add("answer-choice-value");
+    const letter=document.createElement("span");letter.className="answer-option-letter";letter.textContent=String.fromCharCode(65+correctIndex);
+    const text=document.createElement("div");setQuizRichText(text,q.options[correctIndex]);value.append(letter,text);
   }
-  highlightCorrectAnswerForView(q);
+  panel.style.display="block";renderAllQuizMath(panel);
+}
+function applyVerifiedAnswerStyles(q,chosen){
+  const opts=document.getElementById("options"),correctIndex=getCorrectOptionIndex(q);
+  opts.querySelectorAll(".option,[data-option-index]").forEach((button,i)=>{
+    const index=button.hasAttribute("data-option-index")?Number(button.dataset.optionIndex):i;
+    const isCorrect=index===correctIndex,isWrong=button.classList.contains("selected")&&!isCorrect;
+    button.classList.toggle("answer-verified-correct",isCorrect);
+    button.classList.toggle("answer-verified-wrong",isWrong);
+    if(isCorrect||isWrong){const badge=document.createElement("span");badge.className="answer-state-badge";badge.textContent=isCorrect?"✓ Correct":"✕ Your answer";button.append(badge)}
+  });
+  if(answerIsPresent(chosen,q)){
+    const correct=isQuestionCorrect(q,chosen);
+    opts.querySelectorAll(".fill-answer,.order-item").forEach(el=>el.classList.add(correct?"answer-verified-correct":"answer-verified-wrong"));
+  }
+}
+function clearVerifiedFeedback(){
+  document.querySelectorAll("#options .answer-verified-correct,#options .answer-verified-wrong").forEach(el=>el.classList.remove("answer-verified-correct","answer-verified-wrong"));
+  const feedback=document.getElementById("feedback");feedback.textContent="";feedback.removeAttribute("data-result");
+  document.getElementById("explanation").style.display="none";
+  const panel=document.getElementById("practiceAnswerPanel");if(panel)panel.style.display="none";
 }
 function getCorrectOptionIndex(q){
   if(!Array.isArray(q.options))return -1;
@@ -2537,6 +2554,7 @@ function highlightCorrectAnswerForView(q){
     const input=opts.querySelector(".fill-answer");
     if(input){
       input.value=String((q.acceptedAnswers||[q.answer])[0]??"");
+      input.classList.remove("answer-verified-wrong");
       input.classList.add("answer-correct-reveal");
       input.readOnly=true;
       renderAllQuizMath(opts);
@@ -2549,12 +2567,12 @@ function highlightCorrectAnswerForView(q){
     const correctIndex=getCorrectOptionIndex(q);
     opts.querySelectorAll(".option").forEach((b,i)=>{
       if(i===correctIndex)b.classList.add("correct","answer-correct-reveal");
-      else b.classList.add("answer-not-correct");
+      else if(!b.classList.contains("answer-verified-wrong"))b.classList.add("answer-not-correct");
     });
     // image_choice may use image cards instead of .option
     opts.querySelectorAll("[data-option-index]").forEach((b,i)=>{
       if(i===correctIndex)b.classList.add("correct","answer-correct-reveal");
-      else b.classList.add("answer-not-correct");
+      else if(!b.classList.contains("answer-verified-wrong"))b.classList.add("answer-not-correct");
     });
     renderAllQuizMath(opts);
   }
@@ -2567,24 +2585,11 @@ function checkCurrentAnswer(){
  const wasChecked=checkedQuestions.has(current);
  checkedQuestions.add(current);
  if(!wasChecked&&mode==="practice")playAnswerSound(isQuestionCorrect(q,chosen));
- const fb=document.getElementById("feedback");
- if(!chosen){toast("Choose an option first");return}
- const correct=isQuestionCorrect(q,chosen);
- fb.textContent=correct?"✓ Correct":"✕ Incorrect";
- fb.style.color=correct?"var(--good)":"var(--bad)";
-
- const ex=document.getElementById("explanation");
- if(q.explanation){
-   ex.style.display="block";
-   setQuizExplanation(ex,q.explanation);
+ if(mode==="practice")render();
+ else{
+   const fb=document.getElementById("feedback");fb.textContent="✓ Answer recorded";fb.style.color="var(--muted)";fb.removeAttribute("data-result");
  }
- // In practice mode, checking is always allowed. In exam mode it is
- // intentionally feedback-only and does not reveal correctness until submit.
- if(mode==="exam"){
-   fb.textContent="✓ Answer recorded";
-   fb.style.color="var(--muted)";
-   if(ex)ex.style.display="none";
- }
+ saveSessionSoon();
  flashKey("Enter");
 }
 

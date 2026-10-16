@@ -6,8 +6,8 @@ body {
   --text: #292d31;
   --muted: #687077;
   --line: #dce1e4;
-  --primary: #56616c;
-  --primary2: #646f79;
+  --primary: #3f6f75;
+  --primary2: #55717d;
   --theme-tint: #b5bec4;
   --on-primary: #ffffff;
   --good: #476e55;
@@ -44,8 +44,8 @@ body.dark {
   --text: #eee9e0;
   --muted: #b5ab9f;
   --line: #48423b;
-  --primary: #bcb9b1;
-  --primary2: #aaa79f;
+  --primary: #a2bdb4;
+  --primary2: #94adb6;
   --theme-tint: #72716b;
   --on-primary: #211d19;
   --good: #9db7a1;

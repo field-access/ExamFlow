@@ -14,6 +14,7 @@ Theme colors and gradients are defined in `css/themes.css`.
 Interface sizing is in `css/interface.css`; the home study calendar and cards use
 `js/study-dashboard.js` and `css/study-dashboard.css`. Study activity is backed up
 alongside sessions and results, and included in data exports.
+Button hierarchy and icon accents are maintained in `css/controls.css`.
 Default seed prompts live in `seed-prompts.json`. Settings saves custom slots and drafts in the browser.
 
 ## Deploying

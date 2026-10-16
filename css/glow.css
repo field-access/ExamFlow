@@ -1,0 +1,22 @@
+/* Color stays at the edges, keeping text surfaces calm and readable. */
+body.exam-active #examView .question {
+  box-shadow:0 8px 28px rgba(20,30,26,.06),0 0 42px color-mix(in srgb,var(--primary) 8%,transparent)!important;
+}
+#examView .option.selected:not(.answer-verified-correct):not(.answer-verified-wrong):not(.answer-correct-reveal) {
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--primary) 16%,transparent),0 0 18px color-mix(in srgb,var(--primary) 16%,transparent);
+}
+body .btn.primary, body.dark .btn.primary {
+  box-shadow:0 4px 12px color-mix(in srgb,var(--primary) 18%,transparent),0 0 22px color-mix(in srgb,var(--primary) 14%,transparent);
+}
+body .btn.primary:hover:not(:disabled) {
+  box-shadow:0 6px 18px color-mix(in srgb,var(--primary) 22%,transparent),0 0 26px color-mix(in srgb,var(--primary) 18%,transparent);
+}
+body .modebtn.active {
+  box-shadow:0 0 14px color-mix(in srgb,var(--primary) 12%,transparent);
+}
+#examView #practiceAnswerPanel {
+  box-shadow:0 0 24px color-mix(in srgb,var(--answer-green) 10%,transparent);
+}
+@media(prefers-reduced-motion:reduce){
+  #examView .option, body .btn { transition:none; }
+}

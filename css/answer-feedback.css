@@ -1,0 +1,49 @@
+#examView { --answer-green:#21764d; --answer-red:#b34242; }
+body.dark #examView { --answer-green:#79cda1; --answer-red:#ec9b94; }
+#examView #options .answer-verified-correct,
+#examView #options .answer-correct-reveal,
+#examView #options .match-correct .match-trigger {
+  border-color:var(--answer-green)!important;
+  background:color-mix(in srgb,var(--answer-green) 6%,var(--surface))!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--answer-green) 15%,transparent),0 0 20px color-mix(in srgb,var(--answer-green) 18%,transparent),0 5px 16px color-mix(in srgb,var(--answer-green) 9%,transparent)!important;
+  opacity:1;
+}
+#examView #options .answer-verified-wrong,
+#examView #options .match-wrong .match-trigger {
+  border-color:var(--answer-red)!important;
+  background:color-mix(in srgb,var(--answer-red) 6%,var(--surface))!important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--answer-red) 15%,transparent),0 0 20px color-mix(in srgb,var(--answer-red) 18%,transparent),0 5px 16px color-mix(in srgb,var(--answer-red) 9%,transparent)!important;
+  opacity:1;
+}
+#examView #options .answer-verified-correct .letter,
+#examView #options .answer-verified-wrong .letter {
+  background:transparent!important; color:inherit!important; border-color:currentColor!important;
+}
+#examView #options .answer-verified-correct .letter { color:var(--answer-green)!important; }
+#examView #options .answer-verified-wrong .letter { color:var(--answer-red)!important; }
+#examView .answer-state-badge { flex:none; margin-left:auto; padding:4px 7px; border-radius:6px; font:600 12px/1.4 var(--exam-font); white-space:nowrap; }
+#examView .answer-verified-correct .answer-state-badge { color:var(--answer-green); }
+#examView .answer-verified-wrong .answer-state-badge { color:var(--answer-red); }
+#examView #feedback { margin:12px auto 0; max-width:680px; font-size:14px; line-height:1.5; }
+#examView #feedback[data-result="correct"] { color:var(--answer-green); }
+#examView #feedback[data-result="wrong"] { color:var(--answer-red); }
+#examView #practiceAnswerPanel {
+  width:100%; max-width:680px; box-sizing:border-box; margin:14px auto;
+  padding:16px 18px; border:1px solid color-mix(in srgb,var(--answer-green) 38%,var(--line))!important;
+  border-radius:12px; background:color-mix(in srgb,var(--answer-green) 6%,var(--surface))!important;
+  box-shadow:none;
+}
+#examView #practiceAnswerPanel .answer-label { display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--answer-green)!important; font:600 13px/1.4 var(--exam-font); letter-spacing:0; text-transform:none; }
+#examView #practiceAnswerPanel .answer-label>span { display:grid; place-items:center; width:22px; height:22px; border-radius:50%; background:color-mix(in srgb,var(--answer-green) 12%,var(--surface)); }
+#examView #practiceAnswerPanel .answer-value { color:var(--text); font:500 17px/1.6 var(--exam-font); overflow-wrap:anywhere; }
+#examView #practiceAnswerPanel .answer-choice-value { display:flex; align-items:flex-start; gap:12px; }
+#examView .answer-option-letter { flex:none; display:grid; place-items:center; width:28px; height:28px; border:1px solid color-mix(in srgb,var(--answer-green) 40%,var(--line)); border-radius:7px; color:var(--answer-green); font-size:14px; font-weight:700; }
+#examView .answer-choice-value>div { min-width:0; }
+#examView #explanation { max-width:680px!important; box-sizing:border-box; margin:12px auto!important; padding:16px 18px!important; border:1px solid var(--line)!important; border-radius:12px!important; background:var(--surface2)!important; color:var(--text)!important; box-shadow:none; }
+#examView #explanation>strong { display:flex; align-items:center; gap:8px; color:var(--muted); font:600 13px/1.4 var(--exam-font); }
+#examView #explanation .explanation-content { margin-top:10px; font-size:16px; line-height:1.6; }
+#examView .question .actions { border-top:0!important; padding-top:0!important; margin-top:18px; }
+@media(max-width:600px){
+  #examView .answer-state-badge{font-size:11px;padding:3px 4px;white-space:normal;max-width:74px}
+  #examView #practiceAnswerPanel,#examView #explanation{padding:14px!important}
+}
