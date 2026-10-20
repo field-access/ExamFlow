@@ -13,12 +13,19 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/prompt-library.css">
 <link rel="stylesheet" href="css/question-palette.css">
-<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/themes.css?v=2">
 <link rel="stylesheet" href="css/study-dashboard.css">
 <link rel="stylesheet" href="css/interface.css">
 <link rel="stylesheet" href="css/answer-feedback.css">
 <link rel="stylesheet" href="css/controls.css">
 <link rel="stylesheet" href="css/glow.css">
+<link rel="stylesheet" href="css/flashcards.css">
+<link rel="stylesheet" href="css/exam-focus.css">
+<link rel="stylesheet" href="css/exam-explanation.css">
+<link rel="stylesheet" href="css/cbq-review-preview.css">
+<link rel="stylesheet" href="css/study-accent.css?v=2">
+<link rel="stylesheet" href="css/theme-picker.css">
+<link rel="stylesheet" href="css/home-focus.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -56,8 +63,10 @@
   <nav class="topnav">
     <button id="navHome" class="active" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
     <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button>
+    <button id="navFlashcards" onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
     <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
     <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+    <button id="navNotes" onclick="openNotes()" title="Open Refmaps in a new tab (Alt+6)"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
   </nav>
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
   <div class="header-right" hidden>
@@ -67,7 +76,9 @@
   </div>
 </header>
 <nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
+  <button onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
   <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+  <button onclick="openNotes()" title="Open Refmaps in a new tab"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
 </nav>
 
 
@@ -80,15 +91,14 @@
     <div class="dashactions"><button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg> Future tests</button><button class="btn primary" onclick="openImporter()">＋ New CBQ</button></div>
   </div>
     <section class="hero-copy card cbq-intro">
-      <div class="hero-kicker"><svg class="ui-icon"><use href="#icon-brain"/></svg> CONCEPT BREAKDOWN QUIZ</div>
-      <h1>Turn difficult ideas into clear reasoning.</h1>
-      <p>A Concept Breakdown Quiz takes one complex topic and walks you through five small questions, each building the next step of understanding until the solution makes sense.</p>
+      <div class="hero-kicker">CONCEPT BREAKDOWN QUIZ</div>
+      <h1>Understand it.<br>One question at a time.</h1>
+      <p>Build your reasoning with connected questions, then apply what you learn.</p>
       <div class="hero-actions">
-        <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
-        <button class="btn" type="button" onclick="copyBeginnerSchema()"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy schema</button>
-        <button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
+        <button class="btn" onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Learn flashcards</button>
+        <button class="btn" type="button" onclick="Flashcards.copyPrompt(this)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy flashcard prompt</button>
+        <button class="btn" type="button" onclick="copyBeginnerSchema()">Copy CBQ schema</button>
       </div>
-      <div class="cbq-flow"><span>One concept</span><i>→</i><span>Small reasoning steps</span><i>→</i><span>Confident solution</span></div>
     </section>
 
   </div>
@@ -97,7 +107,7 @@
 
 <section class="json-home card">
     <div class="json-home-head">
-      <div><h3>Paste your CBQ</h3><small>Copy your quiz JSON → click the button → start.</small></div>
+      <div><h3>Paste your CBQ</h3></div>
       <div style="display:flex;gap:7px">
         <button id="homePasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('homeJson','homeJsonStatus','homePasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste from Clipboard</button>
         <button class="btn" type="button" onclick="document.getElementById('homeJson').value=''">Clear</button>
@@ -105,15 +115,10 @@
     </div>
     <textarea id="homeJson" class="home-json-input" spellcheck="false" placeholder='Paste your CBQ JSON directly here...'></textarea>
     <div class="home-json-footer">
-      <div><div id="homeJsonStatus" class="paste-status">Supports flat lists, sections, aliases, LaTeX and HTTPS image links.</div></div>
+      <div><div id="homeJsonStatus" class="paste-status">JSON · LaTeX · images</div></div>
       <div style="display:flex;gap:7px"><label class="filelabel"><svg class="ui-icon"><use href="#icon-file"/></svg>JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
     </div>
   </section>
-  </div>
-
-  <div class="metrics" style="margin-top:18px">
-    <div class="metric card"><small>Tests completed</small><b id="homeTests">0</b></div>
-    <div class="metric card"><small>Questions solved</small><b id="homeQuestions">0</b></div>
   </div>
 
   <div class="dashcols">
@@ -127,7 +132,7 @@
         <div id="todoListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:12px;"></div>
       </div>
     </section>
-    <section class="panel card home-continue-panel"><div class="panel-heading"><div><h3>Continue studying</h3><small>Resume a quiz or explore your study history</small></div></div><div id="homeSessionsList"></div></section>
+    <section class="panel card home-continue-panel"><div class="panel-heading"><div><h3>Continue studying</h3><small>Resume a quiz or explore your study history</small></div><div class="study-summary" aria-label="Study totals"><span><strong id="homeTests">0</strong> tests completed</span><span class="study-summary-separator" aria-hidden="true">·</span><span><strong id="homeQuestions">0</strong> questions solved</span></div></div><div id="homeSessionsList"></div></section>
   </div>
 
 <textarea id="beginnerSchema" hidden>{
@@ -218,6 +223,7 @@
     <button class="active"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
     <button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
     <button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+    <button onclick="openNotes()" title="Open Refmaps in a new tab"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
   </div>
   <div class="progress-mini"><small>Progress</small><strong id="progressText">0 / 0</strong><div class="bar"><i id="progressBar"></i></div></div>
   <div class="session-list"><div class="side-title">Saved sessions</div><div id="sessionList"></div></div>
@@ -231,12 +237,20 @@
     <div><span class="qnum">Question <span id="currentLabel">0</span></span> <span>of <span id="totalLabel">0</span></span></div>
     <div class="modepicker">
       <button id="examProgressBtn" class="modebtn" type="button" aria-controls="examProgressDrawer" aria-expanded="false" onclick="toggleQuestionProgress()"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
-      <button id="examMode" class="modebtn active" onclick="setMode('exam')"><svg class="ui-icon"><use href="#icon-clock"/></svg>Exam</button>
-      <button id="practiceMode" class="modebtn" onclick="setMode('practice')"><svg class="ui-icon"><use href="#icon-brain"/></svg>Practice</button>
-
-      <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT with the minimal CBQ prompt"><svg class="ui-icon"><use href="#icon-external"/></svg>GPT</button>
-      <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the current question with its answer and explanation"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy</button>
-      <button id="bookmark" class="bookmark" onclick="toggleReview()"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Review</button>
+      <button id="bookmark" class="bookmark" onclick="toggleReview()" title="Mark for review (R)"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Review</button>
+      <details id="questionTools" class="exam-tools">
+        <summary title="Study mode and question tools"><span id="questionToolsMode">Exam</span><span aria-hidden="true">⌄</span></summary>
+        <div class="exam-tools-menu">
+          <div class="exam-tools-label">Study mode</div>
+          <div class="exam-mode-switch">
+            <button id="examMode" class="modebtn active" onclick="setMode('exam')" title="Exam mode (Shift+E)">Exam</button>
+            <button id="practiceMode" class="modebtn" onclick="setMode('practice')" title="Practice mode (Shift+P)">Practice</button>
+          </div>
+          <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT (G)"><svg class="ui-icon"><use href="#icon-external"/></svg>Open in ChatGPT <kbd>G</kbd></button>
+          <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question <kbd>C</kbd></button>
+          <button class="modebtn" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer <kbd>Del</kbd></button>
+        </div>
+      </details>
     </div>
   </div>
   <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
@@ -250,7 +264,6 @@
     <button class="btn" id="prevBtn" onclick="previousQuestion()">← Previous</button>
     <div style="display:flex;gap:7px;flex-wrap:wrap">
       <button class="btn practice-answer-btn" id="viewAnswerBtn" onclick="viewPracticeAnswer()"><svg class="ui-icon"><use href="#icon-lightbulb"/></svg>View answer</button>
-      <button class="btn" onclick="clearAnswer()">Clear</button>
       <button class="btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
     </div>
   </div>
@@ -397,6 +410,7 @@
 </section>
 
 <!-- include: settings.html -->
+<!-- include: flashcards.html -->
 </div>
 
 <!-- IMPORTER -->
@@ -421,7 +435,12 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- include: cbq-review-preview.html -->
+
 <script src="js/study-dashboard.js"></script>
+<script src="js/flashcards-core.js"></script>
+<script src="js/cbq-review-preview.js"></script>
+<script src="js/flashcards.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+/* Keep the question central; secondary tools share one small menu. */
+#examView .qtop { gap: 12px; align-items: center; }
+#examView .modepicker { display: flex !important; flex-wrap: nowrap !important; overflow: visible !important; gap: 8px !important; }
+#examView .question { overflow: visible !important; }
+#examView .modepicker > button, #examView .exam-tools > summary { min-height: 36px; padding: 8px 11px !important; font-size: 12px !important; box-shadow: none !important; }
+#examView .modepicker > button { width: auto !important; flex: 0 0 auto; }
+#examView .exam-tools { position: relative; flex: none; }
+#examView .exam-tools > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--surface); }
+#examView .exam-tools > summary::-webkit-details-marker { display: none; }
+#examView .exam-tools > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+#examView .exam-tools[open] > summary { color: var(--primary); border-color: var(--primary); }
+#examView .exam-tools-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 80; min-width: 230px; max-width: calc(100vw - 40px); padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--ux-shadow-md); display: grid; gap: 8px; }
+#examView .exam-tools-label { color: var(--muted); font-size: 11px; padding: 2px 0 4px; }
+#examView .exam-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+#examView .exam-tools-menu .modebtn { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 9px 10px; font-size: 13px; width: 100%; }
+#examView .exam-tools-menu kbd { margin-left: auto; font-size: 10px; color: var(--muted); background: transparent; border: none; }
+#examView .question .actions .btn { box-shadow: none; }
+#examView #practiceAnswerPanel .answer-label { flex-wrap: wrap; }
+#examView #practiceAnswerPanel .save-flashcard { margin: 0 0 0 auto; min-height: 32px; padding: 5px 8px; font-size: 12px; background: transparent; border-color: transparent; box-shadow: none; }
+#examView #practiceAnswerPanel .save-flashcard:hover { border-color: var(--line); }
+#examView .save-flashcard kbd { font-size: 10px; color: var(--muted); background: transparent; border: none; }
+@media (max-width: 600px) {
+  #examView .qtop .modepicker { justify-content: flex-start; }
+  #examView .exam-tools-menu { min-width: 220px; }
+  #examView .question .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  #examView .question .actions > div { flex: 1; justify-content: flex-end; }
+}

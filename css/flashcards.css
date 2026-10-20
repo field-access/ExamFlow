@@ -1,0 +1,141 @@
+/* Flashcards use quiet surfaces and show controls only where they are needed. */
+.save-flashcard { margin-top: 16px; }
+#flashcardsView { --fc-tint: color-mix(in srgb, var(--primary) 5%, var(--surface)); }
+body:has(#flashcardsView.active) { background: var(--bg); }
+#flashcardsView [hidden] { display: none !important; }
+.fc-page { max-width: 1080px; margin: 0 auto; padding: 28px 26px 56px; }
+.fc-heading, .fc-panel-heading, .fc-section-heading, .fc-study-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.fc-heading { margin-bottom: 20px; }
+.fc-heading > div { min-width: 0; }
+.fc-heading-actions { display: flex; flex-wrap:wrap; justify-content:flex-end; gap: 10px; flex: 0 1 auto; }
+.fc-heading-actions .btn { white-space: nowrap; }
+#flashcardsView h1 { font-size: clamp(28px, 4vw, 36px); letter-spacing: -.035em; margin: 0 0 6px; }
+#flashcardsView h2 { font-size: 21px; margin: 0; letter-spacing: -.025em; }
+#flashcardsView h3 { margin: 0; font-size: 19px; }
+#flashcardsView p { line-height: 1.65; }
+.fc-heading p, .fc-panel-heading p { margin: 0; color: var(--muted); font-size: 14px; }
+#flashcardsView .btn { min-height: 42px; font-size: 14px; justify-content: center; gap: 6px; box-shadow: none; }
+#flashcardsView .fc-help-button { width: 42px; min-width: 42px; padding: 0; font-size: 17px; background: transparent; color: var(--muted); }
+#flashcardsView :focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
+.fc-stats { display: flex; flex-wrap: wrap; gap: 24px; padding: 12px 0 20px; border-bottom: 1px solid var(--line); margin-bottom: 26px; }
+.fc-stat { display: flex; align-items: baseline; gap: 7px; }
+.fc-stat strong { font-size: 18px; color: var(--text); }
+.fc-stat span, .fc-section-heading span, .fc-study-toolbar span { color: var(--muted); font-size: 13px; }
+.fc-panel { border: 1px solid var(--line); border-radius: 18px; padding: 24px; background: var(--surface); margin-bottom: 24px; }
+.fc-import-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-top: 22px; }
+#flashcardsView label { display: block; font-weight: 600; margin: 0 0 10px; font-size: 14px; }
+#flashcardsView textarea, #flashcardsView input[type=text], #flashcardsView select { width: 100%; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--text); padding: 11px 12px; font: inherit; box-sizing: border-box; }
+#fcJson { min-height: 180px; resize: vertical; font-family: ui-monospace, monospace !important; font-size: 14px !important; line-height: 1.6; }
+.fc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: center; }
+#flashcardsView .fc-file { display: inline-flex; margin: 0; cursor: pointer; }
+.fc-file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.fc-file:focus-within { outline: 2px solid var(--primary); outline-offset: 3px; }
+.fc-import-help { padding: 12px 0 0; border-top: 1px solid var(--line); }
+#flashcardsView summary { cursor: pointer; color: var(--muted); font-size: 13px; padding: 8px 0; }
+.fc-import-help p { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.fc-import-shortcut { display: block; margin-top: 10px; color: var(--muted); font-size: 12px; }
+.fc-notice { padding: 10px 14px; border-left: 3px solid var(--primary); background: var(--surface); border-radius: 6px; font-size: 14px; }
+.fc-notice.fc-error, #fcImportStatus.fc-error { color: var(--bad); }
+.fc-preview { margin-top: 18px; padding-top: 20px; border-top: 1px solid var(--line); }
+.fc-preview > p { margin: 6px 0 10px; color: var(--muted); font-size: 14px; }
+.fc-preview > label { margin-top: 16px !important; }
+.fc-preview small, .fc-deck small { color: var(--muted); font-size: 12px; }
+.fc-preview-card { border-left: 2px solid var(--line); padding: 10px 18px; margin: 12px 0; }
+.fc-section-heading { margin-bottom: 16px; }
+.fc-decks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.fc-deck { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 22px; }
+.fc-deck h3 { overflow-wrap: anywhere; line-height: 1.4; }
+.fc-deck p { margin: 10px 0; color: var(--muted); font-size: 13px; }
+.fc-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.fc-deck .fc-deck-counts { margin-top: 10px; }
+.fc-deck > details { margin-top: 14px; }
+.fc-deck > details[open] { border-top: 1px solid var(--line); padding-top: 8px; }
+.fc-deck-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+.fc-deck-options label { font-size: 12px !important; color: var(--muted); }
+#flashcardsView .fc-deck-options select { font-size: 14px; padding: 9px; margin-top: 6px; }
+#flashcardsView .fc-shuffle { display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 400; color: var(--muted); }
+.fc-shuffle input { accent-color: var(--primary); }
+#flashcardsView [data-fc=delete], #flashcardsView [data-fc=delete-card] { color: var(--bad); }
+.fc-empty { grid-column: 1 / -1; text-align: center; padding: 40px 24px; border: 1px dashed var(--line); border-radius: 16px; }
+.fc-empty .ui-icon { width: 28px; height: 28px; color: var(--primary); margin-bottom: 14px; }
+.fc-empty p { max-width: 420px; margin: 10px auto 20px; color: var(--muted); font-size: 14px; }
+.is-studying .fc-heading { display: none; }
+.is-importing #fcStats, .is-importing .fc-section-heading, .is-importing #fcDecks { display: none; }
+.fc-study-toolbar { margin-bottom: 22px; }
+.fc-study-toolbar > div { flex: 1; min-width: 0; }
+.fc-study-toolbar h2 { overflow-wrap: anywhere; margin-bottom: 4px !important; font-size: 19px !important; }
+.fc-progress { width: min(100%, 800px); height: 3px; border: none; display: block; margin: 0 auto 20px; accent-color: var(--primary); border-radius: 10px; overflow: hidden; background: var(--line); }
+.fc-progress::-webkit-progress-bar { background: var(--line); }
+.fc-progress::-webkit-progress-value { background: var(--primary); }
+.fc-review-card { max-width: 800px; margin: 0 auto; scroll-margin-top: 90px; }
+.fc-card-scene { perspective: 1400px; }
+.fc-flip-card { display: grid; transform-style: preserve-3d; transition: transform .46s cubic-bezier(.22,.65,.25,1); }
+.fc-flip-card.is-flipped { transform: rotateY(180deg); }
+.fc-face { grid-area: 1 / 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; border: 1px solid var(--line); border-radius: 20px; padding: 30px 36px; background: var(--surface); min-height: 280px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 8px 28px color-mix(in srgb, var(--primary) 7%, transparent); overflow-wrap: anywhere; }
+.fc-face-back { transform: rotateY(180deg); background: var(--surface); pointer-events: none; }
+.is-flipped .fc-face-front { pointer-events: none; }
+.is-flipped .fc-face-back { pointer-events: auto; }
+.fc-card-label { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.fc-front { font-size: clamp(21px, 2.3vw, 25px); line-height: 1.6; flex: 1; display: grid; align-content: center; }
+.fc-front p { margin: 0 0 12px; }
+.fc-back-content { font-size: 18px; line-height: 1.7; flex: 1; }
+.fc-back-content p:first-child { margin-top: 0; }
+.fc-back-content p:last-child { margin-bottom: 0; }
+.fc-flip-actions { display: flex; justify-content: center; margin: 20px 0; }
+.fc-flip-actions .btn { min-width: 180px; }
+.fc-ratings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+#flashcardsView .fc-rating { display: flex; flex-direction: column; gap: 6px; min-height: 66px; padding: 12px; border: 1px solid var(--line); color: var(--rating); background: var(--surface); border-radius: 12px; cursor: pointer; font: inherit; }
+.fc-rating strong { display: flex; gap: 12px; align-items: center; justify-content: center; font-size: 14px; }
+.fc-rating kbd { font-size: 11px; border: none; background: transparent; color: var(--muted); padding: 0; }
+.fc-rating small { font-size: 12px; color: var(--muted); }
+.fc-rating[data-rating=again] { --rating: var(--bad); }
+.fc-rating[data-rating=hard] { --rating: var(--warn); }
+.fc-rating[data-rating=good], .fc-rating[data-rating=easy] { --rating: var(--good); }
+.fc-rating:hover { border-color: var(--rating) !important; }
+.fc-shortcuts { text-align: center; color: var(--muted); font-size: 12px; margin: 20px 0 0; }
+.fc-browse-actions { display: flex; justify-content: space-between; align-items: start; gap: 10px; margin-top: 16px; }
+.fc-card-menu { text-align: center; }
+.fc-card-menu .fc-actions { justify-content: center; }
+.fc-complete { max-width: 720px; margin: 0 auto; text-align: center; padding: 38px 24px; border-radius: 20px; border: 1px solid var(--line); background: var(--surface); }
+.fc-complete > .ui-icon { color: var(--good); width: 32px; height: 32px; margin-bottom: 14px; }
+.fc-complete .fc-actions { justify-content: center; }
+.fc-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; margin: 20px 0; }
+.fc-badge { font-size: 13px; color: var(--muted); }
+.fc-editor textarea { min-height: 130px; resize: vertical; margin-bottom: 16px; }
+#flashcardsView .quiz-code-block { max-width: 100%; overflow-x: auto; font-size: 14px; }
+#flashcardsView .katex-display { overflow-x: auto; overflow-y: hidden; }
+.fc-key-dialog { width: min(520px, calc(100% - 28px)); max-height: 85vh; overflow: auto; border: 1px solid var(--line); border-radius: 18px; padding: 24px; color: var(--text); background: var(--surface); }
+.fc-key-dialog::backdrop { background: rgba(20,25,25,.35); }
+.fc-key-list { margin: 20px 0; }
+.fc-key-list > div { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.fc-key-list dt { flex: 0 0 auto; }
+.fc-key-list dd { text-align: right; margin: 0; color: var(--muted); }
+.fc-key-dialog p { font-size: 12px; color: var(--muted); }
+@media (max-width: 800px) { .fc-decks { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  body:has(#flashcardsView.active) header { display: flex; flex-wrap: nowrap !important; justify-content: space-between; min-height: 64px; padding: 10px 14px; }
+  body:has(#flashcardsView.active) header .brand { width: max-content !important; flex: 0 1 auto; }
+  body:has(#flashcardsView.active) header .brand span { display: inline; font-size: 18px; }
+  body:has(#flashcardsView.active) .mobile-menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; margin-left: auto; padding: 10px; }
+  .fc-page { padding: 22px 14px 40px; }
+  .fc-heading { flex-direction: column; align-items: stretch; gap: 16px; }
+  .fc-heading-actions { display: grid; grid-template-columns: 1fr 1fr 42px; }
+  .fc-heading-actions [data-fc=open-import] { grid-column:1/3; grid-row:1; }
+  .fc-heading-actions [data-fc=help] { grid-column:3; grid-row:1; }
+  .fc-heading-actions [data-fc=copy-prompt] { grid-column:1; grid-row:2; }
+  .fc-heading-actions [data-fc=copy-schema] { grid-column:2/4; grid-row:2; }
+  .fc-stats { gap: 16px; padding: 10px 0 16px; margin-bottom: 20px; }
+  .fc-stat { gap: 5px; } .fc-stat span { font-size: 11px; } .fc-stat strong { font-size: 17px; }
+  .fc-panel, .fc-deck { padding: 20px; }
+  .fc-panel-heading { align-items: start; }
+  .fc-study-toolbar { flex-wrap: wrap; gap: 12px; }
+  .fc-study-toolbar > div { flex-basis: calc(100% - 150px); }
+  .fc-study-toolbar > #fcUndo { margin-left: auto; }
+  .fc-face { padding: 24px; min-height: 260px; }
+  .fc-back-content { font-size: 17px; }
+  .fc-ratings { grid-template-columns: repeat(2, 1fr); }
+  .fc-shortcuts { display: none; }
+  .fc-key-list > div { gap: 12px; font-size: 12px; }
+  .fc-key-dialog { padding: 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .fc-flip-card { transition: none; } }

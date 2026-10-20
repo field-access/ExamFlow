@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ExamFlow — Practice & Exam</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/mhchem.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/contrib/auto-render.min.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="css/prompt-library.css">
+<link rel="stylesheet" href="css/question-palette.css">
+<link rel="stylesheet" href="css/themes.css">
+<link rel="stylesheet" href="css/study-dashboard.css">
+<link rel="stylesheet" href="css/interface.css">
+<link rel="stylesheet" href="css/answer-feedback.css">
+<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/glow.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+</head>
+<body>
+<div class="app">
+<svg class="icon-sprite" aria-hidden="true" focusable="false">
+  <symbol id="icon-brain" viewBox="0 0 24 24"><path d="M12 4a3 3 0 0 0-5.8 1.1A3.5 3.5 0 0 0 4 11a3.5 3.5 0 0 0 2.2 6.2A3.2 3.2 0 0 0 12 19"/><path d="M12 4a3 3 0 0 1 5.8 1.1A3.5 3.5 0 0 1 20 11a3.5 3.5 0 0 1-2.2 6.2A3.2 3.2 0 0 1 12 19M12 4v16m-4-13 2 2m8-2-2 2m-9 5h3m9 0h-3m-6 4 2-2m4 2-2-2"/></symbol>
+  <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="icon-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8m-8 4h8"/></symbol>
+  <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 19V5m0 14h17"/><path d="m7 15 4-4 3 2 6-7"/><path d="M17 6h3v3"/></symbol>
+  <symbol id="icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18m-13 4h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></symbol>
+  <symbol id="icon-settings" viewBox="0 0 24 24"><path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.8 1.8 0 1 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3 .9v.2a1.8 1.8 0 1 1-3.6 0v-.2a1.8 1.8 0 0 0-3-.9l-.1.1a1.8 1.8 0 1 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-.9-3h-.2a1.8 1.8 0 1 1 0-3.6h.2a1.8 1.8 0 0 0 .9-3l-.1-.1a1.8 1.8 0 1 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3-.9v-.2a1.8 1.8 0 1 1 3.6 0v.2a1.8 1.8 0 0 0 3 .9l.1-.1a1.8 1.8 0 1 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 .9 3h.2a1.8 1.8 0 1 1 0 3.6h-.2a1.8 1.8 0 0 0-.9 3Z"/></symbol>
+  <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></symbol>
+  <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.8 14.2A8.8 8.8 0 0 1 9.8 3.2 9 9 0 1 0 20.8 14.2Z"/></symbol>
+  <symbol id="icon-type" viewBox="0 0 24 24"><path d="M4 7V4h16v3M12 4v16m-4 0h8"/></symbol>
+  <symbol id="icon-text" viewBox="0 0 24 24"><path d="M4 7V4h16v3M12 4v16m-4 0h8M19 11v9m-3-3 3 3 3-3"/></symbol>
+  <symbol id="icon-width" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 12h10m-3-3 3 3-3 3m-4-6-3 3 3 3"/></symbol>
+  <symbol id="icon-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 1.7-4.3 1.5 1.5 0 0 1 1-2.7H19a2 2 0 0 0 2-2A9 9 0 0 0 12 3Z"/><path d="M7.5 12h.01M10 7.5h.01M15 7.5h.01M17 11h.01"/></symbol>
+  <symbol id="icon-volume" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"/></symbol>
+  <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="icon-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+  <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+  <symbol id="icon-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 3h7v7m0-7-10 10"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="icon-bookmark" viewBox="0 0 24 24"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18l-6-4-6 4z"/></symbol>
+  <symbol id="icon-lightbulb" viewBox="0 0 24 24"><path d="M9 18h6m-5 4h4m-6-7a7 7 0 1 1 8 0c-1 .7-1 1-1 3h-6c0-2 0-2.3-1-3Z"/></symbol>
+  <symbol id="icon-list" viewBox="0 0 24 24"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></symbol>
+  <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+</svg>
+<header>
+  <button class="brand home-brand" onclick="showView('home')" aria-label="Go to ExamFlow home"><div class="logo"><svg class="ui-icon"><use href="#icon-brain"/></svg></div><span>ExamFlow</span></button>
+  <button class="mobile-menu-toggle" type="button" onclick="toggleMobileNav()" aria-label="Open navigation" aria-controls="mobileNav"><svg class="ui-icon"><use href="#icon-menu"/></svg></button>
+  <nav class="topnav">
+    <button id="navHome" class="active" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
+    <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button>
+    <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
+    <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+  </nav>
+  <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
+  <div class="header-right" hidden>
+    <div class="pill" id="headerQuizName">CBQ Practice</div>
+    <button class="btn" onclick="openImporter()">＋ Add Quiz</button>
+    <button class="btn primary" onclick="submitExam()">Submit</button>
+  </div>
+</header>
+<nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
+  <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+</nav>
+
+
+<!-- HOME / CENTRAL DASHBOARD -->
+<section id="homeView" class="view active">
+<div class="dashboard">
+  <div class="home-stage">
+  <div class="home-hero">
+  <div class="dashhead dashboard-hero" hidden style="justify-content: flex-end;">
+    <div class="dashactions"><button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg> Future tests</button><button class="btn primary" onclick="openImporter()">＋ New CBQ</button></div>
+  </div>
+    <section class="hero-copy card cbq-intro">
+      <div class="hero-kicker"><svg class="ui-icon"><use href="#icon-brain"/></svg> CONCEPT BREAKDOWN QUIZ</div>
+      <h1>Turn difficult ideas into clear reasoning.</h1>
+      <p>A Concept Breakdown Quiz takes one complex topic and walks you through five small questions, each building the next step of understanding until the solution makes sense.</p>
+      <div class="hero-actions">
+        <button class="btn primary" onclick="pasteAndStart()">▶ Start CBQ</button>
+        <button class="btn" type="button" onclick="copyBeginnerSchema()"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy schema</button>
+        <button class="btn" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
+      </div>
+      <div class="cbq-flow"><span>One concept</span><i>→</i><span>Small reasoning steps</span><i>→</i><span>Confident solution</span></div>
+    </section>
+
+  </div>
+
+
+
+<section class="json-home card">
+    <div class="json-home-head">
+      <div><h3>Paste your CBQ</h3><small>Copy your quiz JSON → click the button → start.</small></div>
+      <div style="display:flex;gap:7px">
+        <button id="homePasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('homeJson','homeJsonStatus','homePasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste from Clipboard</button>
+        <button class="btn" type="button" onclick="document.getElementById('homeJson').value=''">Clear</button>
+      </div>
+    </div>
+    <textarea id="homeJson" class="home-json-input" spellcheck="false" placeholder='Paste your CBQ JSON directly here...'></textarea>
+    <div class="home-json-footer">
+      <div><div id="homeJsonStatus" class="paste-status">Supports flat lists, sections, aliases, LaTeX and HTTPS image links.</div></div>
+      <div style="display:flex;gap:7px"><label class="filelabel"><svg class="ui-icon"><use href="#icon-file"/></svg>JSON file<input type="file" accept=".json,application/json" onchange="readHomeFile(event)"></label><button class="btn primary" onclick="startHomeQuiz()">Load & Start →</button></div>
+    </div>
+  </section>
+  </div>
+
+  <div class="metrics" style="margin-top:18px">
+    <div class="metric card"><small>Tests completed</small><b id="homeTests">0</b></div>
+    <div class="metric card"><small>Questions solved</small><b id="homeQuestions">0</b></div>
+  </div>
+
+  <div class="dashcols">
+    <section class="panel card advice-panel" style="grid-column: 1 / -1;"><div class="panel-heading"><div><h3><svg class="ui-icon"><use href="#icon-file"/></svg> Study Todo List</h3></div></div>
+      <div id="todoApp" style="margin-top: 10px;">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="todoInput" placeholder="What needs to be done?" style="flex:1; border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px;" onkeypress="if(event.key==='Enter') addTodo()">
+          <input type="date" id="todoDeadline" style="border:1px solid var(--line); border-radius:8px; padding:10px; font-size:13px; color:var(--ink);">
+          <button class="btn primary" onclick="addTodo()">Add</button>
+        </div>
+        <div id="todoListContainer" style="display:flex; flex-direction:column; gap:8px; margin-top:12px;"></div>
+      </div>
+    </section>
+    <section class="panel card home-continue-panel"><div class="panel-heading"><div><h3>Continue studying</h3><small>Resume a quiz or explore your study history</small></div></div><div id="homeSessionsList"></div></section>
+  </div>
+
+<textarea id="beginnerSchema" hidden>{
+  "name": "My Exam",
+  "sections": [
+    {
+      "name": "Physics",
+      "timeMinutes": 30,
+      "marks": 4,
+      "negativeMarks": 1,
+      "questions": [
+        {
+          "type": "mcq",
+          "question": "What is the SI unit of force?",
+          "options": ["Joule", "Newton", "Watt", "Pascal"],
+          "answer": "B",
+          "hint": "Think about the unit named after a person associated with classical mechanics.",
+          "explanation": "The SI unit of force is the newton (N)."
+        },
+        {
+          "type": "true_false",
+          "question": "Acceleration is the rate of change of velocity.",
+          "answer": "True",
+          "explanation": "Acceleration is defined as the rate of change of velocity with respect to time."
+        },
+        {
+          "type": "fill_blank",
+          "question": "The acceleration due to gravity near Earth's surface is approximately ____.",
+          "acceptedAnswers": ["9.8 m/s²", "9.8 m/s^2", "9.8"],
+          "explanation": "The standard approximate value is $g = 9.8\\,m/s^2$."
+        },
+        {
+          "type": "match",
+          "question": "Match each quantity with its SI unit.",
+          "pairs": [
+            {"left": "Force", "right": "Newton"},
+            {"left": "Energy", "right": "Joule"},
+            {"left": "Power", "right": "Watt"}
+          ],
+          "explanation": "Each physical quantity has its corresponding SI unit."
+        },
+        {
+          "type": "drag_drop",
+          "question": "Match each concept with its definition.",
+          "pairs": [
+            {"left": "Velocity", "right": "Rate of change of displacement"},
+            {"left": "Acceleration", "right": "Rate of change of velocity"},
+            {"left": "Momentum", "right": "Mass × velocity"}
+          ]
+        },
+        {
+          "type": "ordering",
+          "question": "Arrange the following steps of the scientific method in the correct order.",
+          "items": [
+            "Make an observation",
+            "Form a hypothesis",
+            "Conduct an experiment",
+            "Analyze the results"
+          ],
+          "answer": [
+            "Make an observation",
+            "Form a hypothesis",
+            "Conduct an experiment",
+            "Analyze the results"
+          ]
+        },
+        {
+          "type": "image_choice",
+          "question": "Which diagram represents a projectile following a parabolic trajectory?",
+          "image": "https://example.com/projectile.png",
+          "options": ["Diagram A", "Diagram B", "Diagram C", "Diagram D"],
+          "answer": "C",
+          "explanation": "Ignoring air resistance, projectile motion follows a parabolic path."
+        }
+      ]
+    }
+  ]
+}</textarea>
+</div>
+</section>
+
+<!-- EXAM -->
+<section id="examView" class="view">
+<div class="main">
+<aside class="sidebar card">
+  <div class="side-title">Navigate</div>
+  <div class="nav"><button onclick="showView('home')">⌂ Home</button><div class="side-title" style="margin-top:13px">Exam</div>
+    <button class="active"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
+    <button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
+    <button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+  </div>
+  <div class="progress-mini"><small>Progress</small><strong id="progressText">0 / 0</strong><div class="bar"><i id="progressBar"></i></div></div>
+  <div class="session-list"><div class="side-title">Saved sessions</div><div id="sessionList"></div></div>
+</aside>
+
+<main>
+<section class="question card">
+  <div class="qtop">
+
+    <div id="examTimerControl" class="timer" style="margin:0;"><svg class="ui-icon"><use href="#icon-clock"/></svg><span id="timer">30:00</span></div>
+    <div><span class="qnum">Question <span id="currentLabel">0</span></span> <span>of <span id="totalLabel">0</span></span></div>
+    <div class="modepicker">
+      <button id="examProgressBtn" class="modebtn" type="button" aria-controls="examProgressDrawer" aria-expanded="false" onclick="toggleQuestionProgress()"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
+      <button id="examMode" class="modebtn active" onclick="setMode('exam')"><svg class="ui-icon"><use href="#icon-clock"/></svg>Exam</button>
+      <button id="practiceMode" class="modebtn" onclick="setMode('practice')"><svg class="ui-icon"><use href="#icon-brain"/></svg>Practice</button>
+
+      <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT with the minimal CBQ prompt"><svg class="ui-icon"><use href="#icon-external"/></svg>GPT</button>
+      <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the current question with its answer and explanation"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy</button>
+      <button id="bookmark" class="bookmark" onclick="toggleReview()"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Review</button>
+    </div>
+  </div>
+  <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
+  <div id="hintCard" class="hint-card" hidden>
+    <button id="hintToggle" class="hint-toggle" type="button" onclick="toggleHint()" aria-expanded="false" aria-controls="hintText"><svg class="ui-icon"><use href="#icon-lightbulb"/></svg>Show hint</button>
+    <div id="hintText" class="hint-text" hidden></div>
+  </div>
+  <div id="options" class="options"></div>
+  <div id="feedback" class="feedback"></div><div id="explanation" class="exam-summary" style="display:none"></div>
+  <div class="actions">
+    <button class="btn" id="prevBtn" onclick="previousQuestion()">← Previous</button>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn practice-answer-btn" id="viewAnswerBtn" onclick="viewPracticeAnswer()"><svg class="ui-icon"><use href="#icon-lightbulb"/></svg>View answer</button>
+      <button class="btn" onclick="clearAnswer()">Clear</button>
+      <button class="btn primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+    </div>
+  </div>
+</section>
+</main>
+
+<aside class="right card">
+  <h3 style="margin:0 0 12px;font-size:13px">Question navigator</h3>
+  <div class="stats"><div class="stat"><small>Answered</small><b id="answeredCount">0</b></div><div class="stat"><small>Review</small><b id="reviewCount">0</b></div></div>
+  <div id="qgrid" class="qgrid"></div>
+</aside>
+<div id="examProgressDrawer" class="exam-progress-drawer" role="complementary" aria-label="Question progress" aria-hidden="true">
+  <div class="drawer-head">
+    <strong>Question Progress</strong>
+    <button class="drawer-close" type="button" onclick="toggleQuestionProgress()" aria-label="Close question palette">×</button>
+  </div>
+  <div class="drawer-legend">
+    <span><i class="legend-dot current"></i> Current</span>
+    <span><i class="legend-dot answered"></i> Answered</span>
+    <span><i class="legend-dot review"></i> Review</span>
+    <span><i class="legend-dot empty"></i> Unanswered</span>
+  </div>
+  <div id="examProgressGrid" class="exam-progress-grid"></div>
+</div>
+</div>
+</section>
+
+<div class="exam-progress-backdrop" onclick="toggleQuestionProgress()" aria-hidden="true"></div>
+
+<!-- DASHBOARD (RESULTS) -->
+<section id="dashboardView" class="view">
+<div class="dashboard beautiful-dashboard">
+
+  <div class="metrics">
+    <div class="metric card metric-tests"><span class="metric-icon">✓</span><small>Tests completed</small><b id="mTests">0</b></div>
+    <div class="metric card metric-average"><span class="metric-icon">◔</span><small>Average score</small><b id="mAvg">0%</b></div>
+    <div class="metric card metric-best"><span class="metric-icon">★</span><small>Best score</small><b id="mBest">0%</b></div>
+    <div class="metric card metric-questions"><span class="metric-icon">#</span><small>Questions attempted</small><b id="mQuestions">0</b></div>
+    <div class="metric card metric-questions"><span class="metric-icon">✓</span><small>Questions solved</small><b id="mSolved">0</b></div>
+  </div>
+  <div class="dashcols" style="display:flex; flex-direction:column; gap:16px;">
+    <section class="panel card recent-quizzes-panel"><div class="panel-heading"><div><h3>Recent Quizzes</h3><small>Your recently opened quizzes</small></div></div><div id="recentQuizzesList"></div></section>
+    <section class="panel card results-panel"><div class="panel-heading"><div><h3>Recent performance</h3><small>Your latest saved sessions</small></div><button class="text-btn" aria-label="Refresh dashboard" onclick="renderDashboard()">↻</button></div><div id="resultsList"></div></section>
+  </div>
+</div>
+</section>
+
+
+<!-- DETAILED RESULTS -->
+<section id="testResultsView" class="view">
+<div class="results-page">
+  <div class="results-topbar">
+    <div class="results-title">
+      <div class="results-title-icon">🏆</div>
+      <div><h1>Test Results</h1><p id="resultSubtitle">CBQ · Practice Mode</p></div>
+    </div>
+    <div class="results-actions">
+      <button class="btn primary" onclick="saveResultCopy()">▣ Save Result</button>
+      <button class="btn" onclick="showView('home')">← Change Exam</button>
+      <button class="btn" onclick="retakeLastTest()">↻ Retake</button>
+    </div>
+  </div>
+
+  <section class="result-hero card">
+    <div class="result-hero-top">
+      <div id="resultStatus" class="result-status">💪 Needs Improvement</div>
+      <div class="result-score"><span id="resultScore">0</span><span id="resultMax">/0</span></div>
+      <div id="resultPercent" class="result-percent">0.0%</div>
+      <div id="resultTime" class="result-time">◷ Time taken: 0s</div>
+      <div class="result-progress"><i id="resultProgressBar"></i></div>
+    </div>
+    <div class="result-stats">
+      <div class="result-stat"><div class="result-stat-icon">✓</div><b id="resultAttempted">0</b><small>Attempted</small></div>
+      <div class="result-stat correct"><div class="result-stat-icon">✓</div><b id="resultCorrect">0</b><small>Correct</small></div>
+      <div class="result-stat wrong"><div class="result-stat-icon">×</div><b id="resultWrong">0</b><small>Wrong</small></div>
+      <div class="result-stat skip"><div class="result-stat-icon">−</div><b id="resultSkipped">0</b><small>Skipped</small></div>
+    </div>
+  </section>
+
+  <section class="result-section card">
+    <div class="section-head">Section Performance</div>
+    <div id="sectionPerformance" class="section-body"></div>
+  </section>
+
+  <section class="result-section card">
+    <div class="section-body">
+      <div class="review-head">
+        <div class="review-title">⚱ Question Review <span id="reviewShown">(0 shown)</span></div>
+        <div class="filters">
+          <select id="resultSectionFilter" onchange="renderResultQuestions()"><option>All Sections</option></select>
+          <button class="filter-btn active" data-filter="all" onclick="setResultFilter('all')">All</button>
+          <button class="filter-btn" data-filter="correct" onclick="setResultFilter('correct')">✓ Correct</button>
+          <button class="filter-btn" data-filter="wrong" onclick="setResultFilter('wrong')">× Wrong</button>
+          <button class="filter-btn" data-filter="skipped" onclick="setResultFilter('skipped')">− Skipped</button>
+          <button class="filter-btn" data-filter="review" onclick="setResultFilter('review')">⚑ Marked</button>
+          <button id="practiceMarkedBtn" class="filter-btn practice-marked-btn" type="button" onclick="practiceMarkedQuestions()" hidden>Practice marked</button>
+        </div>
+      </div>
+    </div>
+    <div id="resultQuestions"></div>
+  </section>
+
+  <div class="result-bottom-grid">
+    <section class="result-insight card"><h3><svg class="ui-icon"><use href="#icon-brain"/></svg> What to work on</h3><p id="resultInsight">Complete a test to receive targeted advice.</p></section>
+    <section class="result-insight card"><h3><svg class="ui-icon"><use href="#icon-target"/></svg> Next step</h3><p id="resultNextStep">Use Practice Mode to strengthen weak concepts, then retake in Exam Mode.</p></section>
+  </div>
+</div>
+</section>
+
+<!-- PLANNER -->
+<section id="plannerView" class="view">
+<div class="planner-page">
+  <div class="planner-hero"><div><div class="hero-kicker">TEST PLANNER</div><h1>Plan a test</h1><p>Schedule CBQs, track important dates, and keep study tasks together.</p></div><button class="btn" onclick="showView('home')">⌂ Home</button></div>
+
+  <section class="card quick-plan planner-paste-card">
+    <div class="quick-plan-head"><div><h3>Paste quiz JSON</h3><small>Scheduling fields: <code>date</code>, <code>examDate</code>, <code>scheduledDate</code>, <code>time</code>.</small></div><button id="planPasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste</button></div>
+    <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
+    <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test · Ctrl/Cmd+Enter</div><div class="quick-plan-actions"><button class="btn" type="button" onclick="clearQuickPlan()">Clear</button><button class="btn primary" type="button" onclick="saveQuickPlan()"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan Test</button></div></div>
+  </section>
+
+  <div class="planner-workspace">
+  <div class="planner-column">
+  <section class="card planner-calendar-card" aria-label="Study calendar">
+    <div class="planner-card-head"><div><div class="hero-kicker">STUDY CALENDAR</div><h2>Mark the dates that matter.</h2><p>Select a date to mark an exam or study day.</p></div></div>
+    <div class="calendar-toolbar"><button class="btn" type="button" onclick="shiftPlannerCalendar(-1)" aria-label="Previous month">←</button><strong id="plannerCalendarTitle"></strong><button class="btn" type="button" onclick="shiftPlannerCalendar(1)" aria-label="Next month">→</button></div>
+    <div id="plannerCalendar" class="planner-calendar"></div>
+    <div class="calendar-legend"><span><i class="calendar-dot exam"></i> Exam date</span><span><i class="calendar-dot important"></i> Important date</span></div>
+    <div class="calendar-editor">
+      <label for="plannerDateInput">Selected date</label>
+      <input id="plannerDateInput" type="date" onchange="selectPlannerDate(this.value)">
+      <input id="plannerDateLabel" type="text" placeholder="Label, e.g. Physics revision" maxlength="80">
+      <div class="calendar-editor-actions"><button class="btn primary" type="button" onclick="savePlannerDate('important')">Mark important</button><button class="btn" type="button" onclick="savePlannerDate('exam')">Set exam date</button><button class="btn" type="button" onclick="removePlannerDate()">Remove</button></div>
+    </div>
+    <div class="deadline-summary"><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate">Choose a date to start your countdown.</span></div>
+  </section>
+  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
+  </div>
+  <section class="panel card planner-todo-card"><div class="panel-heading"><div><h3>Study todo list</h3><small>Keep tasks beside your calendar.</small></div></div>
+    <div class="planner-todo-form"><input type="text" id="plannerTodoInput" placeholder="Add a study task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><input type="date" id="plannerTodoDeadline"><button class="btn primary" type="button" onclick="addPlannerTodo()">Add task</button></div>
+    <div id="plannerTodoList"></div>
+  </section>
+  </div>
+</div>
+</section>
+
+<!-- SETTINGS -->
+<section id="settingsView" class="view">
+<div class="dashboard">
+  <div class="dashhead"><div><h1><svg class="ui-icon"><use href="#icon-settings"/></svg> Settings</h1></div></div>
+  <div class="settings">
+    <section class="setting card setting-appearance"><h3><svg class="ui-icon"><use href="#icon-sun"/></svg> Appearance</h3>
+<div class="setting-actions"><button id="lightBtn" class="modebtn" onclick="setTheme('light')"><svg class="ui-icon"><use href="#icon-sun"/></svg>Light</button><button id="darkBtn" class="modebtn" onclick="setTheme('dark')"><svg class="ui-icon"><use href="#icon-moon"/></svg>Dark</button></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-brain"/></svg> Default mode</h3><div class="setting-actions"><button id="defaultPractice" class="modebtn" onclick="setDefaultMode('practice')">Practice</button><button id="defaultExam" class="modebtn" onclick="setDefaultMode('exam')">Exam</button></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-type"/></svg> Font</h3><div class="setting-control"><select id="fontSelect" onchange="saveSettings()">
+<option value="System Default">System default</option>
+<option value="Serif Elegant">Serif Elegant</option>
+<option value="Modern Rounded">Modern Rounded</option>
+<option value="Monospace">Monospace</option>
+<option value="Source Serif">Source Serif 4</option>
+<option value="Libre Baskerville">Libre Baskerville</option>
+<option value="Lora">Lora</option>
+<option value="DM Sans">DM Sans</option>
+<option value="Nunito Sans">Nunito Sans</option>
+<option value="Inter">Inter</option>
+<option value="Roboto">Roboto</option>
+<option value="Open Sans">Open Sans</option>
+<option value="Manrope">Manrope</option>
+<option value="Merriweather">Merriweather</option>
+<option value="IBM Plex Mono">IBM Plex Mono</option>
+<option value="JetBrains Mono">JetBrains Mono</option>
+<option value="Fira Code">Fira Code</option>
+</select></div></section>
+    <section class="setting card setting-text-size"><h3><svg class="ui-icon"><use href="#icon-text"/></svg> Text size</h3><div class="setting-control"><select id="questionTextSizeSelect" onchange="saveSettings()">
+<option value="small">Small</option>
+<option value="standard">Standard</option>
+<option value="large">Large</option>
+<option value="extra-large">Extra large</option>
+</select></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-width"/></svg> Exam width</h3><div class="setting-control"><select id="examCardWidthSelect" onchange="saveSettings()">
+<option value="compact">Compact</option>
+<option value="balanced">Balanced</option>
+<option value="spacious">Spacious</option>
+</select></div></section>
+    <section class="setting card"><h3><svg class="ui-icon"><use href="#icon-palette"/></svg> Color scheme</h3><div class="setting-control"><select id="colorSchemeSelect" onchange="saveSettings()">
+<option value="classic">Clean White (default)</option>
+<option value="ocean">Ocean Blue</option>
+<option value="forest">Forest Study</option>
+<option value="sunset">Warm Sunset</option>
+<option value="slate">Slate Ink</option>
+</select></div></section>
+    <section class="setting card setting-sounds"><h3><svg class="ui-icon"><use href="#icon-volume"/></svg> Sounds</h3><div class="setting-actions"><button id="soundOnBtn" class="modebtn" type="button" onclick="setSoundEnabled(true)"><svg class="ui-icon"><use href="#icon-volume"/></svg>On</button><button id="soundOffBtn" class="modebtn" type="button" onclick="setSoundEnabled(false)">Mute</button><button class="btn" type="button" onclick="testAnswerSound()">Test</button></div></section>
+    <section class="setting card setting-duration"><h3><svg class="ui-icon"><use href="#icon-clock"/></svg> Default duration</h3><div class="setting-control"><select id="defaultDuration" onchange="saveSettings()">
+<option value="5">5 minutes</option><option value="10">10 minutes</option>
+<option value="15">15 minutes</option><option value="20">20 minutes</option>
+<option value="30">30 minutes</option><option value="45">45 minutes</option>
+<option value="60">60 minutes</option>
+</select></div></section>
+
+<section id="promptLibrary" class="prompt-settings-card">
+<div class="prompt-library-head"><div><span class="prompt-eyebrow">CBQ LAB</span><h3>Your prompt collection</h3><p>Choose a saved prompt for copying, or experiment with a draft.</p></div><span id="promptSlotCount" class="prompt-count">0 slots</span></div>
+<div class="prompt-workspace">
+<div class="prompt-slot-sidebar" aria-label="Prompt slots"><div id="promptSlotList" class="prompt-slot-list"></div><button class="btn prompt-new-slot" type="button" onclick="addPromptSlot()">+ New prompt</button></div>
+<div class="prompt-edit-pane">
+<div class="prompt-name-row"><label for="promptSlotName">Prompt name<input id="promptSlotName" class="prompt-library-edit" oninput="editPrompt()" placeholder="Name this experiment"></label><div class="prompt-slot-tools"><button class="btn prompt-library-edit" type="button" onclick="addPromptSlot(true)">Duplicate</button><button id="deletePromptBtn" class="btn" type="button" onclick="deletePromptSlot()">Delete</button></div></div>
+<label class="prompt-editor-label" for="seedPromptEditor">Seed prompt <span>Paste your instructions and schema</span></label>
+<textarea id="seedPromptEditor" class="prompt-editor prompt-library-edit" rows="14" spellcheck="false" placeholder="Write your CBQ prompt here…" aria-describedby="seedPromptStatus" oninput="editPrompt()"></textarea>
+<div id="seedPromptStatus" class="prompt-status" role="status"></div>
+<div class="prompt-editor-actions"><button class="btn primary prompt-library-edit" type="button" onclick="savePrompt()">Save slot</button><button class="btn prompt-library-edit" type="button" onclick="copyPromptDraft()">Copy draft</button><button class="btn prompt-library-edit" type="button" onclick="copyBeginnerSchema()">Copy saved</button><button class="btn prompt-library-edit" type="button" onclick="discardPromptDraft()">Discard edits</button></div>
+</div></div>
+</section>
+
+<section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
+<div class="shortcut-grid">
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>4</kbd></span><span>Home / exam / plan / settings</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>I</kbd></span><span>Import quiz</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>X</kbd></span><span>Export data</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>S</kbd></span><span>Save session</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>D</kbd></span><span>Light / dark</span></div>
+<div><span class="shortcut-keys"><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Enter</kbd></span><span>Load quiz / plan test</span></div>
+<div><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Close</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>E</kbd> / <kbd>P</kbd></span><span>Exam / practice</span></div>
+<div><span class="shortcut-keys"><kbd>H</kbd></span><span>Show / hide hint</span></div>
+<div><span class="shortcut-keys"><kbd>P</kbd></span><span>Question palette</span></div>
+<div><span class="shortcut-keys"><kbd>G</kbd></span><span>Open ChatGPT</span></div>
+<div><span class="shortcut-keys"><kbd>C</kbd></span><span>Copy question</span></div>
+<div><span class="shortcut-keys"><kbd>V</kbd></span><span>View answer in practice</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>S</kbd></span><span>Submit quiz</span></div>
+<div><span class="shortcut-keys"><kbd>R</kbd></span><span>Mark for review</span></div>
+<div><span class="shortcut-keys"><kbd>1</kbd>–<kbd>4</kbd></span><span>Select answer</span></div>
+<div><span class="shortcut-keys"><kbd>Enter</kbd></span><span>Check / confirm</span></div>
+<div><span class="shortcut-keys"><kbd>←</kbd> / <kbd>→</kbd></span><span>Previous / next</span></div>
+<div><span class="shortcut-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></span><span>Clear answer</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd></span><span>Retake / save / home</span></div>
+</div></section>
+<section class="setting card setting-data"><h3><svg class="ui-icon"><use href="#icon-database"/></svg> Local data</h3><div class="setting-actions">
+<button class="btn" onclick="exportData()">Export JSON</button>
+<label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>
+<button class="btn" onclick="resetData()">Reset data</button>
+</div>
+<div id="dataImportStatus" class="paste-status" style="margin-top:8px" hidden></div></section>
+  </div>
+</div>
+</section>
+
+</div>
+
+<!-- IMPORTER -->
+<div id="importer" class="modal">
+<div class="importbox">
+  <h2>＋ Add CBQ Quiz</h2>
+  <p>Paste your quiz JSON directly. No template is inserted — optimized for fast CBQ copy/paste. Supports flat lists, explicit sections, aliases, and LaTeX.</p>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:8px">
+    <button id="importPasteBtn" class="btn primary" onclick="pasteFromClipboard('jsonInput','jsonStatus','importPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste from Clipboard</button>
+  </div>
+  <textarea id="jsonInput" class="jsoninput" spellcheck="false" placeholder='Paste your CBQ quiz JSON directly here...'></textarea>
+  <div id="jsonStatus" class="status"></div>
+  <div class="importfoot"><label class="filelabel"><svg class="ui-icon"><use href="#icon-file"/></svg>Import .json<input type="file" accept=".json,application/json" onchange="readFile(event)"></label><div style="display:flex;gap:7px"><button class="btn" onclick="closeImporter()">Cancel</button><button class="btn primary" onclick="loadQuiz()">Load Quiz</button></div></div>
+</div>
+</div>
+
+<!-- SUBMIT -->
+<div id="submitModal" class="modal"><div class="modalbox"><h2>Submit test?</h2><p id="submitText"></p><div class="modalactions"><button class="btn" onclick="closeSubmit()">Keep working</button><button class="btn primary" onclick="finishTest()">Submit & save result</button></div></div></div>
+
+<!-- SESSIONS -->
+<div id="sessionsModal" class="modal"><div class="modalbox" style="width:min(560px,100%)"><h2><svg class="ui-icon"><use href="#icon-database"/></svg> Saved sessions</h2><p>Restore a quiz exactly where you left it.</p><div id="mobileSessions"></div><div class="modalactions"><button class="btn" onclick="closeSessions()">Close</button></div></div></div>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/study-dashboard.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

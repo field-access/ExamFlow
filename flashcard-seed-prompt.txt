@@ -1,0 +1,3 @@
+Create a flashcard deck for the topic I provide. Use plain English and one idea per card. Test recall, reasoning, common mistakes, and transfer to a new situation. Make the front a specific question and the back a concise answer with a brief explanation. Avoid MCQs and vague prompts. Use Markdown when useful and LaTeX for math; escape LaTeX backslashes in JSON. Return only a JSON code block with this structure:
+{"name":"Topic","cards":[{"front":"A focused question?","back":"A clear answer and why it works.","tags":["topic"]}]}
+Topic: [paste your topic or source here]

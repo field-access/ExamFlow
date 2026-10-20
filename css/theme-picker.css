@@ -1,0 +1,35 @@
+#settingsView .setting.card.theme-settings { grid-column:1/-1; display:block; padding:22px!important; border-radius:16px; }
+.theme-picker-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+#settingsView .theme-picker-heading h3 { font-size:16px; }
+.theme-picker-heading>span { color:var(--muted); font:400 13px/1.5 "DM Sans",sans-serif; }
+.theme-picker { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+.theme-choice { position:relative; cursor:pointer; min-width:0; --preview-bg:#f4f6f6; --preview-tint:#ccd7d9; }
+.theme-choice[data-theme=ocean] { --preview-bg:#edf3f3; --preview-tint:#adc9c9; }
+.theme-choice[data-theme=forest] { --preview-bg:#f0f3ef; --preview-tint:#bbcbb8; }
+.theme-choice[data-theme=sunset] { --preview-bg:#f7f1ee; --preview-tint:#d9bfb5; }
+.theme-choice[data-theme=slate] { --preview-bg:#eef1f4; --preview-tint:#bac4cf; }
+.theme-choice input { position:absolute; width:1px; height:1px; opacity:0; margin:0; }
+.theme-choice-content { display:block; padding:8px 8px 12px; border:1px solid var(--line); border-radius:12px; background:var(--surface); transition:border-color .18s,box-shadow .18s; }
+.theme-choice:hover .theme-choice-content { border-color:var(--primary); }
+.theme-choice input:checked + .theme-choice-content { border-color:var(--primary); box-shadow:0 0 0 1px var(--primary),0 4px 16px color-mix(in srgb,var(--primary) 9%,transparent); }
+.theme-choice input:focus-visible + .theme-choice-content { outline:2px solid var(--primary); outline-offset:4px; }
+.theme-preview { position:relative; display:block; height:94px; overflow:hidden; border:1px solid rgb(80 100 100 / .1); border-radius:8px; background:radial-gradient(ellipse at 10% 0%,var(--preview-tint),transparent 95%),var(--preview-bg); }
+.theme-preview-nav { display:block; height:13px; border-bottom:1px solid rgb(80 100 100 / .08); background:rgb(255 255 255 / .65); }
+.theme-preview-card { position:absolute; top:27px; left:16%; width:68%; height:53px; box-sizing:border-box; padding:11px; border:1px solid #ddd8cd; border-radius:7px; background:#fcfbf8; box-shadow:0 3px 9px rgb(30 65 65 / .06); }
+.theme-preview-card b { display:block; width:72%; height:4px; border-radius:2px; background:#889b9e; }
+.theme-preview-card em { display:block; width:45%; height:11px; margin-top:10px; border-radius:3px; background:#3f6f75; }
+.theme-preview-check { position:absolute; right:5px; top:5px; display:grid; place-items:center; width:21px; height:21px; border-radius:50%; background:#3f6f75; color:#fff; font:700 12px/1 sans-serif; opacity:0; }
+.theme-choice input:checked + .theme-choice-content .theme-preview-check { opacity:1; }
+.theme-choice-name { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:12px 4px 3px; color:var(--text); font:600 14px/1.4 "DM Sans",sans-serif; }
+.theme-choice-name small { color:var(--muted); font-size:10px; font-weight:400; }
+.theme-choice-description { display:block; margin:0 4px; color:var(--muted); font:400 12px/1.5 "DM Sans",sans-serif; }
+body.dark .theme-choice { --preview-bg:#1b1e1e; --preview-tint:#3a4545; }
+body.dark .theme-choice[data-theme=ocean] { --preview-bg:#191e1e; --preview-tint:#354a49; }
+body.dark .theme-choice[data-theme=forest] { --preview-bg:#1b1e1b; --preview-tint:#3c493c; }
+body.dark .theme-choice[data-theme=sunset] { --preview-bg:#211d1c; --preview-tint:#514039; }
+body.dark .theme-choice[data-theme=slate] { --preview-bg:#1d1f21; --preview-tint:#3e454c; }
+body.dark .theme-preview-nav { background:rgb(35 40 38 / .8); border-color:rgb(255 255 255 / .08); }
+body.dark .theme-preview-card { background:#252827; border-color:#46514c; }
+@media(max-width:750px) { .theme-picker { grid-template-columns:repeat(3,minmax(0,1fr)); } .theme-picker-heading { align-items:start; flex-direction:column; gap:6px; } }
+@media(max-width:450px) { #settingsView .setting.card.theme-settings { padding:16px!important; } .theme-picker { grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; } }
+@media(prefers-reduced-motion:reduce) { .theme-choice-content { transition:none; } }

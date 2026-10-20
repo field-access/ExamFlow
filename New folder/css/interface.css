@@ -1,0 +1,24 @@
+/* Interface sizing stays independent from the quiz's adjustable text scale. */
+body { font-size:15px; }
+body .btn, body .modebtn, body .bookmark, body .preset-btn { font-size:14px; min-height:40px; }
+body header .btn, body .topnav button, body .nav button { font-size:14px; }
+body .panel-heading h3, body .panel h3 { font-size:17px; }
+body .panel-heading small, body .resultmain small, body .paste-status, body .status { font-size:13px; line-height:1.5; }
+body .resultmain strong { font-size:15px; }
+body .metric small, body .stat small, body .side-title { font-size:12px; }
+#settingsView .setting.card h3 { font-size:14px; }
+#settingsView .setting-actions>*, #settingsView .setting-control select { font-size:14px; min-height:42px; }
+#settingsView .keyboard-shortcuts-card .shortcut-grid span { font-size:13px; }
+#promptLibrary .btn, #promptLibrary .prompt-slot strong { font-size:14px; }
+#promptLibrary .prompt-status, #promptLibrary .prompt-slot span, #promptLibrary .prompt-editor-label, #promptLibrary .prompt-name-row>label { font-size:13px; }
+#plannerView .calendar-weekdays, #plannerView .calendar-legend, #plannerView .calendar-editor label { font-size:12px; }
+#plannerView .calendar-day { font-size:14px; }
+#plannerView .calendar-editor-actions .btn { font-size:13px; }
+#homeView .home-session-actions .btn, #homeView .home-session-row .resultmain strong { font-size:14px; }
+#homeView .home-session-row .resultmain small { font-size:13px; }
+#examView #examProgressBtn, #examView .modepicker .modebtn { font-size:12px!important; }
+@media(max-width:600px){
+  body header .btn{font-size:12px}
+  #settingsView .setting.card h3{font-size:14px}
+  #settingsView .setting-actions>*, #settingsView .setting-control select{font-size:13px}
+}

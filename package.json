@@ -2,6 +2,7 @@
   "name": "examflow",
   "private": true,
   "scripts": {
-    "build": "node scripts/build.mjs"
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/flashcards-core.test.cjs"
   }
 }

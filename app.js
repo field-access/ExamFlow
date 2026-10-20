@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",study:"examflow_study_activity_v1"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",study:"examflow_study_activity_v1",flashcards:"examflow_flashcards_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -21,6 +21,7 @@ restoreFromPersistentStorage().then(()=>{
     renderDashboard();
     renderPlans();
     renderHome();
+    if(document.getElementById("flashcardsView")?.classList.contains("active"))Flashcards.refresh();
   }catch(e){}
 }).finally(()=>requestPersistentStorage());
 
@@ -67,7 +68,7 @@ async function restorePersistentBackup(){
       req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
     });
     db.close();
-    if(!record?.data)return false;
+    if(!record?.data || (localStorage.getItem("examflow_last_reset") && String(record.savedAt||"")<=localStorage.getItem("examflow_last_reset")))return false;
     let restored=false;
     Object.entries(record.data).forEach(([k,v])=>{
       if(Object.values(K).includes(k)){
@@ -78,7 +79,7 @@ async function restorePersistentBackup(){
       try{localStorage.setItem("examflow_exam_deadline",record.data.examDeadline);restored=true}catch(e){}
     }
     if(restored){
-      try{renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();}catch(e){}
+      try{renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();if(document.getElementById("flashcardsView")?.classList.contains("active"))Flashcards.refresh();}catch(e){}
     }
     return restored;
   }catch(e){return false}
@@ -130,6 +131,7 @@ function openRecentQuiz(idValue){
   const session=get(K.sessions,[]).find(x=>x.examId===idValue&&!x.examFinished);
   if(session){restoreSession(session.id);return}
   const exam=getExamRecord(idValue);if(!exam)return;
+  sessionId=null;
   examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;quizDurationMinutes=clampDurationMinutes(exam.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
 }
 
@@ -325,7 +327,7 @@ async function restoreFromPersistentStorage(){
       req.onerror=()=>reject(req.error);
     });
     db.close();
-    if(!snapshot || !snapshot.data)return;
+    if(!snapshot || !snapshot.data || (localStorage.getItem("examflow_last_reset") && String(snapshot.savedAt||"")<=localStorage.getItem("examflow_last_reset")))return;
 
     // Only restore missing keys; never overwrite newer localStorage data.
     Object.entries(snapshot.data).forEach(([key,value])=>{
@@ -370,7 +372,7 @@ function saveSettings(){
   if(duration)settings.defaultDuration=[5,10,15,20,30,45,60].includes(Number(duration.value))?Number(duration.value):5;
   const fs=document.getElementById("fontSelect");if(fs)settings.fontFamily=fs.value;
   const textSize=document.getElementById("questionTextSizeSelect");if(textSize)settings.questionTextSize=textSize.value;
-  const cs=document.getElementById("colorSchemeSelect");if(cs)settings.colorScheme=cs.value;
+  const cs=document.querySelector('input[name="colorScheme"]:checked');if(cs)settings.colorScheme=cs.value;
   const cw=document.getElementById("examCardWidthSelect");if(cw)settings.examCardWidth=cw.value;
   put(K.settings,settings);applySettings();
 }
@@ -390,7 +392,7 @@ function applySettings(){
  const scheme=schemes.includes(settings.colorScheme)?settings.colorScheme:"classic";
  settings.colorScheme=scheme;
  document.body.classList.add(`scheme-${scheme}`);
- const cs=document.getElementById("colorSchemeSelect");if(cs)cs.value=scheme;
+ document.querySelectorAll('input[name="colorScheme"]').forEach(input=>input.checked=input.value===scheme);
  const widths=["compact","balanced","spacious"];
  const width=widths.includes(settings.examCardWidth)?settings.examCardWidth:"balanced";
  settings.examCardWidth=width;
@@ -423,6 +425,7 @@ function applySettings(){
  mode=settings.defaultMode;updateModeUI()
 }
 function setTheme(x){settings.theme=x;put(K.settings,settings);applySettings()}
+function setColorScheme(value){if(!["classic","ocean","forest","sunset","slate"].includes(value))return;settings.colorScheme=value;put(K.settings,settings);applySettings()}
 function setSoundEnabled(enabled){settings.soundEnabled=!!enabled;put(K.settings,settings);applySettings();toast(enabled?"Interface sounds on":"Interface sounds muted")}
 function setDefaultMode(x){settings.defaultMode=x;put(K.settings,settings);setMode(x)}
 function updateTheme(){document.getElementById("lightBtn").classList.toggle("active",settings.theme==="light");document.getElementById("darkBtn").classList.toggle("active",settings.theme==="dark")}
@@ -464,6 +467,7 @@ function setPracticeTimer(minutes){
 }
 function updateModeUI(){
  document.body.classList.toggle("practice-active",mode==="practice");
+ const toolsMode=document.getElementById("questionToolsMode");if(toolsMode)toolsMode.textContent=mode==="practice"?"Practice":"Exam";
  document.getElementById("examMode").classList.toggle("active",mode==="exam");
  document.getElementById("practiceMode").classList.toggle("active",mode==="practice");
  document.getElementById("defaultExam").classList.toggle("active",settings.defaultMode==="exam");
@@ -753,8 +757,9 @@ function renderQuizInlineMarkdown(text){
     .replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,"$1<em>$2</em>");
   return html.replace(/\uE000(\d+)\uE001/g,(_,index)=>tokens[Number(index)]);
 }
-function quizMarkdownHtml(text){
-  const lines=String(text??"").replace(/\\n/g,"\n").replace(/\r\n?/g,"\n").split("\n");
+function quizMarkdownHtml(text,{literalNewlines=true}={}){
+  const source=String(text??"").replace(/\r\n?/g,"\n");
+  const lines=(literalNewlines?source.replace(/\\n/g,"\n"):source).split("\n");
   const blocks=[];
   let paragraph=[],i=0;
   const flushParagraph=()=>{
@@ -809,14 +814,16 @@ function quizMarkdownHtml(text){
   flushParagraph();
   return blocks.join("");
 }
-function setQuizRichText(element,text){
+function setQuizRichText(element,text,options){
   if(!element)return;
   element.classList.add("quiz-rich-text");
-  element.innerHTML=quizMarkdownHtml(text);
+  element.innerHTML=quizMarkdownHtml(text,options);
 }
 function setQuizExplanation(element,text){
   if(!element)return;
-  element.innerHTML='<strong><svg class="ui-icon"><use href="#icon-lightbulb"/></svg> Explanation</strong>';
+  element.setAttribute("role","region");
+  element.setAttribute("aria-labelledby","explanationHeading");
+  element.innerHTML='<div class="explanation-heading"><span class="explanation-icon" aria-hidden="true"><svg class="ui-icon"><use href="#icon-lightbulb"/></svg></span><h3 id="explanationHeading">Explanation</h3></div>';
   const content=document.createElement("div");
   content.className="explanation-content";
   setQuizRichText(content,formatExplanationText(text));
@@ -1082,8 +1089,11 @@ function examflowSelectOptionByNumber(n){
 }
 function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
+  if(window.CBQReviewPreview?.handleKey(e))return;
+  if(window.Flashcards?.handleKey(e))return;
 
   if(e.key==="Escape"){
+    const tools=document.getElementById("questionTools");if(tools)tools.open=false;
     closeImporter();closeSubmit();closeSessions();
     if(typeof closeCBQModal === "function") closeCBQModal();
     const drawer=document.getElementById("examProgressDrawer");
@@ -1117,11 +1127,16 @@ function examflowKeyboardHandler(e){
 
   // Never hijack normal text editing.
   if(typing)return;
+  if(!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&!e.altKey&&!e.repeat&&lower==="f"&&
+     (document.getElementById("examView")?.classList.contains("active")||document.getElementById("testResultsView")?.classList.contains("active"))){
+    e.preventDefault();saveVisibleCBQFlashcard(e.target);return;
+  }
 
   // Alt+number navigation stays separate from quiz answer keys and browser tabs.
-  if(e.altKey && !e.shiftKey && /^[1-4]$/.test(e.key)){
+  if(e.altKey && !e.shiftKey && /^[1-6]$/.test(e.key)){
     e.preventDefault();
-    const page=["home","exam","planner","settings"][Number(e.key)-1];
+    if(e.key==="6"){openNotes();return}
+    const page=["home","exam","flashcards","planner","settings"][Number(e.key)-1];
     if(page)showView(page);
     return;
   }
@@ -1185,6 +1200,19 @@ function examflowKeyboardHandler(e){
 
 /* Single keyboard router: all app shortcuts live here. */
 document.addEventListener("keydown",examflowKeyboardHandler,true);
+document.addEventListener("click",event=>{const tools=document.getElementById("questionTools");if(tools?.open&&(!tools.contains(event.target)||event.target.closest("button")))tools.open=false;});
+
+function saveVisibleCBQFlashcard(target){
+  if(document.getElementById("examView")?.classList.contains("active")){
+    if(mode!=="practice"||!checkedQuestions.has(current)){toast("Reveal or verify the answer in Practice before saving a flashcard.");return;}
+    if(questions[current])Flashcards.saveQuestion(questions[current],examName);
+    return;
+  }
+  const row=target?.closest?.(".result-question")||document.querySelector("#resultQuestions .result-question.keyboard-current")||document.querySelector("#resultQuestions .result-question.open");
+  const index=Number(row?.dataset.questionIndex);
+  if(row&&Number.isInteger(index)&&lastResultSnapshot?.questions[index])Flashcards.saveQuestion(lastResultSnapshot.questions[index],lastResultSnapshot.name);
+  else toast("Open a result question or select it with the arrow keys, then press F.");
+}
 
 
 /* Lightweight click pulse: visual confirmation for every interactive button */
@@ -1546,8 +1574,9 @@ function finishTest(automatic=false){
  const r=saveResult();saveSession();openDetailedResults(r);toast(automatic?"Time is up. Exam submitted.":`Result saved · ${r.percent}% ✓`)
 }
 
+const deletedSessionIds=new Set();
 function saveSession(){
- if(!questions.length)return;
+ if(!questions.length||deletedSessionIds.has(sessionId))return;
  const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
  const item={id:sid,examId:examId||sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
  const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
@@ -1560,10 +1589,20 @@ function renderSessions(){
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
+ deletedSessionIds.delete(sid);
  sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(60*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=clampDurationMinutes(s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
-function deleteSession(sid){put(K.sessions,get(K.sessions,[]).filter(x=>x.id!==sid));renderSessions();renderDashboard();renderHome();}
+function deleteSession(sid){
+ const saved=get(K.sessions,[]);
+ if(!saved.some(x=>x.id===sid))return;
+ deletedSessionIds.add(sid);
+ if(sessionId===sid){clearTimeout(saveTimer);timerState.running=false;updateTimerUI()}
+ put(K.sessions,saved.filter(x=>x.id!==sid));
+ put(K.study,get(K.study,[]).filter(x=>x.sessionId!==sid));
+ renderSessions();renderDashboard();renderHome();
+ toast("Session deleted");
+}
 
 
 async function redirectQuestionToChatGPT(){
@@ -1767,7 +1806,7 @@ function renderResultQuestions(){
    const isReview=!!q.isReview;
    const selected=resultValueText(q,q.selected);
    const correct=correctValueText(q);
-   return `<div class="result-question ${status}" onclick="this.classList.toggle('open')">
+   return `<div class="result-question ${status}" data-question-index="${q.index}" onclick="selectResultQuestion(this)">
      <div class="result-qno">${q.index+1}</div>
      <div>
        <div class="result-qmeta">SECTION ${esc(q.section||"GENERAL")} <span style="margin-left:5px">· ${status==="correct"?"✓ Correct +"+q.marks:status==="wrong"?"× Wrong":"Skipped"}</span>${isReview?'<span class="result-mark" aria-label="Marked for review">⚑ Marked for review</span>':""}</div>
@@ -1779,12 +1818,17 @@ function renderResultQuestions(){
          <strong>Options / Items</strong>
          <div style="margin-top:5px">${optionsHtml(q)}</div>
          ${q.explanation?`<div class="result-explanation"><strong><svg class="ui-icon"><use href="#icon-lightbulb"/></svg> Explanation</strong><br>${esc(q.explanation)}</div>`:""}
+         <button class="btn save-flashcard" title="Save this question as a flashcard (F)" onclick="event.stopPropagation();Flashcards.saveQuestion(lastResultSnapshot.questions[${q.index}],lastResultSnapshot.name)"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Save flashcard <kbd>F</kbd></button>
        </div>
      </div>
      <div class="result-status-icon">${status==="correct"?"✓":status==="wrong"?"×":"−"}</div>
    </div>`;
  }).join(""):'<div class="empty">No questions match this filter.</div>';
  renderAllQuizMath(el);
+}
+function selectResultQuestion(row){
+ document.querySelectorAll("#resultQuestions .keyboard-current").forEach(item=>item.classList.remove("keyboard-current"));
+ row.classList.add("keyboard-current");row.classList.toggle("open");
 }
 
 function practiceMarkedQuestions(){
@@ -1998,19 +2042,21 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions","exams","recent","study"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent","study","flashcards"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
+    const flashcardBackup=parsed.flashcards!==undefined?Flashcards.validateBackup(parsed.flashcards):null;
 
     const overwrite=confirm(
       "Import this ExamFlow backup?\\n\\n" +
-      "This will replace your current settings, results, goals, plans, saved sessions and quiz history with the backup."
+      "This will replace the settings, results, goals, plans, sessions, quiz history and flashcards included in the backup."
     );
     if(!overwrite){
       event.target.value="";
       return;
     }
 
+    if(flashcardBackup){localStorage.setItem(K.flashcards,JSON.stringify(flashcardBackup));schedulePersistentBackup();Flashcards.refresh();}
     if(parsed.settings!==undefined)put(K.settings,parsed.settings);
     if(parsed.results!==undefined)put(K.results,Array.isArray(parsed.results)?parsed.results:[]);
     if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
@@ -2046,9 +2092,22 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click()
+ const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
-function resetData(){if(confirm("Reset all local ExamFlow data?")){Object.values(K).forEach(x=>localStorage.removeItem(x));location.reload()}}
+async function resetData(){
+ if(!confirm("Reset all local ExamFlow data?"))return;
+ clearTimeout(saveTimer);clearTimeout(examflowBackupTimer);
+ window.removeEventListener("beforeunload",saveSession);
+ Object.values(K).forEach(x=>localStorage.removeItem(x));
+ localStorage.removeItem("examflow_exam_deadline");
+ localStorage.setItem("examflow_last_reset",new Date().toISOString());
+ // Clear both recovery stores so a reset cannot resurrect the deleted decks and quizzes.
+ await Promise.allSettled([openExamFlowDB().then(db=>clearRecoveryStore(db,"backup")),openBackupDB().then(db=>clearRecoveryStore(db,EXAMFLOW_BACKUP_STORE))]);
+ location.reload();
+}
+function clearRecoveryStore(db,store){
+ return new Promise((resolve,reject)=>{const tx=db.transaction(store,"readwrite");tx.objectStore(store).clear();tx.oncomplete=()=>{db.close();resolve()};tx.onerror=tx.onabort=()=>{db.close();reject(tx.error)}});
+}
 
 
 
@@ -2366,16 +2425,18 @@ function showView(name){
  if(name==="exam"){updateTimerUI();updateModeUI();}
  document.body.classList.toggle("exam-active",name==="exam");
  window.scrollTo({top:0,behavior:"smooth"});
- ["home","exam","dashboard","testResults","planner","settings"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
- ["navHome","navExam","navPlanner","navSettings"].forEach(x=>document.getElementById(x).classList.remove("active"));
- const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings"}[name];
+ ["home","exam","dashboard","testResults","planner","settings","flashcards"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
+ ["navHome","navExam","navPlanner","navSettings","navFlashcards"].forEach(x=>document.getElementById(x).classList.remove("active"));
+ const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings",flashcards:"navFlashcards"}[name];
  if(activeNav)document.getElementById(activeNav).classList.add("active");
+ if(name==="flashcards")Flashcards.refresh();
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  renderPromptSettings();updateTheme();updateModeUI()}
 }
 function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
+function openNotes(){closeMobileNav();window.open("https://refmaps.vercel.app/","_blank","noopener,noreferrer")}
 function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
@@ -2478,6 +2539,8 @@ function showPracticeAnswerPanel(q){
     const letter=document.createElement("span");letter.className="answer-option-letter";letter.textContent=String.fromCharCode(65+correctIndex);
     const text=document.createElement("div");setQuizRichText(text,q.options[correctIndex]);value.append(letter,text);
   }
+  const save=document.createElement("button");save.className="btn save-flashcard";save.title="Save this question as a flashcard (F)";save.innerHTML='<svg class="ui-icon"><use href="#icon-bookmark"/></svg>Save flashcard <kbd>F</kbd>';
+  save.addEventListener("click",()=>Flashcards.saveQuestion(q,examName));panel.querySelector(".answer-label").append(save);
   panel.style.display="block";renderAllQuizMath(panel);
 }
 function applyVerifiedAnswerStyles(q,chosen){

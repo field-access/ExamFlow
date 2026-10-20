@@ -1,0 +1,61 @@
+/* Core study cards retain their reference palette independently of the page theme. */
+body {
+  --study-teal:#3f6f75;
+  --study-teal-end:#50777b;
+  --study-teal-ink:#3f6f75;
+  --study-surface:#fcfbf8;
+  --study-surface2:#f5f4ef;
+  --study-text:#293b40;
+  --study-muted:#6c7b7e;
+  --study-line:#ddd8cd;
+}
+body.dark {
+  --study-teal-ink:#9dc8cc;
+  --study-surface:#252827;
+  --study-surface2:#303533;
+  --study-text:#e8eeeb;
+  --study-muted:#aab8b3;
+  --study-line:#46514c;
+}
+:is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) {
+  --surface:var(--study-surface);
+  --surface2:var(--study-surface2);
+  --text:var(--study-text);
+  --muted:var(--study-muted);
+  --line:var(--study-line);
+  --paper:var(--study-surface);
+  --paper2:var(--study-surface2);
+  --cream:var(--study-surface2);
+  --ink:var(--study-text);
+  --primary:var(--study-teal-ink);
+  --primary2:var(--study-teal-ink);
+  --accent:var(--study-teal-ink);
+  --accent2:var(--study-teal-ink);
+  --ux-primary:var(--study-teal-ink);
+  --ux-primary-2:var(--study-teal-ink);
+  --primary-soft:color-mix(in srgb,var(--study-teal-ink) 9%,var(--surface));
+  --control-info:var(--study-teal-ink);
+  --control-study:var(--study-teal-ink);
+  --control-plan:var(--study-teal-ink);
+  --control-warm:var(--study-teal-ink);
+}
+body :is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) .btn.primary {
+  background:linear-gradient(135deg,var(--study-teal),var(--study-teal-end))!important;
+  border-color:var(--study-teal)!important;
+  color:#fff!important;
+  box-shadow:0 4px 12px color-mix(in srgb,var(--study-teal) 18%,transparent),0 0 22px color-mix(in srgb,var(--study-teal) 12%,transparent);
+}
+body :is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) .btn.primary .ui-icon { color:inherit!important; }
+body :is(.json-home,.study-session-card,#examView .question,#flashcardsView .fc-panel,#flashcardsView .fc-deck,#flashcardsView .fc-face,#cbqPreviewDialog .fc-face) {
+  background:var(--study-surface)!important;
+  color:var(--study-text)!important;
+  border-color:color-mix(in srgb,var(--study-teal-ink) 26%,var(--study-line))!important;
+  box-shadow:0 5px 22px color-mix(in srgb,var(--study-teal-ink) 10%,transparent),0 0 30px color-mix(in srgb,var(--study-teal-ink) 6%,transparent)!important;
+}
+body :is(.json-home,#importer,#flashcardsView) textarea { background:var(--study-surface2)!important; border-color:var(--study-line)!important; color:var(--study-text)!important; }
+body .home-continue-panel { background:var(--study-surface)!important; color:var(--study-text); }
+body.exam-active #examView .question { background:var(--study-surface)!important; border-color:color-mix(in srgb,var(--study-teal-ink) 26%,var(--study-line))!important; }
+body :is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) ::selection {
+  background:var(--study-teal);
+  color:#fff;
+}

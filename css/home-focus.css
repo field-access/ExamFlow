@@ -1,0 +1,23 @@
+/* The paste panel carries the primary action; the introduction stays quiet. */
+body #homeView .home-stage { grid-template-columns:minmax(0,1fr) minmax(340px,1fr); gap:24px; }
+body #homeView .home-stage .hero-copy {
+  padding:32px!important;
+  min-height:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  font-family:"DM Sans","Segoe UI",sans-serif;
+}
+body #homeView .hero-copy::before,body #homeView .hero-copy::after { content:none!important; }
+body #homeView .hero-copy .hero-kicker { font:600 11px/1.5 "DM Sans",sans-serif; color:var(--primary); letter-spacing:.08em; margin-bottom:14px; }
+body #homeView .home-stage .hero-copy h1 { max-width:520px; font-family:"DM Sans","Segoe UI",sans-serif!important; font-size:clamp(28px,3.2vw,42px)!important; font-weight:600!important; line-height:1.18!important; letter-spacing:-.03em!important; margin:0 0 18px; }
+body #homeView .home-stage .hero-copy p { max-width:42ch; margin:0; font:400 16px/1.7 "DM Sans","Segoe UI",sans-serif; color:var(--muted); }
+body #homeView .hero-copy .hero-actions { display:flex!important; flex-wrap:wrap; gap:8px 16px; margin-top:24px; }
+body #homeView .hero-copy .hero-actions .btn { width:auto; min-height:36px; padding:5px 0; border:0!important; border-radius:4px; background:transparent!important; box-shadow:none!important; font:500 13px/1.5 "DM Sans",sans-serif; }
+body #homeView .hero-copy .hero-actions .btn:hover { text-decoration:underline; text-underline-offset:4px; }
+body #homeView .home-stage .json-home { padding:24px!important; }
+body #homeView .json-home-head h3 { margin:0 0 14px; font:600 20px/1.4 "DM Sans",sans-serif; }
+body #homeView .home-stage .home-json-input { min-height:170px; margin-top:14px; }
+body #homeView .home-stage .paste-status { font:400 12px/1.5 "DM Sans",sans-serif; }
+@media(max-width:850px) { body #homeView .home-stage { grid-template-columns:1fr; gap:16px; } body #homeView .home-stage .hero-copy { padding:12px 8px 20px!important; } }
+@media(max-width:600px) { body #homeView .home-stage .json-home { padding:18px!important; } body #homeView .hero-copy .hero-actions { gap:8px 14px; margin-top:18px; } }
