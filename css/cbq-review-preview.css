@@ -4,15 +4,21 @@
 .study-session-card .study-review-note { margin:14px 0 0; }
 .cbq-preview-dialog { box-sizing:border-box; width:min(780px,calc(100% - 32px)); max-height:calc(100dvh - 32px); padding:28px; border:1px solid var(--line); border-radius:24px; color:var(--text); background:var(--surface); font:inherit; overflow:auto; box-shadow:0 16px 70px color-mix(in srgb,var(--primary) 18%,transparent); }
 .cbq-preview-dialog::backdrop { background:rgb(0 0 0 / .42); backdrop-filter:blur(6px); }
-.cbq-preview-heading { display:flex; justify-content:space-between; align-items:start; gap:16px; }
+.cbq-preview-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; }
 .cbq-preview-heading small { color:var(--primary); font-size:13px; }
-.cbq-preview-heading h2 { margin:6px 0 0; font-size:24px; line-height:1.35; overflow-wrap:anywhere; }
+.cbq-preview-heading h2 { margin:0; font:600 20px/1.4 "DM Sans","Segoe UI",sans-serif; overflow-wrap:anywhere; }
 .cbq-preview-heading .btn { flex:none; font-size:24px!important; padding:4px 12px; }
 #cbqPreviewNote,.cbq-preview-keys { color:var(--muted); font-size:13px; line-height:1.6; }
 .cbq-preview-filters { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 12px; }
 .cbq-preview-filters .btn { font-size:13px!important; }
 .cbq-preview-filters span,.study-review-actions button span { opacity:.8; font-variant-numeric:tabular-nums; }
-.cbq-preview-position { font-size:13px; color:var(--muted); margin:16px 0; }
+.cbq-preview-toolbar { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin:14px 0 8px; }
+.cbq-preview-toolbar select { max-width:100%; min-height:34px; padding:6px 24px 6px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--muted); font:400 13px/1.4 "DM Sans",sans-serif; }
+.cbq-preview-position { font:400 13px/1.5 "DM Sans",sans-serif; color:var(--muted); margin:0; }
+.cbq-preview-accessible { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+body #cbqPreviewDialog.cbq-preview-dialog .fc-face { border:0!important; border-radius:0; box-shadow:none!important; background:var(--surface)!important; padding:20px 2px; }
+body #cbqPreviewDialog .cbq-preview-navigation > .btn:not(.primary),body #cbqPreviewDialog #cbqPreviewClose { background:transparent!important; border-color:transparent!important; box-shadow:none!important; }
+.cbq-preview-navigation #cbqPreviewFlip { min-width:160px; }
 .cbq-preview-dialog .fc-face { padding:28px; min-height:250px; gap:14px; line-height:1.7; font-size:18px; }
 .cbq-preview-dialog .fc-face p { margin:0 0 12px; }
 .cbq-preview-dialog .fc-face p:last-child { margin-bottom:0; }

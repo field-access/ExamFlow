@@ -15,7 +15,7 @@
       <section id="fcImport" class="fc-panel" hidden aria-labelledby="fcImportTitle">
         <div class="fc-panel-heading"><div><h2 id="fcImportTitle">Bring your ideas here</h2><p>Paste a generated deck, or choose a JSON file. Preview it before saving.</p></div><button class="btn" data-fc="close-import" aria-label="Close deck importer">Close</button></div>
         <div class="fc-import-grid">
-          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Load deck (Ctrl/Cmd+Enter)">Load deck</button></div><small class="fc-import-shortcut">Paste JSON → Ctrl/Cmd+Enter to load</small><p id="fcImportStatus" role="status"></p></div>
+          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Paste clipboard & load (Ctrl/Cmd+Enter)">Load deck</button></div><small class="fc-import-shortcut">Ctrl/Cmd+Enter → paste clipboard & load</small><p id="fcImportStatus" role="status"></p></div>
           <details class="fc-import-help"><summary>Need a deck to start with?</summary><p>Ask your AI for focused questions and concise answers.</p><div class="fc-actions"><button class="btn" data-fc="copy-prompt">Copy generation prompt</button><button class="btn" data-fc="example">Try an example</button></div></details>
         </div>
         <div id="fcPreview" class="fc-preview" hidden></div>
@@ -41,7 +41,7 @@
       <div><dt><kbd>B</kbd></dt><dd>Back to decks</dd></div>
       <div><dt><kbd>N</kbd></dt><dd>Add a deck from the library</dd></div>
       <div><dt><kbd>C</kbd></dt><dd>Copy schema from the library</dd></div>
-      <div><dt><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd></dt><dd>Open importer / load pasted deck · save card edits</dd></div>
+      <div><dt><kbd data-shortcut-primary>Ctrl</kbd> + <kbd>Enter</kbd></dt><dd>Paste clipboard & load deck · save card edits</dd></div>
       <div><dt><kbd>Esc</kbd></dt><dd>Close help, cancel edit, or close import</dd></div>
       <div><dt><kbd>?</kbd></dt><dd>Show shortcuts</dd></div>
     </dl><p>Ratings work on the answer side. Text fields keep their normal editing shortcuts.</p>

@@ -27,6 +27,14 @@
 .study-date-actions { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
 .study-date-actions .btn { flex:1; font-size:12px!important; padding:8px; }
 .study-content-column { min-width:0; }
+.study-search-bar { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.study-search-bar input { width:100%; min-width:0; flex:1; box-sizing:border-box; padding:10px 12px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--text); font:400 14px/1.5 "DM Sans",sans-serif; }
+.study-search-bar input::placeholder { color:var(--muted); opacity:1; }
+.study-search-bar select { max-width:145px; min-height:42px; padding:8px; border:1px solid var(--line); border-radius:9px; background:var(--surface); color:var(--muted); font:400 12px/1.5 "DM Sans",sans-serif; }
+.study-search-bar .btn { min-width:32px; padding:5px; border:0; background:transparent; }
+.study-search-bar :focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
+.study-session-card .study-search-match { font-size:13px; line-height:1.6; color:var(--text); overflow-wrap:anywhere; margin-bottom:12px; }
+@media(max-width:450px){.study-search-bar{flex-wrap:wrap}.study-search-bar input{flex-basis:calc(100% - 40px)}.study-search-bar select{max-width:none;min-height:34px}.study-search-bar .btn{order:-1}}
 .study-list-heading { display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:16px; }
 .study-list-heading h4 { margin:0; font-size:17px; }
 .study-list-heading>span { flex:none; font-size:13px; color:var(--muted); }

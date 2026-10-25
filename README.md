@@ -1,4 +1,8 @@
-# ExamFlow
+# QuizFlow
+
+On Mac, use **Option+1–6** for page navigation, **Option+I** to import a quiz, **Option+M** for the mobile menu, **Option+X** to export, and **Option+S** to save the current session. **Cmd+Enter** loads pasted quizzes/decks or saves flashcard edits; **Cmd+Z** undoes a flashcard rating. Option shortcuts use physical key codes so macOS symbols do not break navigation. Shortcut help displays Mac labels automatically. Windows/Linux retain Alt navigation and Ctrl actions; standard browser shortcuts remain available.
+
+Continue studying includes a keyword search across saved quiz titles and question content. Choose Title & content, Title only, or Content only. Multiple keywords must all match; matching titles come first. Searching without a calendar date includes prior loaded quizzes and completed results, preferring a resumable session for each quiz. A selected date limits the search to that day's history. Questions, options, matching prompts, sections and hints are searchable; explanations are searchable for Practice/completed work. Unsubmitted Exam explanations and correct answers stay hidden. Clear the search to return to in-progress sessions. **Option+F** on Mac / **Alt+F** elsewhere opens this search.
 
 Static exam and practice app. Serve this folder over HTTP so the prompt JSON loads automatically.
 
@@ -29,11 +33,11 @@ Import previews validate every card before saving. Adding to a saved deck skips 
 
 Review due and new cards in small sessions. Flip between question and answer with Space, Enter, or the flip button, then rate Again, Hard, Good or Easy with keys 1–4. New cards return in 1 minute, 10 minutes, 1 day or 4 days respectively. Successful later reviews increase the interval; Again returns a card to learning. A card appears once per session, and overdue reviews come before new cards. Browse does not change scheduling. Editing a card's content resets its schedule. Reduced-motion preferences disable the flip animation.
 
-Deck session settings and management are under **Options**. Press **?** for shortcut help, **U** to undo a rating, **B** to return to decks, **N** to add a deck, and **C** to copy the schema from the library. In Browse, use the arrow keys to move and **E** to edit. Ctrl/Cmd+Enter opens the importer from the library, loads pasted JSON in one press, or saves card edits; text fields retain normal typing and undo behavior.
+Deck session settings and management are under **Options**. Press **?** for shortcut help, **U** to undo a rating, **B** to return to decks, **N** to add a deck, and **C** to copy the schema from the library. In Browse, use the arrow keys to move and **E** to edit. Ctrl/Cmd+Enter opens the importer, pastes the latest clipboard JSON and loads the deck in one press, or saves card edits; text fields retain normal typing and undo behavior.
 
 Ratings save immediately; returning to the page or reloading resumes the active session. Undo reverses the most recent rating in the current visit. Quiz practice answers and completed result reviews have a **Save as flashcard** button for a shared explanations deck. Review activity appears in the home study calendar.
 
-Press **F** to save a revealed/verified practice question or the selected question in completed results. The shortcut does not interrupt text entry. Navigation follows page order: **Alt+1** Home, **Alt+2** Exam, **Alt+3** Flashcards, **Alt+4** Plan, **Alt+5** Settings.
+Press **F** to save a revealed/verified practice question or the selected question in completed results. The shortcut does not interrupt text entry. Navigation follows page order: **Alt+1** Home, **Alt+2** Quiz, **Alt+3** Flashcards, **Alt+4** Plan, **Alt+5** Settings.
 
 Data is stored in this browser, included in persistent recovery and Settings data backups. Deck export contains portable content; the full app export also includes scheduling and activity. There is no account or automatic cross-device sync.
 

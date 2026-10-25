@@ -5,16 +5,16 @@ body {
   --study-teal-ink:#3f6f75;
   --study-surface:#fcfbf8;
   --study-surface2:#f5f4ef;
-  --study-text:#293b40;
-  --study-muted:#6c7b7e;
+  --study-text:#1d2e33;
+  --study-muted:#506164;
   --study-line:#ddd8cd;
 }
 body.dark {
   --study-teal-ink:#9dc8cc;
   --study-surface:#252827;
   --study-surface2:#303533;
-  --study-text:#e8eeeb;
-  --study-muted:#aab8b3;
+  --study-text:#f2f6f3;
+  --study-muted:#c0ccc6;
   --study-line:#46514c;
 }
 :is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) {
@@ -34,10 +34,6 @@ body.dark {
   --ux-primary:var(--study-teal-ink);
   --ux-primary-2:var(--study-teal-ink);
   --primary-soft:color-mix(in srgb,var(--study-teal-ink) 9%,var(--surface));
-  --control-info:var(--study-teal-ink);
-  --control-study:var(--study-teal-ink);
-  --control-plan:var(--study-teal-ink);
-  --control-warm:var(--study-teal-ink);
 }
 body :is(#examView,#flashcardsView,#importer,#cbqPreviewDialog,.json-home,.home-hero,.home-continue-panel) .btn.primary {
   background:linear-gradient(135deg,var(--study-teal),var(--study-teal-end))!important;

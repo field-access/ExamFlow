@@ -1091,6 +1091,7 @@ function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
   if(window.CBQReviewPreview?.handleKey(e))return;
   if(window.Flashcards?.handleKey(e))return;
+  if(e.target.id==="studyQuizSearch"&&(e.ctrlKey||e.metaKey))return;
 
   if(e.key==="Escape"){
     const tools=document.getElementById("questionTools");if(tools)tools.open=false;
@@ -1132,21 +1133,23 @@ function examflowKeyboardHandler(e){
     e.preventDefault();saveVisibleCBQFlashcard(e.target);return;
   }
 
-  // Alt+number navigation stays separate from quiz answer keys and browser tabs.
-  if(e.altKey && !e.shiftKey && /^[1-6]$/.test(e.key)){
+  // Option on macOS can change event.key into a symbol. Read its physical code.
+  const optionKey=KeyboardShortcuts.optionKey(e);
+  if(e.altKey && !e.shiftKey && /^[1-6]$/.test(optionKey)){
     e.preventDefault();
-    if(e.key==="6"){openNotes();return}
-    const page=["home","exam","flashcards","planner","settings"][Number(e.key)-1];
+    if(optionKey==="6"){openNotes();return}
+    const page=["home","exam","flashcards","planner","settings"][Number(optionKey)-1];
     if(page)showView(page);
     return;
   }
-  if(e.altKey && lower==="m"){e.preventDefault();toggleMobileNav();return}
-  if(e.altKey && lower==="i"){e.preventDefault();openImporter();return}
-  if(e.altKey && lower==="x"){e.preventDefault();exportData();return}
-  if(e.altKey && lower==="s"){
+  if(e.altKey && !e.shiftKey && optionKey==="m"){e.preventDefault();toggleMobileNav();return}
+  if(e.altKey && !e.shiftKey && optionKey==="i"){e.preventDefault();openImporter();return}
+  if(e.altKey && !e.shiftKey && optionKey==="x"){e.preventDefault();exportData();return}
+  if(e.altKey && !e.shiftKey && optionKey==="s"){
     if(document.getElementById("examView")?.classList.contains("active")){e.preventDefault();saveSession();toast("Session saved ✓")}
     return;
   }
+  if(e.altKey && !e.shiftKey && optionKey==="f"){e.preventDefault();showView("home");document.getElementById("studyQuizSearch")?.focus({preventScroll:false});return}
 
   if(e.shiftKey && !e.altKey && lower==="l"){e.preventDefault();setTheme("light");return}
   if(e.shiftKey && !e.altKey && lower==="d"){e.preventDefault();setTheme("dark");return}
@@ -1378,7 +1381,7 @@ async function initPromptLibrary(){
 function copyBeginnerSchema(override){
   const text=typeof override==="string"?override:getPromptText();
   if(!text){toast("Choose a saved prompt with text in Settings first");return}
-  const done=()=>toast("AI CBQ prompt and schema copied ✓");
+  const done=()=>toast("CBQ prompt copied ✓");
   if(navigator.clipboard?.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>{
       const ta=document.createElement("textarea");
@@ -2044,11 +2047,11 @@ async function importDataFile(event){
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
     const allowed=["settings","results","goal","plans","sessions","exams","recent","study","flashcards"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
-    if(!hasBackup)throw new Error("This is a quiz JSON, not an ExamFlow data backup. Use Add CBQ Quiz.");
+    if(!hasBackup)throw new Error("This is a quiz JSON, not a QuizFlow data backup. Use Add CBQ Quiz.");
     const flashcardBackup=parsed.flashcards!==undefined?Flashcards.validateBackup(parsed.flashcards):null;
 
     const overwrite=confirm(
-      "Import this ExamFlow backup?\\n\\n" +
+      "Import this QuizFlow backup?\\n\\n" +
       "This will replace the settings, results, goals, plans, sessions, quiz history and flashcards included in the backup."
     );
     if(!overwrite){
@@ -2078,7 +2081,7 @@ async function importDataFile(event){
       status.textContent="✓ Backup imported successfully.";
       status.style.color="var(--good)";
     }
-    toast("ExamFlow data imported ✓");
+    toast("QuizFlow data imported ✓");
   }catch(err){
     if(status){
       status.hidden=false;
@@ -2095,7 +2098,7 @@ function exportData(){
  const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
 async function resetData(){
- if(!confirm("Reset all local ExamFlow data?"))return;
+ if(!confirm("Reset all local QuizFlow data?"))return;
  clearTimeout(saveTimer);clearTimeout(examflowBackupTimer);
  window.removeEventListener("beforeunload",saveSession);
  Object.values(K).forEach(x=>localStorage.removeItem(x));

@@ -137,3 +137,15 @@ body .btn:not(.primary):hover { background: var(--surface2); }
   background: linear-gradient(120deg, color-mix(in srgb, var(--primary) 5%, var(--surface)), var(--surface));
   border-color: var(--line);
 }
+
+/* Keep both body copy and secondary labels readable across every backdrop. */
+body:not(.dark),body:not(.dark)[class*="scheme-"] {
+  --text:#1d2b2f;
+  --muted:#506168;
+  --ink:var(--text);
+}
+body.dark,body.dark[class*="scheme-"] {
+  --text:#f2f6f3;
+  --muted:#c0ccc6;
+  --ink:var(--text);
+}

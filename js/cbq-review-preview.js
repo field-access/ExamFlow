@@ -62,8 +62,9 @@
     const cards = queue(), card = cards[state.cursor];
     const complete = !card && cards.length > 0;
     $('cbqPreviewTitle').textContent = state.name;
-    $('cbqPreviewFilters').innerHTML = [['all', 'All to review', state.cards.length], ['marked', 'Marked', state.cards.filter(c => c.review).length], ['mistakes', 'Mistakes', state.cards.filter(c => c.mistake).length]].map(([key, label, count]) => '<button type="button" class="btn' + (state.filter === key ? ' primary' : '') + '" data-preview-filter="' + key + '" aria-pressed="' + (state.filter === key) + '">' + label + ' <span>' + count + '</span></button>').join('');
-    $('cbqPreviewProgress').textContent = card ? (state.cursor + 1) + ' / ' + cards.length + ' · Question ' + (card.index + 1) + (card.review ? ' · Marked' : '') + (card.mistake ? ' · Mistake' : '') : complete ? 'Preview complete · ' + cards.length + ' cards' : 'No questions in this group';
+    $('cbqPreviewFilters').innerHTML = [['all', 'All to review', state.cards.length], ['marked', 'Marked', state.cards.filter(c => c.review).length], ['mistakes', 'Mistakes', state.cards.filter(c => c.mistake).length]].map(([key, label, count]) => '<option value="' + key + '">' + label + ' (' + count + ')</option>').join('');
+    $('cbqPreviewFilters').value = state.filter;
+    $('cbqPreviewProgress').textContent = card ? 'Preview · ' + (state.cursor + 1) + ' / ' + cards.length : complete ? 'Preview complete' : 'No questions in this group';
     $('cbqPreviewBody').hidden = !card;
     $('cbqPreviewEmpty').hidden = !!card;
     $('cbqPreviewEmpty').textContent = complete ? 'You reached the end. Review again, or return to your quiz.' : 'No eligible questions here. Try another group.';
@@ -71,7 +72,7 @@
     $('cbqPreviewFlip').hidden = !card;
     $('cbqPreviewPrevious').disabled = !cards.length || state.cursor === 0;
     $('cbqPreviewNext').hidden = !card;
-    $('cbqPreviewNext').textContent = state.cursor === cards.length - 1 ? 'Finish preview' : 'Next →';
+    $('cbqPreviewNext').textContent = state.cursor === cards.length - 1 ? 'Done' : '→';
     if (!card) return;
     state.revealed = false;
     const value = content(card.q);
@@ -139,12 +140,15 @@
     $('cbqPreviewDialog').addEventListener('click', e => {
       const button = e.target.closest('button');
       if (!button || !state) return;
-      if (button.dataset.previewFilter) { state.filter = button.dataset.previewFilter; state.cursor = 0; render(); }
-      else if (button.id === 'cbqPreviewClose') $('cbqPreviewDialog').close();
+      if (button.id === 'cbqPreviewClose') $('cbqPreviewDialog').close();
       else if (button.id === 'cbqPreviewFlip') flip();
       else if (button.id === 'cbqPreviewPrevious') move(-1);
       else if (button.id === 'cbqPreviewNext') move(1);
       else if (button.id === 'cbqPreviewRestart') { state.cursor = 0; render(); $('cbqPreviewFlip').focus(); }
+    });
+    $('cbqPreviewFilters').addEventListener('change', e => {
+      if (!state || !['all', 'marked', 'mistakes'].includes(e.target.value)) return;
+      state.filter = e.target.value; state.cursor = 0; render();
     });
     $('cbqPreviewDialog').addEventListener('close', () => {
       state = null;

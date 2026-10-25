@@ -3,6 +3,7 @@
   const C = window.FlashcardsCore, $ = id => document.getElementById(id);
   const KEY = 'examflow_flashcards_v1';
   let state = { version: 1, decks: [], session: null, activity: [] }, pending = null, undo = null, editor = false, readFailed = false;
+  let clipboardLoadBusy = false, clipboardLoadRequest = 0;
   const example = { name: 'Binary search · reasoning', description: 'Understand why halving works, then transfer the idea.', cards: [
     { front: 'Why must data be sorted before binary search?', back: 'Sorted order tells us which **half can be discarded** after comparing the target with the middle element.', tags: ['algorithms', 'reasoning'] },
     { front: 'The middle value is smaller than the target. Which half can you discard, and why?', back: 'Discard the middle value and everything to its left. Every value there is at most the middle value, so none can equal the larger target.', tags: ['algorithms'] },
@@ -74,7 +75,7 @@
     if (state.session && !save({ ...state, session: null })) return;
     undo = null; render(); $('flashcardsView').classList.add('is-importing'); $('fcImport').hidden = false; $('fcJson').focus();
   }
-  function closeImport() { $('fcImport').hidden = true; $('flashcardsView').classList.remove('is-importing'); $('flashcardsView').querySelector('.fc-heading [data-fc=open-import]').focus(); }
+  function closeImport() { clipboardLoadRequest++; $('fcImport').hidden = true; $('flashcardsView').classList.remove('is-importing'); $('flashcardsView').querySelector('.fc-heading [data-fc=open-import]').focus(); }
   function preview() {
     try {
       pending = C.parse($('fcJson').value);
@@ -99,6 +100,29 @@
     } catch (e) { notice(e.message, true); }
   }
   function loadImport() { if (!pending) preview(); if (pending) saveImport(); }
+  async function loadClipboardDeck() {
+    if (clipboardLoadBusy) return;
+    clipboardLoadBusy = true;
+    const request = ++clipboardLoadRequest;
+    try {
+      if ($('fcImport').hidden) openImport();
+      if ($('fcImport').hidden) return;
+      const before = $('fcJson').value;
+      if (!window.isSecureContext || !navigator.clipboard?.readText) throw new Error('Clipboard access is unavailable. Paste JSON manually, then click Load deck.');
+      const text = await navigator.clipboard.readText();
+      if (request !== clipboardLoadRequest || !$('flashcardsView').classList.contains('active') || $('fcImport').hidden || $('fcJson').value !== before) return;
+      if (!text.trim()) throw new Error('The clipboard is empty. Copy a flashcard JSON deck first.');
+      $('fcJson').value = text;
+      $('fcJson').dispatchEvent(new Event('input', { bubbles: true }));
+      loadImport();
+    } catch (error) {
+      if (request !== clipboardLoadRequest || !$('flashcardsView').classList.contains('active') || $('fcImport').hidden) return;
+      $('fcImportStatus').classList.add('fc-error');
+      $('fcImportStatus').textContent = error.name === 'NotAllowedError'
+        ? 'Allow clipboard access for this site, or paste JSON manually and click Load deck.' : error.message;
+      $('fcJson').focus();
+    } finally { clipboardLoadBusy = false; }
+  }
   function start(deck, mode, container) {
     if (!deck) return;
     const limit = mode === 'browse' ? C.MAX_CARDS : Number(container?.querySelector('[data-option=limit]')?.value || 20);
@@ -261,8 +285,7 @@
     if (e.repeat) return false;
     if ((e.ctrlKey || e.metaKey) && key === 'Enter' && !e.altKey && !e.shiftKey) {
       if (editor) return consume(() => invoke('save-edit'));
-      if (!$('fcImport').hidden) return consume(loadImport);
-      return consume(() => { openImport(); if ($('fcJson').value.trim()) loadImport(); });
+      return consume(loadClipboardDeck);
     }
     if (typing) return false;
     if ((e.ctrlKey || e.metaKey) && lower === 'z' && !e.shiftKey && undo) return consume(() => invoke('undo'));

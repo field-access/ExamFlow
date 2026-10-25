@@ -1,15 +1,13 @@
 <dialog id="cbqPreviewDialog" class="cbq-preview-dialog" aria-labelledby="cbqPreviewTitle" aria-describedby="cbqPreviewNote">
-  <div class="cbq-preview-heading"><div><small>CBQ · Flashcard preview</small><h2 id="cbqPreviewTitle"></h2></div><button id="cbqPreviewClose" class="btn" type="button" aria-label="Close preview">×</button></div>
-  <p id="cbqPreviewNote">Review only · No deck is saved. Your quiz progress stays unchanged.</p>
-  <div id="cbqPreviewFilters" class="cbq-preview-filters" role="group" aria-label="Questions to review"></div>
-  <p id="cbqPreviewProgress" class="cbq-preview-position" role="status" aria-live="polite"></p>
+  <div class="cbq-preview-heading"><h2 id="cbqPreviewTitle"></h2><button id="cbqPreviewClose" class="btn" type="button" aria-label="Close preview" title="Close (Esc)">×</button></div>
+  <p id="cbqPreviewNote" class="cbq-preview-accessible">Review only. No deck is saved. Your quiz progress stays unchanged. Space or Enter flips the card; arrow keys browse; Escape closes.</p>
+  <div class="cbq-preview-toolbar"><p id="cbqPreviewProgress" class="cbq-preview-position" role="status" aria-live="polite"></p><select id="cbqPreviewFilters" aria-label="Questions to review"></select></div>
   <div id="cbqPreviewBody" class="fc-card-scene">
     <div id="cbqPreviewCard" class="fc-flip-card">
-      <div id="cbqPreviewFrontPanel" class="fc-face fc-face-front"><div class="fc-card-label">Question</div><div id="cbqPreviewFront"></div><img id="cbqPreviewImage" alt="Question illustration" hidden></div>
-      <div id="cbqPreviewBackPanel" class="fc-face fc-face-back" inert aria-hidden="true"><div class="fc-card-label">Answer & explanation</div><div id="cbqPreviewBack"></div><div id="cbqPreviewSelected" class="cbq-preview-selected"></div></div>
+      <div id="cbqPreviewFrontPanel" class="fc-face fc-face-front" aria-label="Question"><div id="cbqPreviewFront"></div><img id="cbqPreviewImage" alt="Question illustration" hidden></div>
+      <div id="cbqPreviewBackPanel" class="fc-face fc-face-back" aria-label="Answer and explanation" inert aria-hidden="true"><div id="cbqPreviewBack"></div><div id="cbqPreviewSelected" class="cbq-preview-selected"></div></div>
     </div>
   </div>
   <p id="cbqPreviewEmpty" class="cbq-preview-empty" hidden></p>
-  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn">← Previous</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false">Show answer</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn">Next →</button></div>
-  <p class="cbq-preview-keys">Space / Enter to flip · ← → to browse · Esc to close</p>
+  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn" aria-label="Previous card" title="Previous (←)">←</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false" title="Flip (Space / Enter)">Show answer</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn" aria-label="Next card or finish preview" title="Next (→)">→</button></div>
 </dialog>

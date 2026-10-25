@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ExamFlow — Practice & Exam</title>
+<title>QuizFlow — Practice & Quizzes</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎓</text></svg>">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
@@ -13,17 +13,17 @@
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="css/prompt-library.css">
 <link rel="stylesheet" href="css/question-palette.css">
-<link rel="stylesheet" href="css/themes.css?v=2">
+<link rel="stylesheet" href="css/themes.css?v=3">
 <link rel="stylesheet" href="css/study-dashboard.css">
 <link rel="stylesheet" href="css/interface.css">
 <link rel="stylesheet" href="css/answer-feedback.css">
-<link rel="stylesheet" href="css/controls.css">
+<link rel="stylesheet" href="css/controls.css?v=2">
 <link rel="stylesheet" href="css/glow.css">
 <link rel="stylesheet" href="css/flashcards.css">
 <link rel="stylesheet" href="css/exam-focus.css">
 <link rel="stylesheet" href="css/exam-explanation.css">
 <link rel="stylesheet" href="css/cbq-review-preview.css">
-<link rel="stylesheet" href="css/study-accent.css?v=2">
+<link rel="stylesheet" href="css/study-accent.css?v=3">
 <link rel="stylesheet" href="css/theme-picker.css">
 <link rel="stylesheet" href="css/home-focus.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -58,11 +58,11 @@
   <symbol id="icon-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
 </svg>
 <header>
-  <button class="brand home-brand" onclick="showView('home')" aria-label="Go to ExamFlow home"><div class="logo"><svg class="ui-icon"><use href="#icon-brain"/></svg></div><span>ExamFlow</span></button>
+  <button class="brand home-brand" onclick="showView('home')" aria-label="Go to QuizFlow home"><div class="logo"><svg class="ui-icon"><use href="#icon-brain"/></svg></div><span>QuizFlow</span></button>
   <button class="mobile-menu-toggle" type="button" onclick="toggleMobileNav()" aria-label="Open navigation" aria-controls="mobileNav"><svg class="ui-icon"><use href="#icon-menu"/></svg></button>
   <nav class="topnav">
     <button id="navHome" class="active" onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button>
-    <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button>
+    <button id="navExam" onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Quiz</button>
     <button id="navFlashcards" onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
     <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
     <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
@@ -77,7 +77,7 @@
 </header>
 <nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
   <button onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
-  <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Exam</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
+  <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Quiz</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
   <button onclick="openNotes()" title="Open Refmaps in a new tab"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
 </nav>
 
@@ -95,9 +95,8 @@
       <h1>Understand it.<br>One question at a time.</h1>
       <p>Build your reasoning with connected questions, then apply what you learn.</p>
       <div class="hero-actions">
-        <button class="btn" onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Learn flashcards</button>
         <button class="btn" type="button" onclick="Flashcards.copyPrompt(this)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy flashcard prompt</button>
-        <button class="btn" type="button" onclick="copyBeginnerSchema()">Copy CBQ schema</button>
+        <button class="btn" type="button" onclick="copyBeginnerSchema()">Copy CBQ prompt</button>
       </div>
     </section>
 
@@ -219,7 +218,7 @@
 <div class="main">
 <aside class="sidebar card">
   <div class="side-title">Navigate</div>
-  <div class="nav"><button onclick="showView('home')">⌂ Home</button><div class="side-title" style="margin-top:13px">Exam</div>
+  <div class="nav"><button onclick="showView('home')">⌂ Home</button><div class="side-title" style="margin-top:13px">Quiz</div>
     <button class="active"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
     <button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
     <button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
@@ -480,7 +479,7 @@
 
 <section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
 <div class="shortcut-grid">
-<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>6</kbd></span><span>Home / exam / flashcards / plan / settings / notes ↗</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>6</kbd></span><span>Home / quiz / flashcards / plan / settings / notes ↗</span></div>
 <div><span class="shortcut-keys"><kbd>Space</kbd> · <kbd>1</kbd>–<kbd>4</kbd> · <kbd>U</kbd></span><span>Flashcards: flip / rate / undo</span></div>
 <div><span class="shortcut-keys"><kbd>N</kbd> · <kbd>B</kbd> · <kbd>?</kbd></span><span>Flashcards: add deck / library / shortcut help</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
@@ -488,7 +487,8 @@
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>X</kbd></span><span>Export data</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>S</kbd></span><span>Save session</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>L</kbd> / <kbd>D</kbd></span><span>Light / dark</span></div>
-<div><span class="shortcut-keys"><kbd>Ctrl</kbd> / <kbd>Cmd</kbd> + <kbd>Enter</kbd></span><span>Load quiz / plan test</span></div>
+<div><span class="shortcut-keys"><kbd data-shortcut-primary>Ctrl</kbd> + <kbd>Enter</kbd></span><span>Load quiz / plan test</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>F</kbd></span><span>Search previous quizzes</span></div>
 <div><span class="shortcut-keys"><kbd>Esc</kbd></span><span>Close</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>E</kbd> / <kbd>P</kbd></span><span>Exam / practice</span></div>
 <div><span class="shortcut-keys"><kbd>H</kbd></span><span>Show / hide hint</span></div>
@@ -532,7 +532,7 @@
       <section id="fcImport" class="fc-panel" hidden aria-labelledby="fcImportTitle">
         <div class="fc-panel-heading"><div><h2 id="fcImportTitle">Bring your ideas here</h2><p>Paste a generated deck, or choose a JSON file. Preview it before saving.</p></div><button class="btn" data-fc="close-import" aria-label="Close deck importer">Close</button></div>
         <div class="fc-import-grid">
-          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Load deck (Ctrl/Cmd+Enter)">Load deck</button></div><small class="fc-import-shortcut">Paste JSON → Ctrl/Cmd+Enter to load</small><p id="fcImportStatus" role="status"></p></div>
+          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Paste clipboard & load (Ctrl/Cmd+Enter)">Load deck</button></div><small class="fc-import-shortcut">Ctrl/Cmd+Enter → paste clipboard & load</small><p id="fcImportStatus" role="status"></p></div>
           <details class="fc-import-help"><summary>Need a deck to start with?</summary><p>Ask your AI for focused questions and concise answers.</p><div class="fc-actions"><button class="btn" data-fc="copy-prompt">Copy generation prompt</button><button class="btn" data-fc="example">Try an example</button></div></details>
         </div>
         <div id="fcPreview" class="fc-preview" hidden></div>
@@ -558,7 +558,7 @@
       <div><dt><kbd>B</kbd></dt><dd>Back to decks</dd></div>
       <div><dt><kbd>N</kbd></dt><dd>Add a deck from the library</dd></div>
       <div><dt><kbd>C</kbd></dt><dd>Copy schema from the library</dd></div>
-      <div><dt><kbd>Ctrl</kbd> / <kbd>⌘</kbd> + <kbd>Enter</kbd></dt><dd>Open importer / load pasted deck · save card edits</dd></div>
+      <div><dt><kbd data-shortcut-primary>Ctrl</kbd> + <kbd>Enter</kbd></dt><dd>Paste clipboard & load deck · save card edits</dd></div>
       <div><dt><kbd>Esc</kbd></dt><dd>Close help, cancel edit, or close import</dd></div>
       <div><dt><kbd>?</kbd></dt><dd>Show shortcuts</dd></div>
     </dl><p>Ratings work on the answer side. Text fields keep their normal editing shortcuts.</p>
@@ -590,22 +590,21 @@
 <div id="toast" class="toast"></div>
 
 <dialog id="cbqPreviewDialog" class="cbq-preview-dialog" aria-labelledby="cbqPreviewTitle" aria-describedby="cbqPreviewNote">
-  <div class="cbq-preview-heading"><div><small>CBQ · Flashcard preview</small><h2 id="cbqPreviewTitle"></h2></div><button id="cbqPreviewClose" class="btn" type="button" aria-label="Close preview">×</button></div>
-  <p id="cbqPreviewNote">Review only · No deck is saved. Your quiz progress stays unchanged.</p>
-  <div id="cbqPreviewFilters" class="cbq-preview-filters" role="group" aria-label="Questions to review"></div>
-  <p id="cbqPreviewProgress" class="cbq-preview-position" role="status" aria-live="polite"></p>
+  <div class="cbq-preview-heading"><h2 id="cbqPreviewTitle"></h2><button id="cbqPreviewClose" class="btn" type="button" aria-label="Close preview" title="Close (Esc)">×</button></div>
+  <p id="cbqPreviewNote" class="cbq-preview-accessible">Review only. No deck is saved. Your quiz progress stays unchanged. Space or Enter flips the card; arrow keys browse; Escape closes.</p>
+  <div class="cbq-preview-toolbar"><p id="cbqPreviewProgress" class="cbq-preview-position" role="status" aria-live="polite"></p><select id="cbqPreviewFilters" aria-label="Questions to review"></select></div>
   <div id="cbqPreviewBody" class="fc-card-scene">
     <div id="cbqPreviewCard" class="fc-flip-card">
-      <div id="cbqPreviewFrontPanel" class="fc-face fc-face-front"><div class="fc-card-label">Question</div><div id="cbqPreviewFront"></div><img id="cbqPreviewImage" alt="Question illustration" hidden></div>
-      <div id="cbqPreviewBackPanel" class="fc-face fc-face-back" inert aria-hidden="true"><div class="fc-card-label">Answer & explanation</div><div id="cbqPreviewBack"></div><div id="cbqPreviewSelected" class="cbq-preview-selected"></div></div>
+      <div id="cbqPreviewFrontPanel" class="fc-face fc-face-front" aria-label="Question"><div id="cbqPreviewFront"></div><img id="cbqPreviewImage" alt="Question illustration" hidden></div>
+      <div id="cbqPreviewBackPanel" class="fc-face fc-face-back" aria-label="Answer and explanation" inert aria-hidden="true"><div id="cbqPreviewBack"></div><div id="cbqPreviewSelected" class="cbq-preview-selected"></div></div>
     </div>
   </div>
   <p id="cbqPreviewEmpty" class="cbq-preview-empty" hidden></p>
-  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn">← Previous</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false">Show answer</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn">Next →</button></div>
-  <p class="cbq-preview-keys">Space / Enter to flip · ← → to browse · Esc to close</p>
+  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn" aria-label="Previous card" title="Previous (←)">←</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false" title="Flip (Space / Enter)">Show answer</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn" aria-label="Next card or finish preview" title="Next (→)">→</button></div>
 </dialog>
 
 
+<script src="js/keyboard-shortcuts.js"></script>
 <script src="js/study-dashboard.js"></script>
 <script src="js/flashcards-core.js"></script>
 <script src="js/cbq-review-preview.js"></script>

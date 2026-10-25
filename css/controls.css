@@ -1,5 +1,6 @@
 /* Small, restrained accents distinguish actions without coloring the surfaces. */
 body {
+  --icon-base:#3f6f75;
   --control-info:#536d97;
   --control-study:#75618c;
   --control-plan:#4b775d;
@@ -7,6 +8,7 @@ body {
   --control-danger:#ad514c;
 }
 body.dark {
+  --icon-base:#9dc8cc;
   --control-info:#a9bad7;
   --control-study:#bdacd0;
   --control-plan:#a4c2ad;
@@ -35,15 +37,14 @@ body .modebtn.active, #examView .modepicker .modebtn.active {
   border-color:color-mix(in srgb,var(--primary) 35%,var(--line));
   box-shadow:none;
 }
-body .ui-icon { color:var(--icon-tone,var(--primary))!important; }
+body .ui-icon { color:var(--icon-tone,var(--icon-base))!important; }
 .ui-icon:has(use[href="#icon-brain"]) { --icon-tone:var(--control-study); }
 .ui-icon:has(use[href="#icon-copy"]), .ui-icon:has(use[href="#icon-external"]),
 .ui-icon:has(use[href="#icon-file"]) { --icon-tone:var(--control-info); }
 .ui-icon:has(use[href="#icon-calendar"]), .ui-icon:has(use[href="#icon-chart"]) { --icon-tone:var(--control-plan); }
 .ui-icon:has(use[href="#icon-bookmark"]), .ui-icon:has(use[href="#icon-lightbulb"]),
 .ui-icon:has(use[href="#icon-sun"]) { --icon-tone:var(--control-warm); }
-body :is(.btn.primary,.logo) .ui-icon,
-body :is(.modebtn.active,.topnav button.active,.nav button.active) .ui-icon { color:inherit!important; }
+body :is(.btn.primary,.logo) .ui-icon { color:inherit!important; }
 #examView #copyQuestionBtn {
   color:var(--control-info);
   background:color-mix(in srgb,var(--control-info) 5%,var(--surface));
