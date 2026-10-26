@@ -1,0 +1,7 @@
+#libraryLoading { position:fixed; inset:0; display:grid; place-items:center; background:var(--bg,#fff); color:var(--text,#333); z-index:1000; font:500 16px "DM Sans",sans-serif; }
+#librarySaveWarning { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); width:min(680px,calc(100% - 36px)); padding:14px 18px; border-radius:12px; border:1px solid var(--bad,#b84444); background:var(--surface,#fff); color:var(--bad,#b84444); font:500 14px/1.5 "DM Sans",sans-serif; box-shadow:0 4px 24px #0001; z-index:200; }
+#librarySaveWarning[hidden] { display:none; }
+.library-storage-info { margin-top:16px; font-size:14px; line-height:1.6; color:var(--text); }
+.library-storage-info p { margin:4px 0; }
+#libraryStorageCapacity,.library-storage-help { color:var(--muted); font-size:13px; }
+.storage-error { color:var(--bad); }

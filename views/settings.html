@@ -57,7 +57,7 @@
 <!-- include: partials/prompt-library.html -->
 <section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
 <div class="shortcut-grid">
-<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>6</kbd></span><span>Home / quiz / flashcards / plan / settings / notes ↗</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>7</kbd></span><span>Home / quiz / flashcards / plan / settings / notes ↗ / generate</span></div>
 <div><span class="shortcut-keys"><kbd>Space</kbd> · <kbd>1</kbd>–<kbd>4</kbd> · <kbd>U</kbd></span><span>Flashcards: flip / rate / undo</span></div>
 <div><span class="shortcut-keys"><kbd>N</kbd> · <kbd>B</kbd> · <kbd>?</kbd></span><span>Flashcards: add deck / library / shortcut help</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
@@ -88,6 +88,9 @@
 <label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>
 <button class="btn" onclick="resetData()">Reset data</button>
 </div>
+<div class="library-storage-info"><p id="libraryStorageStatus" role="status">Loading library…</p><p id="libraryStorageUsage"></p><p id="libraryStorageCapacity"></p></div>
+<div class="setting-actions"><button class="btn" type="button" onclick="QuizStorage.requestPersistence()">Protect browser storage</button><button class="btn" type="button" onclick="QuizStorage.retry()">Retry saving</button></div>
+<p class="library-storage-help">Quizzes, sessions, prompt slots and flashcards use IndexedDB. Export JSON regularly as your library grows. Browser data stays tied to this browser and address; clearing site data can still delete it.</p>
 <div id="dataImportStatus" class="paste-status" style="margin-top:8px" hidden></div></section>
   </div>
 </div>

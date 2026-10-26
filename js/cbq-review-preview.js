@@ -158,6 +158,7 @@
       returnFocus = null;
     });
     $('cbqPreviewImage').addEventListener('error', () => { $('cbqPreviewImage').hidden = true; });
+    window.addEventListener('quizflow-library-change', e => { if(state && e.detail.keys.some(key=>key===K.sessions||key===K.results)){ $('cbqPreviewDialog').close();toast('Saved quizzes changed in another tab. Open the preview again.')} });
     window.addEventListener('storage', e => {
       if (state && (e.key === null || e.key === K.sessions || e.key === K.results)) { $('cbqPreviewDialog').close(); toast('Saved quizzes changed in another tab. Open the preview again to refresh.'); }
     });

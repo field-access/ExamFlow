@@ -17,14 +17,14 @@
   const button = (action, label, extra = '') => '<button class="btn" data-fc="' + action + '" ' + extra + '>' + label + '</button>';
   function notice(message, error = false) { if (!error) { $('fcNotice').hidden = true; toast(message); return; } $('fcNotice').hidden = false; $('fcNotice').textContent = message; $('fcNotice').classList.add('fc-error'); }
   function read() {
-    const raw = localStorage.getItem(KEY);
+    const raw = QuizStorage.getItem(KEY);
     state = raw ? C.validateStore(JSON.parse(raw)) : { version: 1, decks: [], session: null, activity: [] };
     readFailed = false;
   }
   function save(next) {
     if (readFailed) { notice('Saved flashcard data needs recovery before you can make changes. Export a backup from Settings first.', true); return false; }
     try {
-      localStorage.setItem(KEY, JSON.stringify(next));
+      QuizStorage.setItem(KEY, JSON.stringify(next));
       state = next;
       if ($('fcNotice').classList.contains('fc-error')) $('fcNotice').hidden = true;
       if (typeof schedulePersistentBackup === 'function') schedulePersistentBackup();
@@ -321,6 +321,7 @@
       try { if (file.size > 4000000) throw new Error('Choose a JSON file under 4 MB.'); $('fcJson').value = await file.text(); preview(); }
       catch (e) { notice(e.message, true); } finally { event.target.value = ''; }
     });
+    window.addEventListener('quizflow-library-change', e => { if(e.detail.keys.includes(KEY)){refresh();notice('Your flashcards were updated in another tab.')} });
     window.addEventListener('storage', e => { if (e.key === KEY || e.key === null) { refresh(); notice('Your flashcards were updated in another tab.'); } });
     // Update due counts while the library is open, without interrupting its controls.
     setInterval(() => {

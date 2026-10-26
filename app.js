@@ -14,27 +14,14 @@ function clampDurationMinutes(value,fallback=5){
 }
 let matchOrders={};
 let settings=loadSettings();
-restoreFromPersistentStorage().then(()=>{
-  try{
-    settings=loadSettings();
-    renderSessions();
-    renderDashboard();
-    renderPlans();
-    renderHome();
-    if(document.getElementById("flashcardsView")?.classList.contains("active"))Flashcards.refresh();
-  }catch(e){}
-}).finally(()=>requestPersistentStorage());
 
-function get(k,d){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(d))}catch(e){return d}}
+function get(k,d){try{return JSON.parse(QuizStorage.getItem(k)||JSON.stringify(d))}catch(e){return d}}
 function put(k,v){
-  try{localStorage.setItem(k,JSON.stringify(v))}catch(e){
-    // localStorage is intentionally kept as the fast cache; large data is backed up below.
-  }
+  try{QuizStorage.setItem(k,JSON.stringify(v))}catch(e){toast('Could not save: '+e.message);throw e}
   schedulePersistentBackup();
 }
-/* Persistent data backup: IndexedDB is substantially larger than localStorage.
-   localStorage remains the fast synchronous cache, while IndexedDB protects
-   quizzes/results/sessions if the browser evicts or fills the cache. */
+/* Legacy backup databases remain readable for one-time migration and full reset.
+   New writes use the primary IndexedDB library without duplicating whole snapshots. */
 const EXAMFLOW_DB_NAME="ExamFlowPersistentBackup_v1",EXAMFLOW_DB_VERSION=1;
 let examflowBackupTimer=null;
 function openExamFlowDB(){return new Promise((resolve,reject)=>{
@@ -45,45 +32,12 @@ function openExamFlowDB(){return new Promise((resolve,reject)=>{
 })}
 function schedulePersistentBackup(){
   clearTimeout(examflowBackupTimer);
-  examflowBackupTimer=setTimeout(savePersistentBackup,250);
+  examflowBackupTimer=setTimeout(()=>savePersistentBackup().catch(()=>{}),250);
 }
 async function savePersistentBackup(){
-  try{
-    const db=await openExamFlowDB();
-    const data={};
-    Object.values(K).forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)data[k]=JSON.parse(v)}catch(e){}});
-    data.examDeadline=localStorage.getItem("examflow_exam_deadline")||null;
-    await new Promise((resolve,reject)=>{
-      const tx=db.transaction("backup","readwrite");tx.objectStore("backup").put({data,savedAt:new Date().toISOString()},"latest");
-      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
-    });
-    db.close();
-  }catch(e){}
+  return QuizStorage.flush();
 }
-async function restorePersistentBackup(){
-  try{
-    const db=await openExamFlowDB();
-    const record=await new Promise((resolve,reject)=>{
-      const tx=db.transaction("backup","readonly"),req=tx.objectStore("backup").get("latest");
-      req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
-    });
-    db.close();
-    if(!record?.data || (localStorage.getItem("examflow_last_reset") && String(record.savedAt||"")<=localStorage.getItem("examflow_last_reset")))return false;
-    let restored=false;
-    Object.entries(record.data).forEach(([k,v])=>{
-      if(Object.values(K).includes(k)){
-        if(localStorage.getItem(k)===null){try{localStorage.setItem(k,JSON.stringify(v));restored=true}catch(e){}}
-      }
-    });
-    if(record.data.examDeadline && !localStorage.getItem("examflow_exam_deadline")){
-      try{localStorage.setItem("examflow_exam_deadline",record.data.examDeadline);restored=true}catch(e){}
-    }
-    if(restored){
-      try{renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();if(document.getElementById("flashcardsView")?.classList.contains("active"))Flashcards.refresh();}catch(e){}
-    }
-    return restored;
-  }catch(e){return false}
-}
+async function restorePersistentBackup(){await QuizStorage.ready;return false}
 async function enablePersistentStorage(){
   try{if(navigator.storage?.persist)await navigator.storage.persist()}catch(e){}
 }
@@ -132,7 +86,7 @@ function openRecentQuiz(idValue){
   if(session){restoreSession(session.id);return}
   const exam=getExamRecord(idValue);if(!exam)return;
   sessionId=null;
-  examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;quizDurationMinutes=clampDurationMinutes(exam.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;examFinished=false;registerRecentQuiz(exam);showView("exam");render();saveSession();
+  examId=exam.id;examName=exam.name;questions=cloneData(exam.questions||[]);sections=cloneData(exam.sections||[]);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;quizDurationMinutes=clampDurationMinutes(exam.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;examFinished=false;startLoadedExamTimer();registerRecentQuiz(exam);showView("exam");render();saveSession();
 }
 
 function renderTodos() {
@@ -241,7 +195,7 @@ function savePlannerDate(type){
   if(!value){toast("Select a calendar date first");return}
   const label=document.getElementById("plannerDateLabel")?.value.trim()|| (type==="exam"?"Final exam":"Important study date");
   if(type==="exam"){
-    localStorage.setItem("examflow_exam_deadline",value);
+    QuizStorage.setItem("examflow_exam_deadline",value);
   }else{
     const dates=getPlannerDates();dates[value]={type:"important",label};put(PLANNER_DATES_KEY,dates);
   }
@@ -251,7 +205,7 @@ function removePlannerDate(){
   const value=document.getElementById("plannerDateInput")?.value||plannerSelectedDate;
   if(!value)return;
   const dates=getPlannerDates();delete dates[value];put(PLANNER_DATES_KEY,dates);
-  if(getSavedExamDeadline()===value)localStorage.removeItem("examflow_exam_deadline");
+  if(getSavedExamDeadline()===value)QuizStorage.removeItem("examflow_exam_deadline");
   renderPlannerCalendar();renderExamDeadline();toast("Calendar date removed");
 }
 function renderPlannerTodos(){
@@ -276,12 +230,12 @@ function backupPayload(){
   const data={};
   Object.values(K).forEach(key=>{
     try{
-      const raw=localStorage.getItem(key);
+      const raw=QuizStorage.getItem(key);
       if(raw!==null)data[key]=JSON.parse(raw);
     }catch(e){}
   });
   try{
-    const deadline=localStorage.getItem("examflow_exam_deadline");
+    const deadline=QuizStorage.getItem("examflow_exam_deadline");
     if(deadline!==null)data.examflow_exam_deadline=deadline;
   }catch(e){}
   return data;
@@ -301,51 +255,9 @@ function openBackupDB(){
   });
 }
 
-async function backupToPersistentStorage(){
-  try{
-    const db=await openBackupDB();
-    await new Promise((resolve,reject)=>{
-      const tx=db.transaction(EXAMFLOW_BACKUP_STORE,"readwrite");
-      tx.objectStore(EXAMFLOW_BACKUP_STORE).put({
-        savedAt:new Date().toISOString(),
-        data:backupPayload()
-      },"latest");
-      tx.oncomplete=resolve;
-      tx.onerror=()=>reject(tx.error);
-    });
-    db.close();
-  }catch(e){}
-}
+async function backupToPersistentStorage(){await QuizStorage.flush().catch(()=>{})}
 
-async function restoreFromPersistentStorage(){
-  try{
-    const db=await openBackupDB();
-    const snapshot=await new Promise((resolve,reject)=>{
-      const tx=db.transaction(EXAMFLOW_BACKUP_STORE,"readonly");
-      const req=tx.objectStore(EXAMFLOW_BACKUP_STORE).get("latest");
-      req.onsuccess=()=>resolve(req.result);
-      req.onerror=()=>reject(req.error);
-    });
-    db.close();
-    if(!snapshot || !snapshot.data || (localStorage.getItem("examflow_last_reset") && String(snapshot.savedAt||"")<=localStorage.getItem("examflow_last_reset")))return;
-
-    // Only restore missing keys; never overwrite newer localStorage data.
-    Object.entries(snapshot.data).forEach(([key,value])=>{
-      if(localStorage.getItem(key)===null){
-        try{
-          localStorage.setItem(key,typeof value==="string"?value:JSON.stringify(value));
-        }catch(e){}
-      }
-    });
-
-    try{
-      if(localStorage.getItem("examflow_exam_deadline")===null &&
-         snapshot.data.examflow_exam_deadline!==undefined){
-        localStorage.setItem("examflow_exam_deadline",snapshot.data.examflow_exam_deadline);
-      }
-    }catch(e){}
-  }catch(e){}
-}
+async function restoreFromPersistentStorage(){await QuizStorage.ready}
 
 async function requestPersistentStorage(){
   try{
@@ -438,6 +350,10 @@ function updateTimerUI(){
 function formatGlobalTime(sec){
  sec=Math.max(0,Math.floor(Number(sec)||0));
  return `${String(Math.floor(sec/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+}
+function startLoadedExamTimer(){
+ timerState.running=mode==="exam"&&!examFinished&&questions.length>0;
+ updateTimerUI();
 }
 function startGlobalTimer(){
  timerState.running=true;
@@ -669,7 +585,7 @@ function loadQuiz(){
    quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON`;
-   registerActiveExam();closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
+   startLoadedExamTimer();registerActiveExam();closeImporter();showView("exam");render();saveSession();toast(`Loaded ${questions.length} questions ✓`);
  }catch(e){document.getElementById("jsonStatus").className="status err";document.getElementById("jsonStatus").textContent="✕ "+e.message}
 }
 
@@ -1090,6 +1006,7 @@ function examflowSelectOptionByNumber(n){
 function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
   if(window.CBQReviewPreview?.handleKey(e))return;
+  if(window.GeminiGenerator?.handleKey(e))return;
   if(window.Flashcards?.handleKey(e))return;
   if(e.target.id==="studyQuizSearch"&&(e.ctrlKey||e.metaKey))return;
 
@@ -1135,9 +1052,10 @@ function examflowKeyboardHandler(e){
 
   // Option on macOS can change event.key into a symbol. Read its physical code.
   const optionKey=KeyboardShortcuts.optionKey(e);
-  if(e.altKey && !e.shiftKey && /^[1-6]$/.test(optionKey)){
+  if(e.altKey && !e.shiftKey && /^[1-7]$/.test(optionKey)){
     e.preventDefault();
     if(optionKey==="6"){openNotes();return}
+    if(optionKey==="7"){showView('generate');return}
     const page=["home","exam","flashcards","planner","settings"][Number(optionKey)-1];
     if(page)showView(page);
     return;
@@ -1881,7 +1799,7 @@ function retakeLastTest(){
  quizDurationMinutes=clampDurationMinutes(lastResultSnapshot.durationMinutes||settings.defaultDuration||5);
  sessionId=null;examName=lastResultSnapshot.name;mode=lastResultSnapshot.mode||settings.defaultMode;examFinished=false;examId=lastResultSnapshot.examId||id();
  timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;
- registerActiveExam({name:examName});
+ startLoadedExamTimer();registerActiveExam({name:examName});
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
  showView("exam");render();saveSession();toast("Retake ready ✓")
 }
@@ -1963,7 +1881,7 @@ function renderGoal(){
  document.getElementById("goalBar").style.width=(g.text?progress:0)+"%";
  document.querySelectorAll(".milestone").forEach(x=>x.classList.toggle("active",Number(x.textContent.match(/\d+/)?.[0])===target));
 }
-function clearResults(){if(confirm("Delete all saved results?")){localStorage.removeItem(K.results);renderDashboard();toast("Results cleared")}}
+function clearResults(){if(confirm("Delete all saved results?")){QuizStorage.removeItem(K.results);renderDashboard();toast("Results cleared")}}
 
 
 function planDateFromSource(source){
@@ -2031,7 +1949,7 @@ function renderPlans(){
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
  const q=parseQuiz(JSON.parse(p.json));questions=prepareShuffledQuiz(q.questions);sections=q.sections;examName=q.name||p.name;examId=p.examId||p.id;quizDurationMinutes=clampDurationMinutes(q.durationMinutes,settings.defaultDuration||5);answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
- registerActiveExam({source:"planned",plannedDate:p.date,plannedTime:p.time,name:p.name});
+ startLoadedExamTimer();registerActiveExam({source:"planned",plannedDate:p.date,plannedTime:p.time,name:p.name});
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();setTimeout(applyQuestionSidebarState,50);saveSession();toast("Planned test loaded ✓")
 }
 function deletePlan(pid){put(K.plans,get(K.plans,[]).filter(x=>x.id!==pid));renderPlans()}
@@ -2059,19 +1977,19 @@ async function importDataFile(event){
       return;
     }
 
-    if(flashcardBackup){localStorage.setItem(K.flashcards,JSON.stringify(flashcardBackup));schedulePersistentBackup();Flashcards.refresh();}
-    if(parsed.settings!==undefined)put(K.settings,parsed.settings);
-    if(parsed.results!==undefined)put(K.results,Array.isArray(parsed.results)?parsed.results:[]);
-    if(parsed.goal!==undefined)put(K.goal,parsed.goal||{});
-    if(parsed.plans!==undefined)put(K.plans,Array.isArray(parsed.plans)?parsed.plans:[]);
-    if(parsed.sessions!==undefined)put(K.sessions,Array.isArray(parsed.sessions)?parsed.sessions:[]);
-    if(parsed.study!==undefined)put(K.study,Array.isArray(parsed.study)?parsed.study:[]);
-    if(parsed.exams!==undefined)put(K.exams,Array.isArray(parsed.exams)?parsed.exams:[]);
-    if(parsed.recent!==undefined)put(K.recent,Array.isArray(parsed.recent)?parsed.recent:[]);
-    if(parsed.examDeadline!==undefined){
-      if(parsed.examDeadline)localStorage.setItem("examflow_exam_deadline",String(parsed.examDeadline));
-      else localStorage.removeItem("examflow_exam_deadline");
+    const entries=new Map();
+    // Preserve prompt slots and planner metadata without overriding validated core data.
+    if(parsed.storage?.version===1&&parsed.storage.records&&typeof parsed.storage.records==='object'){
+      for(const [key,value] of Object.entries(parsed.storage.records))if(/^examflow_[a-z0-9_]+$/i.test(key)&&!Object.values(K).includes(key)&&key!=="examflow_last_reset"&&key!=="examflow_exam_deadline"&&typeof value==='string')entries.set(key,value);
     }
+    if(flashcardBackup)entries.set(K.flashcards,JSON.stringify(flashcardBackup));
+    for(const name of ['settings','goal'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(parsed[name]||{}));
+    for(const name of ['results','plans','sessions','study','exams','recent'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(Array.isArray(parsed[name])?parsed[name]:[]));
+    if(parsed.examDeadline!==undefined){
+      entries.set("examflow_exam_deadline",parsed.examDeadline?String(parsed.examDeadline):null);
+    }
+    await QuizStorage.batch([...entries]);
+    Flashcards.refresh();if(entries.has("examflow_prompt_library_v1"))await initPromptLibrary();
 
     settings=loadSettings();
     renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();applySettings();
@@ -2095,15 +2013,18 @@ async function importDataFile(event){
 }
 
 function exportData(){
- const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[])},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+ const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records:QuizStorage.snapshot()}},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
 }
 async function resetData(){
  if(!confirm("Reset all local QuizFlow data?"))return;
  clearTimeout(saveTimer);clearTimeout(examflowBackupTimer);
  window.removeEventListener("beforeunload",saveSession);
- Object.values(K).forEach(x=>localStorage.removeItem(x));
- localStorage.removeItem("examflow_exam_deadline");
- localStorage.setItem("examflow_last_reset",new Date().toISOString());
+ await QuizStorage.batch(Object.keys(QuizStorage.snapshot()).map(key=>[key,null]));
+ for(const provider of ["gemini","openai","claude"])localStorage.removeItem("quizflow_ai_key_"+provider+"_v1");
+ localStorage.removeItem("quizflow_ai_preferences_v1");
+ QuizStorage.removeItem("examflow_exam_deadline");
+ QuizStorage.setItem("examflow_last_reset",new Date().toISOString());
+ await QuizStorage.flush();
  // Clear both recovery stores so a reset cannot resurrect the deleted decks and quizzes.
  await Promise.allSettled([openExamFlowDB().then(db=>clearRecoveryStore(db,"backup")),openBackupDB().then(db=>clearRecoveryStore(db,EXAMFLOW_BACKUP_STORE))]);
  location.reload();
@@ -2154,11 +2075,11 @@ async function pasteFromClipboard(targetId,statusId,buttonId){
 function saveExamDeadline(sourceId="planExamDeadlineInput"){
   const v=document.getElementById(sourceId)?.value;
   if(!v){toast("Choose your final exam date");return}
-  localStorage.setItem("examflow_exam_deadline",v);
+  QuizStorage.setItem("examflow_exam_deadline",v);
   renderExamDeadline();
   toast("Final exam date saved ✓");
 }
-function getSavedExamDeadline(){return localStorage.getItem("examflow_exam_deadline")||""}
+function getSavedExamDeadline(){return QuizStorage.getItem("examflow_exam_deadline")||""}
 function setDeadlineInputValue(v){
   ["planExamDeadlineInput"].forEach(id=>{
     const input=document.getElementById(id);if(input)input.value=v;
@@ -2199,10 +2120,10 @@ if(!window.examflowDeadlineInterval)window.examflowDeadlineInterval=setInterval(
 const QUESTION_SIDEBAR_KEY="examflow_question_sidebar_open";
 
 function getQuestionSidebarState(){
-  try{return localStorage.getItem(QUESTION_SIDEBAR_KEY)==="true"}catch{return false}
+  try{return QuizStorage.getItem(QUESTION_SIDEBAR_KEY)==="true"}catch{return false}
 }
 function setQuestionSidebarState(open){
-  try{localStorage.setItem(QUESTION_SIDEBAR_KEY,open?"true":"false")}catch{}
+  try{QuizStorage.setItem(QUESTION_SIDEBAR_KEY,open?"true":"false")}catch{}
 }
 function applyQuestionSidebarState(){
   const d=document.getElementById("examProgressDrawer");
@@ -2380,7 +2301,7 @@ function startHomeQuiz(){
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;mode=settings.defaultMode;examFinished=false;
    if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;
    if(document.getElementById("examMeta"))document.getElementById("examMeta").textContent=`${questions.length} questions · ${quizDurationMinutes} min · scoring from JSON`;
-   registerActiveExam();saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
+   startLoadedExamTimer();registerActiveExam();saveSession();showView("exam");render();toast(`Ready — ${questions.length} questions ✓`);
  }catch(e){status.textContent="✕ "+e.message;status.style.color="var(--bad)"}
 }
 function pasteAndStart(){
@@ -2428,13 +2349,14 @@ function showView(name){
  if(name==="exam"){updateTimerUI();updateModeUI();}
  document.body.classList.toggle("exam-active",name==="exam");
  window.scrollTo({top:0,behavior:"smooth"});
- ["home","exam","dashboard","testResults","planner","settings","flashcards"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
- ["navHome","navExam","navPlanner","navSettings","navFlashcards"].forEach(x=>document.getElementById(x).classList.remove("active"));
- const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings",flashcards:"navFlashcards"}[name];
+ ["home","exam","dashboard","testResults","planner","settings","flashcards","generate"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
+ ["navHome","navExam","navPlanner","navSettings","navFlashcards","navGenerate"].forEach(x=>document.getElementById(x).classList.remove("active"));
+ const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings",flashcards:"navFlashcards",generate:"navGenerate"}[name];
  if(activeNav)document.getElementById(activeNav).classList.add("active");
  if(name==="flashcards")Flashcards.refresh();
+ if(name==="generate")window.GeminiGenerator?.refresh();
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
- if(name==="settings"){const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
+ if(name==="settings"){QuizStorage.updatePanel();const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  renderPromptSettings();updateTheme();updateModeUI()}
 }
@@ -2687,6 +2609,11 @@ setInterval(()=>{
 
 window.addEventListener("beforeunload",saveSession);
 
-initPromptLibrary();applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
-
-initPersistentBackup();
+QuizStorage.ready.then(()=>{
+ settings=loadSettings();initPromptLibrary().then(()=>window.GeminiGenerator?.refresh());applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();QuizStorage.updatePanel();
+});
+window.addEventListener("quizflow-library-change",event=>{
+ if(event.detail.keys.includes(K.sessions)&&sessionId){clearTimeout(saveTimer);deletedSessionIds.add(sessionId);timerState.running=false;toast("This session changed in another tab. Reopen it from Continue studying before editing.")}
+ settings=loadSettings();applySettings();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
+ if(event.detail.keys.includes("examflow_prompt_library_v1"))initPromptLibrary().then(()=>window.GeminiGenerator?.refresh());
+});

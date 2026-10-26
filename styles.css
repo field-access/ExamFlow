@@ -1309,7 +1309,8 @@ header{
 @media(max-width:480px){
   .topnav button:nth-child(4),
   .topnav button:nth-child(5),
-  .topnav button:nth-child(6){display:none}
+  .topnav button:nth-child(6),
+  .topnav button:nth-child(7){display:none}
   .header-right .btn:first-of-type{font-size:0;padding:8px;width:37px}
   .header-right .btn:first-of-type::after{content:"＋";font-size:16px}
   .home-hero{width:calc(100% - 12px)}

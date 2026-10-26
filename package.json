@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build.mjs",
+    "predev": "npm run build",
+    "dev": "node scripts/dev.mjs",
     "test": "node --test tests/flashcards-core.test.cjs"
   }
 }

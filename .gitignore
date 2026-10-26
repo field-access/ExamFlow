@@ -1,1 +1,3 @@
 /public/
+# Local archived copy of the development server.
+/scripts/generate-dev.mjs
