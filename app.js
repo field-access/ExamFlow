@@ -383,9 +383,10 @@ function setPracticeTimer(minutes){
 }
 function updateModeUI(){
  document.body.classList.toggle("practice-active",mode==="practice");
- const toolsMode=document.getElementById("questionToolsMode");if(toolsMode)toolsMode.textContent=mode==="practice"?"Practice":"Exam";
  document.getElementById("examMode").classList.toggle("active",mode==="exam");
  document.getElementById("practiceMode").classList.toggle("active",mode==="practice");
+ document.getElementById("examMode").setAttribute("aria-pressed",String(mode==="exam"));
+ document.getElementById("practiceMode").setAttribute("aria-pressed",String(mode==="practice"));
  document.getElementById("defaultExam").classList.toggle("active",settings.defaultMode==="exam");
  document.getElementById("defaultPractice").classList.toggle("active",settings.defaultMode==="practice");
  if(document.getElementById("modeBadge"))document.getElementById("modeBadge").textContent=mode==="exam"?"EXAM MODE":"PRACTICE MODE";
@@ -1011,7 +1012,6 @@ function examflowKeyboardHandler(e){
   if(e.target.id==="studyQuizSearch"&&(e.ctrlKey||e.metaKey))return;
 
   if(e.key==="Escape"){
-    const tools=document.getElementById("questionTools");if(tools)tools.open=false;
     closeImporter();closeSubmit();closeSessions();
     if(typeof closeCBQModal === "function") closeCBQModal();
     const drawer=document.getElementById("examProgressDrawer");
@@ -1121,7 +1121,6 @@ function examflowKeyboardHandler(e){
 
 /* Single keyboard router: all app shortcuts live here. */
 document.addEventListener("keydown",examflowKeyboardHandler,true);
-document.addEventListener("click",event=>{const tools=document.getElementById("questionTools");if(tools?.open&&(!tools.contains(event.target)||event.target.closest("button")))tools.open=false;});
 
 function saveVisibleCBQFlashcard(target){
   if(document.getElementById("examView")?.classList.contains("active")){

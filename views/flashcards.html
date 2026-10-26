@@ -1,7 +1,7 @@
 <section id="flashcardsView" class="view">
   <div class="fc-page">
     <div class="fc-heading">
-      <div><h1>Flashcards</h1><p>Recall an idea. Keep it with you.</p></div>
+      <div><h1>Flashcards</h1></div>
       <div class="fc-heading-actions">
         <button class="btn" data-fc="copy-prompt"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy prompt</button>
         <button class="btn" data-fc="copy-schema"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy schema</button>
@@ -13,10 +13,10 @@
     <div id="fcLibrary">
       <div class="fc-stats" id="fcStats"></div>
       <section id="fcImport" class="fc-panel" hidden aria-labelledby="fcImportTitle">
-        <div class="fc-panel-heading"><div><h2 id="fcImportTitle">Bring your ideas here</h2><p>Paste a generated deck, or choose a JSON file. Preview it before saving.</p></div><button class="btn" data-fc="close-import" aria-label="Close deck importer">Close</button></div>
+        <div class="fc-panel-heading"><div><h2 id="fcImportTitle">Add a deck</h2></div><button class="btn" data-fc="close-import" aria-label="Close deck importer">Close</button></div>
         <div class="fc-import-grid">
-          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Paste clipboard & load (Ctrl/Cmd+Enter)">Load deck</button></div><small class="fc-import-shortcut">Ctrl/Cmd+Enter → paste clipboard & load</small><p id="fcImportStatus" role="status"></p></div>
-          <details class="fc-import-help"><summary>Need a deck to start with?</summary><p>Ask your AI for focused questions and concise answers.</p><div class="fc-actions"><button class="btn" data-fc="copy-prompt">Copy generation prompt</button><button class="btn" data-fc="example">Try an example</button></div></details>
+          <div><label for="fcJson">Flashcard JSON</label><textarea id="fcJson" spellcheck="false" placeholder='{"name":"My topic","cards":[{"front":"A question?","back":"A clear answer","tags":["topic"]}]}'></textarea><div class="fc-actions"><label class="btn fc-file">Choose JSON file<input id="fcFile" type="file" accept=".json,application/json"></label><button class="btn" data-fc="preview">Preview</button><button class="btn primary" data-fc="load-import" title="Paste clipboard & load (Ctrl/Cmd+Enter)">Load deck</button></div><p id="fcImportStatus" role="status"></p></div>
+          <details class="fc-import-help"><summary>Prompt & example</summary><div class="fc-actions"><button class="btn" data-fc="copy-prompt">Copy prompt</button><button class="btn" data-fc="example">Try an example</button></div></details>
         </div>
         <div id="fcPreview" class="fc-preview" hidden></div>
       </section>
@@ -26,7 +26,6 @@
     <section id="fcStudy" hidden aria-labelledby="fcStudyTitle">
       <div class="fc-study-toolbar"><button class="btn" data-fc="library">← Decks</button><div><h2 id="fcStudyTitle"></h2><span id="fcStudyMeta"></span></div><button class="btn" data-fc="undo" id="fcUndo" hidden title="Undo last rating (U)">Undo</button><button class="btn fc-help-button" data-fc="help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button></div>
       <div id="fcStudyBody"></div>
-      <p class="fc-shortcuts" id="fcShortcuts">Space / Enter to reveal · 1 Again · 2 Hard · 3 Good · 4 Easy</p>
     </section>
   </div>
   <dialog id="fcKeyDialog" class="fc-key-dialog" aria-labelledby="fcKeyTitle">

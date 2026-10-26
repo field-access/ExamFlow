@@ -241,19 +241,17 @@
     <div class="modepicker">
       <button id="examProgressBtn" class="modebtn" type="button" aria-controls="examProgressDrawer" aria-expanded="false" onclick="toggleQuestionProgress()"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
       <button id="bookmark" class="bookmark" onclick="toggleReview()" title="Mark for review (R)"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Review</button>
-      <details id="questionTools" class="exam-tools">
-        <summary title="Study mode and question tools"><span id="questionToolsMode">Exam</span><span aria-hidden="true">⌄</span></summary>
-        <div class="exam-tools-menu">
-          <div class="exam-tools-label">Study mode</div>
-          <div class="exam-mode-switch">
-            <button id="examMode" class="modebtn active" onclick="setMode('exam')" title="Exam mode (Shift+E)">Exam</button>
-            <button id="practiceMode" class="modebtn" onclick="setMode('practice')" title="Practice mode (Shift+P)">Practice</button>
-          </div>
-          <button class="modebtn" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT (G)"><svg class="ui-icon"><use href="#icon-external"/></svg>Open in ChatGPT <kbd>G</kbd></button>
-          <button id="copyQuestionBtn" class="modebtn copy-question-btn" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question <kbd>C</kbd></button>
-          <button class="modebtn" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer <kbd>Del</kbd></button>
-        </div>
-      </details>
+    </div>
+  </div>
+  <div class="question-toolbar" role="group" aria-label="Study mode and question tools">
+    <div class="exam-mode-switch" role="group" aria-label="Study mode">
+      <button id="examMode" class="modebtn active" type="button" onclick="setMode('exam')" title="Exam mode (Shift+E)" aria-pressed="true">Exam</button>
+      <button id="practiceMode" class="modebtn" type="button" onclick="setMode('practice')" title="Practice mode (Shift+P)" aria-pressed="false">Practice</button>
+    </div>
+    <div class="question-tool-actions">
+      <button class="modebtn" type="button" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT (G)"><svg class="ui-icon"><use href="#icon-external"/></svg>ChatGPT</button>
+      <button id="copyQuestionBtn" class="modebtn copy-question-btn" type="button" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question</button>
+      <button class="modebtn" type="button" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer</button>
     </div>
   </div>
   <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>

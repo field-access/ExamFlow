@@ -61,7 +61,7 @@
     $('fcStats').innerHTML = [[totals.due, 'Due for review'], [totals.new, 'New to learn'], [totals.total, 'Cards saved']].map(([n, label]) => '<div class="fc-stat"><strong>' + n + '</strong><span>' + label + '</span></div>').join('');
     $('fcDeckCount').textContent = state.decks.length + (state.decks.length === 1 ? ' deck' : ' decks');
     if (!state.decks.length) {
-      $('fcDecks').innerHTML = '<div class="fc-empty">' + icon('bookmark') + '<h3>Your next idea starts here</h3><p>Paste AI-generated flashcards and build a library you can return to. Review a little each day.</p>' + button('open-import', 'Add your first deck') + ' ' + button('example', 'Try a sample deck') + '</div>'; return;
+      $('fcDecks').innerHTML = '<div class="fc-empty">' + icon('bookmark') + '<h3>No decks yet</h3><p>Add flashcard JSON or try a sample.</p>' + button('open-import', 'Add your first deck') + ' ' + button('example', 'Try a sample deck') + '</div>'; return;
     }
     $('fcDecks').innerHTML = state.decks.map(deck => {
       const n = C.counts(deck), tags = [...new Set(deck.cards.flatMap(c => c.tags))].sort();
@@ -137,10 +137,8 @@
     if (!deck) { save({ ...state, session: null }); render(); return; }
     $('fcStudyTitle').textContent = deck.name;
     $('fcUndo').hidden = !undo;
-    $('fcShortcuts').hidden = editor || s.cursor >= s.queue.length;
-    $('fcShortcuts').textContent = s.mode === 'browse' ? 'Space to flip · ← → to browse · ? shortcuts' : 'Space to flip · 1–4 to rate · ? shortcuts';
     const browsing = s.mode === 'browse';
-    $('fcStudyMeta').textContent = browsing ? 'Browse · scheduling stays unchanged' : (s.mode === 'all' ? 'Practice all' : 'Due + new') + ' · ' + s.cursor + ' of ' + s.queue.length + ' reviewed';
+    $('fcStudyMeta').textContent = browsing ? 'Browse' : (s.mode === 'all' ? 'Practice all' : 'Study');
     if (s.cursor >= s.queue.length) {
       const reviewed = Object.values(s.ratings).reduce((a, b) => a + b, 0), n = C.counts(deck);
       $('fcStudyBody').innerHTML = '<div class="fc-complete">' + icon('target') + '<h2>One step stronger.</h2><p>You reviewed ' + reviewed + (reviewed === 1 ? ' card' : ' cards') + ' in this session. Your progress is saved.</p><div class="fc-badges">' + Object.entries(s.ratings).map(([k, v]) => '<span class="fc-badge">' + html(k[0].toUpperCase() + k.slice(1)) + ': ' + v + '</span>').join('') + '</div><p>' + html(dueLabel(deck)) + '.<br>' + (n.due + n.new ? n.due + ' due and ' + n.new + ' new cards remain.' : 'You’re caught up for now.') + '</p><div class="fc-actions">' + button('library', 'Back to decks') + button('continue', 'Review another set') + '</div></div>'; return;
@@ -153,7 +151,7 @@
     $('fcStudyBody').innerHTML = '<progress class="fc-progress" value="' + s.cursor + '" max="' + s.queue.length + '" aria-label="Session progress"></progress><article class="fc-review-card"><div class="fc-card-scene"><div class="fc-flip-card' + ((animateFlip ? !s.revealed : s.revealed) ? ' is-flipped' : '') + '"><div id="fcFrontPanel" class="fc-face fc-face-front" aria-hidden="' + s.revealed + '"' + (s.revealed ? ' inert' : '') + '><div class="fc-card-label">Question · ' + (s.cursor + 1) + ' / ' + s.queue.length + '</div><div id="fcFront" class="fc-front"></div></div>' +
       '<div id="fcBackPanel" class="fc-face fc-face-back" aria-hidden="' + !s.revealed + '"' + (!s.revealed ? ' inert' : '') + '><div class="fc-card-label">Answer · ' + (s.cursor + 1) + ' / ' + s.queue.length + '</div><div id="fcBack" class="fc-back-content"></div></div></div></div>' +
       '<div class="fc-flip-actions"><button class="btn' + (!s.revealed ? ' primary' : '') + '" data-fc="reveal" aria-controls="fcBackPanel" aria-expanded="' + s.revealed + '" title="Flip card (Space / Enter)">' + (s.revealed ? 'Show question' : 'Flip for answer') + '</button></div>' +
-      (!browsing && s.revealed ? '<div class="fc-ratings" aria-label="How well did you recall it?">' + ['again', 'hard', 'good', 'easy'].map((r, i) => '<button class="btn fc-rating" data-fc="rate" data-rating="' + r + '" title="' + r + ' (' + (i + 1) + ')"><strong>' + r[0].toUpperCase() + r.slice(1) + '<kbd>' + (i + 1) + '</kbd></strong><small>' + duration(C.schedule(card.progress, r).interval) + '</small></button>').join('') + '</div>' : '') +
+      (!browsing && s.revealed ? '<div class="fc-ratings" aria-label="How well did you recall it?">' + ['again', 'hard', 'good', 'easy'].map((r, i) => '<button class="btn fc-rating" data-fc="rate" data-rating="' + r + '" title="' + r + ' (' + (i + 1) + ')"><strong>' + r[0].toUpperCase() + r.slice(1) + '</strong><small>' + duration(C.schedule(card.progress, r).interval) + '</small></button>').join('') + '</div>' : '') +
       (browsing ? '<div class="fc-browse-actions">' + button('previous', '← Previous', s.cursor === 0 ? 'disabled' : '') + '<details class="fc-card-menu"><summary>Card options</summary><div class="fc-actions">' + button('edit', 'Edit', 'title="Edit card (E)"') + button('delete-card', 'Delete card') + '</div></details>' + button('next', 'Next →', s.cursor === s.queue.length - 1 ? 'disabled' : '') + '</div>' : '') + '</article>';
     rich('fcFront', card.front);
     rich('fcBack', card.back);

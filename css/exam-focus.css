@@ -1,19 +1,20 @@
-/* Keep the question central; secondary tools share one small menu. */
-#examView .qtop { gap: 12px; align-items: center; }
+/* Visible tools use a quiet, compact row below question progress. */
+body.exam-active #examView .qtop { gap: 12px; align-items: center; font-size: 13px; }
 #examView .modepicker { display: flex !important; flex-wrap: nowrap !important; overflow: visible !important; gap: 8px !important; }
 #examView .question { overflow: visible !important; }
-#examView .modepicker > button, #examView .exam-tools > summary { min-height: 36px; padding: 8px 11px !important; font-size: 12px !important; box-shadow: none !important; }
+#examView .modepicker > button { min-height: 36px; padding: 8px 11px !important; font-size: 13px !important; box-shadow: none !important; }
 #examView .modepicker > button { width: auto !important; flex: 0 0 auto; }
-#examView .exam-tools { position: relative; flex: none; }
-#examView .exam-tools > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 7px; border: 1px solid var(--line); border-radius: 9px; color: var(--muted); background: var(--surface); }
-#examView .exam-tools > summary::-webkit-details-marker { display: none; }
-#examView .exam-tools > summary:focus-visible { outline: 2px solid var(--primary); outline-offset: 3px; }
-#examView .exam-tools[open] > summary { color: var(--primary); border-color: var(--primary); }
-#examView .exam-tools-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 80; min-width: 230px; max-width: calc(100vw - 40px); padding: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--ux-shadow-md); display: grid; gap: 8px; }
-#examView .exam-tools-label { color: var(--muted); font-size: 11px; padding: 2px 0 4px; }
-#examView .exam-mode-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
-#examView .exam-tools-menu .modebtn { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 9px 10px; font-size: 13px; width: 100%; }
-#examView .exam-tools-menu kbd { margin-left: auto; font-size: 10px; color: var(--muted); background: transparent; border: none; }
+#examView .question-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; margin: 10px 0 18px; }
+#examView .exam-mode-switch { display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface2); flex: none; }
+#examView .question-toolbar .modebtn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 7px 10px; font: 500 13px/1.4 "DM Sans","Segoe UI",sans-serif; border: 1px solid transparent; border-radius: 7px; box-shadow: none; cursor: pointer; }
+#examView .exam-mode-switch .modebtn { background: transparent; }
+#examView .exam-mode-switch .modebtn.active { background: var(--surface)!important; color: var(--primary); border-color: color-mix(in srgb,var(--primary) 22%,var(--line)); }
+#examView .question-tool-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+#examView .question-tool-actions .modebtn,
+#examView .question-tool-actions #copyQuestionBtn { background: transparent; border-color: transparent; color: var(--study-text); }
+#examView .question-toolbar .modebtn:hover { background: var(--surface2); }
+#examView .question-toolbar .modebtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+#examView .question-toolbar .ui-icon { width: 15px; height: 15px; flex: none; }
 #examView .question .actions .btn { box-shadow: none; }
 #examView #practiceAnswerPanel .answer-label { flex-wrap: wrap; }
 #examView #practiceAnswerPanel .save-flashcard { margin: 0 0 0 auto; min-height: 32px; padding: 5px 8px; font-size: 12px; background: transparent; border-color: transparent; box-shadow: none; }
@@ -21,7 +22,9 @@
 #examView .save-flashcard kbd { font-size: 10px; color: var(--muted); background: transparent; border: none; }
 @media (max-width: 600px) {
   #examView .qtop .modepicker { justify-content: flex-start; }
-  #examView .exam-tools-menu { min-width: 220px; }
+  #examView .question-toolbar { gap: 8px; margin-bottom: 16px; }
+  #examView .question-tool-actions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); width: 100%; }
+  #examView .question-tool-actions .modebtn { min-width: 0; min-height: 40px; padding: 6px; }
   #examView .question .actions { display: flex; flex-wrap: wrap; gap: 10px; }
   #examView .question .actions > div { flex: 1; justify-content: flex-end; }
 }
