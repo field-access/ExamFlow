@@ -509,15 +509,16 @@
 <div><span class="shortcut-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></span><span>Clear answer</span></div>
 <div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd></span><span>Retake / save / home</span></div>
 </div></section>
-<section class="setting card setting-data"><h3><svg class="ui-icon"><use href="#icon-database"/></svg> Local data</h3><div class="setting-actions">
-<button class="btn" onclick="exportData()">Download library JSON</button>
-<label class="btn" style="cursor:pointer">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" hidden onchange="importDataFile(event)"></label>
-<button class="btn" onclick="resetData()">Reset data</button>
-</div>
-<div class="library-storage-info"><p id="libraryStorageStatus" role="status">Loading library…</p><p id="libraryStorageUsage"></p><p id="libraryStorageCapacity"></p></div>
-<div class="setting-actions"><button class="btn" type="button" onclick="QuizStorage.requestPersistence()">Protect browser storage</button><button class="btn" type="button" onclick="QuizStorage.retry()">Retry saving</button></div>
-<p class="library-storage-help">Quizzes, sessions, prompt slots and flashcards use IndexedDB. Export JSON regularly as your library grows. Browser data stays tied to this browser and address; clearing site data can still delete it.</p>
-<div id="dataImportStatus" class="paste-status" style="margin-top:8px" hidden></div></section>
+<section class="card local-data-panel" aria-labelledby="localDataTitle">
+<div class="local-data-header"><div><h3 id="localDataTitle"><svg class="ui-icon"><use href="#icon-database"/></svg>Local data</h3><p>Download a JSON file to keep offline or share.</p></div>
+<div class="local-data-actions">
+<button class="btn primary" type="button" onclick="exportData(this)"><svg class="ui-icon"><use href="#icon-file"/></svg>Download JSON</button>
+<label class="btn local-data-import">Import JSON<input id="dataImportFile" type="file" accept=".json,application/json" onchange="importDataFile(event)"></label>
+<details class="local-data-tools"><summary aria-label="Browser storage options" title="Browser storage options">⋯</summary><div class="local-data-menu"><button class="btn" type="button" onclick="QuizStorage.requestPersistence()">Protect browser storage</button><button class="btn" type="button" onclick="QuizStorage.retry()">Retry saving</button><p id="libraryStorageCapacity"></p><button class="btn local-data-reset" type="button" onclick="resetData()">Reset browser data</button></div></details>
+</div></div>
+<div class="library-storage-info"><p id="libraryStorageStatus" role="status">Loading library…</p><p id="libraryStorageUsage"></p></div>
+<div id="dataImportStatus" class="paste-status" role="status" hidden></div>
+</section>
   </div>
 </div>
 </section>

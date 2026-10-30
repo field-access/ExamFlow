@@ -1878,15 +1878,30 @@ async function importDataFile(event){
   }
 }
 
-async function exportData(){
- await QuizStorage.ready;clearTimeout(saveTimer);
- const latest=!deletedSessionIds.has(sessionId)?captureCurrentSession():null;
- if(latest&&!sessionId)sessionId=latest.id;
- let failed=false;try{if(latest)saveSession();await QuizStorage.flush()}catch{failed=true}
- const sessions=get(K.sessions,[]);
- if(latest){const index=sessions.findIndex(s=>s.id===latest.id);if(index>=0)sessions[index]=latest;else sessions.unshift(latest)}
- const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions,exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records:QuizStorage.snapshot()}};
- downloadQuizJSON(data,"quizflow-data.json");toast(failed?"JSON backup downloaded with your latest progress. Browser saving still needs attention.":"JSON backup downloaded.");
+let dataExportBusy=false;
+async function exportData(button){
+ if(dataExportBusy)return;
+ dataExportBusy=true;
+ const label=button?.innerHTML;
+ if(button){button.disabled=true;button.textContent="Preparing JSON…";button.setAttribute("aria-busy","true")}
+ try{
+  await QuizStorage.ready;
+  // Export the in-memory snapshot, including pending writes. Downloads never depend on database saving or network access.
+  const latest=!deletedSessionIds.has(sessionId)?captureCurrentSession():null;
+  const sessions=get(K.sessions,[]);
+  if(latest){const index=sessions.findIndex(s=>s.id===latest.id);if(index>=0)sessions[index]=latest;else sessions.unshift(latest)}
+  const records=QuizStorage.snapshot();
+  if(latest)records[K.sessions]=JSON.stringify(sessions);
+  const data={format:"quizflow-library",version:1,exportedAt:new Date().toISOString(),flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions,exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records}};
+  downloadQuizJSON(data,"quizflow-data.json");toast("JSON file downloaded. Ready to keep offline or share.");
+ }catch(error){
+  const status=document.getElementById("dataImportStatus");
+  if(status){status.hidden=false;status.style.color="var(--bad)";status.textContent="Could not prepare JSON: "+error.message}
+  toast("JSON download could not be prepared.");
+ }finally{
+  dataExportBusy=false;
+  if(button){button.disabled=false;button.innerHTML=label;button.removeAttribute("aria-busy")}
+ }
 }
 async function resetData(){
  if(!confirm("Reset all local QuizFlow data?"))return;

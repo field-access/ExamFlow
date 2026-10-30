@@ -5,3 +5,31 @@
 .library-storage-info p { margin:4px 0; }
 #libraryStorageCapacity,.library-storage-help { color:var(--muted); font-size:13px; }
 .storage-error { color:var(--bad); }
+/* Independent layout prevents legacy settings grids from stacking action rows. */
+#settingsView .local-data-panel { grid-column:1/-1; display:block; min-width:0; padding:22px; border:1px solid var(--line); border-radius:16px; background:var(--surface); }
+.local-data-panel *, .local-data-panel *::before, .local-data-panel *::after { box-sizing:border-box; }
+.local-data-header { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:18px 24px; }
+.local-data-header > div:first-child { min-width:0; flex:1 1 240px; }
+.local-data-header h3 { display:flex; align-items:center; gap:9px; margin:0; font-size:18px; color:var(--text); }
+.local-data-header p { margin:7px 0 0; color:var(--muted); font-size:14px; line-height:1.5; }
+.local-data-actions { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+#settingsView .local-data-panel .btn { display:inline-flex; align-items:center; justify-content:center; min-height:42px; margin:0; padding:9px 14px; gap:7px; font-size:14px; white-space:normal; }
+.local-data-import { position:relative; cursor:pointer; }
+.local-data-import input { position:absolute; width:1px; height:1px; opacity:0; }
+.local-data-import:focus-within,.local-data-tools summary:focus-visible { outline:2px solid var(--primary); outline-offset:3px; }
+.local-data-tools { position:relative; }
+.local-data-tools summary { display:grid; place-items:center; width:42px; height:42px; color:var(--muted); font-size:24px; border-radius:8px; list-style:none; cursor:pointer; }
+.local-data-tools summary::-webkit-details-marker { display:none; }
+.local-data-tools summary:hover { background:var(--surface2); }
+.local-data-menu { position:absolute; right:0; top:calc(100% + 6px); z-index:10; display:grid; gap:8px; width:min(270px,calc(100vw - 64px)); padding:12px; border:1px solid var(--line); border-radius:12px; background:var(--surface); box-shadow:0 8px 24px rgb(0 0 0 / .12); }
+.local-data-menu p { margin:4px; font-size:12px; line-height:1.6; overflow-wrap:anywhere; }
+#settingsView .local-data-reset { color:var(--bad); }
+.local-data-panel .library-storage-info { margin-top:18px; }
+.local-data-panel .library-storage-info p { overflow-wrap:anywhere; }
+.local-data-panel #dataImportStatus { margin-top:12px; }
+.local-data-panel [hidden] { display:none!important; }
+@media(max-width:600px) {
+ #settingsView .local-data-panel { padding:18px; }
+ .local-data-actions { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) 42px; width:100%; }
+ #settingsView .local-data-panel .local-data-actions > .btn { padding:9px 8px; }
+}
