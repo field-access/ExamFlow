@@ -1011,7 +1011,6 @@ function examflowSelectOptionByNumber(n){
 function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
   if(window.CBQReviewPreview?.handleKey(e))return;
-  if(window.GeminiGenerator?.handleKey(e))return;
   if(window.Flashcards?.handleKey(e))return;
   if(e.target.id==="studyQuizSearch"&&(e.ctrlKey||e.metaKey))return;
 
@@ -1056,10 +1055,8 @@ function examflowKeyboardHandler(e){
 
   // Option on macOS can change event.key into a symbol. Read its physical code.
   const optionKey=KeyboardShortcuts.optionKey(e);
-  if(e.altKey && !e.shiftKey && /^[1-7]$/.test(optionKey)){
+  if(e.altKey && !e.shiftKey && /^[1-5]$/.test(optionKey)){
     e.preventDefault();
-    if(optionKey==="6"){openNotes();return}
-    if(optionKey==="7"){showView('generate');return}
     const page=["home","exam","flashcards","planner","settings"][Number(optionKey)-1];
     if(page)showView(page);
     return;
@@ -2237,19 +2234,17 @@ function showView(name){
  if(name==="exam"){updateTimerUI();updateModeUI();}
  document.body.classList.toggle("exam-active",name==="exam");
  window.scrollTo({top:0,behavior:"smooth"});
- ["home","exam","dashboard","testResults","planner","settings","flashcards","generate"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
- ["navHome","navExam","navPlanner","navSettings","navFlashcards","navGenerate"].forEach(x=>document.getElementById(x).classList.remove("active"));
- const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings",flashcards:"navFlashcards",generate:"navGenerate"}[name];
+ ["home","exam","dashboard","testResults","planner","settings","flashcards"].forEach(x=>document.getElementById(x+"View").classList.toggle("active",x===name));
+ ["navHome","navExam","navPlanner","navSettings","navFlashcards"].forEach(x=>document.getElementById(x).classList.remove("active"));
+ const activeNav={home:"navHome",exam:"navExam",planner:"navPlanner",settings:"navSettings",flashcards:"navFlashcards"}[name];
  if(activeNav)document.getElementById(activeNav).classList.add("active");
  if(name==="flashcards")Flashcards.refresh();
- if(name==="generate")window.GeminiGenerator?.refresh();
  if(name==="home"){renderHome();if(typeof renderTodos==='function')renderTodos();}if(name==="planner"){renderPlans();requestAnimationFrame(()=>{if(document.getElementById("plannerView")?.classList.contains("active"))renderPlannerCalendar()});renderPlannerTodos();renderExamDeadline();}if(name==="exam"){setTimeout(()=>{applyQuestionSidebarState();syncExamTitleBar()},0)}
  if(name==="settings"){QuizStorage.updatePanel();const feedback=document.getElementById("instantFeedback");if(feedback)feedback.checked=!!settings.instantFeedback;
  const duration=document.getElementById("defaultDuration");if(duration)duration.value=String(settings.defaultDuration||30);
  renderPromptSettings();updateTheme();updateModeUI()}
 }
 function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
-function openNotes(){closeMobileNav();window.open("https://refmaps.vercel.app/","_blank","noopener,noreferrer")}
 function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
 function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
@@ -2498,10 +2493,10 @@ setInterval(()=>{
 window.addEventListener("beforeunload",saveSession);
 
 QuizStorage.ready.then(()=>{
- settings=loadSettings();initPromptLibrary().then(()=>window.GeminiGenerator?.refresh());applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();QuizStorage.updatePanel();
+ settings=loadSettings();initPromptLibrary();applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();QuizStorage.updatePanel();
 });
 window.addEventListener("quizflow-library-change",event=>{
  if(event.detail.keys.includes(K.sessions)&&sessionId){clearTimeout(saveTimer);deletedSessionIds.add(sessionId);timerState.running=false;toast("This session changed in another tab. Reopen it from Continue studying before editing.")}
  settings=loadSettings();applySettings();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();
- if(event.detail.keys.includes("examflow_prompt_library_v1"))initPromptLibrary().then(()=>window.GeminiGenerator?.refresh());
+ if(event.detail.keys.includes("examflow_prompt_library_v1"))initPromptLibrary();
 });

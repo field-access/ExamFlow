@@ -1,4 +1,4 @@
-import { cp, mkdir, readFile, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -22,6 +22,10 @@ async function render(file, ancestors = []) {
 const html = await render('index.html');
 const output = path.join(root, 'public');
 await mkdir(output, { recursive: true });
+// Clear old generated AI assets from builds created before the feature was parked.
+for (const asset of ['css/generate.css', 'js/gemini-generator.js']) {
+  await rm(path.join(output, asset), { force: true });
+}
 await writeFile(path.join(root, 'index.html'), html);
 await writeFile(path.join(output, 'index.html'), html);
 for (const asset of ['app.js', 'styles.css', 'original-prompts.json', 'seed-prompts.json', 'flashcard-seed-prompt.txt', 'css', 'js']) {

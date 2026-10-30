@@ -1,3 +1,6 @@
 /public/
 # Local archived copy of the development server.
 /scripts/generate-dev.mjs
+
+# Local experimental features, excluded from version control.
+/.experimental/

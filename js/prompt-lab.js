@@ -70,7 +70,7 @@ async function savePrompt(){
  const p=activePrompt();if(!p)return false;
  const name=document.getElementById('promptSlotName').value.trim(),text=document.getElementById('seedPromptEditor').value;
  if(!name||!text.trim()||text.length>100000){promptStatus('Enter a name and prompt of up to 100,000 characters.',true);return false}
- p.name=name;p.text=text;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();window.GeminiGenerator?.refresh();
+ p.name=name;p.text=text;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();
  promptStatus(localPromptFile?'Saving project JSON…':'Saved in browser · Export JSON for a file copy');
  try{if(await persistPromptFile())promptStatus('Saved to prompt-library.json')}catch(error){promptStatus(error.message,true)}
  return true;
@@ -94,7 +94,7 @@ function copyEditedPrompt(){
 async function restoreOriginalPrompt(){
  const p=activePrompt(),original=p&&originalPrompts.get(p.id);if(!original)return;
  if(!confirm('Restore the shipped “'+original.name+'” prompt? This replaces its saved text and pending edits.'))return;
- Object.assign(p,original);promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();window.GeminiGenerator?.refresh();
+ Object.assign(p,original);promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();
  try{await persistPromptFile();promptStatus('Original restored.')}catch(error){promptStatus(error.message,true)}
 }
 function exportPromptLibrary(){
@@ -111,7 +111,7 @@ async function importPromptLibrary(event){
   for(const [key,p] of originalPrompts)if(!imported.prompts.some(p=>p.id===key))imported.prompts.unshift({...p});
   if(imported.prompts.length>100)throw Error('Maximum 100 slots including originals.');
   if(!confirm('Replace your prompt slots with this JSON file?'))return;
-  promptLibrary=imported;promptDrafts.clear();backupPromptLibrary();renderPromptSettings();window.GeminiGenerator?.refresh();
+  promptLibrary=imported;promptDrafts.clear();backupPromptLibrary();renderPromptSettings();
   await persistPromptFile();promptStatus('Prompts imported.');
  }catch(error){promptStatus(error.message,true)}
 }

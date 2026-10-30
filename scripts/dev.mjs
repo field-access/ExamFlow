@@ -1,9 +1,8 @@
-/* Local, same-origin server for the study app and per-user AI functions. */
+/* Local, same-origin server for the study app and project prompt JSON. */
 import http from 'node:http';
 import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { createRequire } from 'node:module';
 import { promptFileRequest } from './prompt-file.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
@@ -11,8 +10,6 @@ const publicRoot=await realpath(path.join(root,'public')).catch(()=>null);
 if(!publicRoot){console.error('Run npm run dev to build and start the app.');process.exit(1)}
 const port=Number(process.env.PORT||3000);
 if(!Number.isInteger(port)||port<1||port>65535){console.error('PORT must be a number from 1 to 65535.');process.exit(1)}
-const require=createRequire(import.meta.url);
-const handlers={'/api/gemini':require('../api/gemini.js'),'/api/openai':require('../api/openai.js'),'/api/claude':require('../api/claude.js')};
 const hosts=new Set(['127.0.0.1:'+port,'localhost:'+port]);
 const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json; charset=utf-8','.txt':'text/plain; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.ico':'image/x-icon','.woff2':'font/woff2','.woff':'font/woff'};
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data))}
@@ -22,20 +19,6 @@ const server=http.createServer(async(req,res)=>{
   try{
     const pathname=new URL(req.url,'http://127.0.0.1:'+port).pathname;
     if(pathname==='/api/prompts'){await promptFileRequest(req,res,root,json);return}
-    if(Object.hasOwn(handlers,pathname)){
-      if(req.method==='POST'){
-        const chunks=[];let size=0;
-        for await(const chunk of req){
-          size+=chunk.length;
-          if(size>100000){json(res,413,{error:'The source and prompt are too large.'});return}
-          chunks.push(chunk);
-        }
-        req.body=Buffer.concat(chunks).toString('utf8');
-      }
-      res.status=code=>{res.statusCode=code;return res};
-      res.json=data=>{res.setHeader('Content-Type','application/json; charset=utf-8');res.end(JSON.stringify(data));return res};
-      await handlers[pathname](req,res);return;
-    }
     if(pathname.startsWith('/api/')){json(res,404,{error:'This API endpoint does not exist.'});return}
     if(req.method!=='GET'&&req.method!=='HEAD'){res.writeHead(405,{Allow:'GET, HEAD'});res.end();return}
     const relative=decodeURIComponent(pathname==='/'?'/index.html':pathname).replace(/^\/+/, '');

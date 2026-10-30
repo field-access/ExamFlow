@@ -1,6 +1,5 @@
 {
   "framework": null,
   "buildCommand": "npm run build",
-  "outputDirectory": "public",
-  "functions": { "api/gemini.js": { "maxDuration": 60 }, "api/openai.js": { "maxDuration": 60 }, "api/claude.js": { "maxDuration": 60 } }
+  "outputDirectory": "public"
 }

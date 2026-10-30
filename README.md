@@ -14,23 +14,15 @@ On the Quiz page, **Save** (Alt/Option+S) saves the current attempt to the brows
 
 Settings → Local data → **Download JSON** exports the full library and includes the latest active session. It creates an ordinary `quizflow-data.json` file for offline backup or sharing; the recipient can use Settings → **Import JSON** to load it. Export reads the in-memory library, including pending writes, and does not require an IndexedDB save or internet connection. Results → **Download result JSON** exports the selected result. IndexedDB remains the browser save location; API keys are excluded from files. Imported sessions are validated before writing, and replacing sessions with a full backup stops stale active autosaves until you reopen a session. Browser protection, retry and reset controls are under the Local data panel's **⋯** menu.
 
-## Generate quizzes with AI
+## Local experimental features
 
-Open **Generate** (Alt/Option+7) to use **Gemini, OpenAI or Claude**. Choose the provider, paste its API key and click **Connect** to fetch the available supported models. Choose a saved CBQ prompt, enter a topic or source, and select a question count or follow the prompt. Settings still manages the prompt slots; default prompts remain in separate project files.
+The API-key Generate page and its Gemini/OpenAI/Claude routes are removed from the app. Their sources and integration snapshots are kept locally in `.experimental/generate/`, excluded by Git and Vercel ignore rules. They are not included in builds or served by the active local server. Copy CBQ/flashcard prompts, the question-to-ChatGPT action, and Prompt Lab remain available. The Notes redirect and its navigation shortcut have also been removed.
 
-Get keys from [Google AI Studio](https://aistudio.google.com/apikey), [OpenAI](https://platform.openai.com/api-keys), or [Anthropic](https://platform.claude.com/settings/keys). Each provider has separate key storage and model preferences. **Remember key on this device** is optional: it stores the key without encryption in this browser's localStorage. Keys are excluded from quiz exports, library backups and IndexedDB records, and the server forwards them to the selected provider without saving or logging them. **Forget key** removes that provider's saved key. A saved key must be connected again after reloading.
-
-Gemini's **Free-tier models only** filter uses the published eligibility catalog in `gemini-models.json`; eligibility does not guarantee available quota or free requests on a paid project. OpenAI and Claude use API credits: ChatGPT and Claude subscriptions do not include API usage. Claude lists models supporting structured JSON output and prefers Haiku when available. Check provider pricing and account limits before generating.
-
-Generation runs only when requested, with no automatic retries. Connecting fetches model metadata; studying saved quizzes or flashcards makes no AI calls. Generated JSON is validated and previewed before **Open quiz** loads it through the existing importer. You can edit or download it first. New Exam attempts start their timer automatically; restored sessions preserve their saved timer state. Ctrl/Cmd+Enter connects from the key field, generates from the source, or opens the quiz from the JSON editor. Escape cancels a pending request.
-
-Run `npm run dev` in a normal terminal in this project, then open [http://127.0.0.1:3000](http://127.0.0.1:3000). This builds the app and serves both study pages and the same-origin `/api/gemini`, `/api/openai`, and `/api/claude` endpoints. Opening `index.html` directly or using a static-only server cannot run generation. The server needs outbound HTTPS access to the selected provider; a server started in a restricted coding sandbox may be denied access. Vercel deploys the API functions alongside `public/`.
-
-On Mac, use **Option+1–7** for page navigation, **Option+I** to import a quiz, **Option+M** for the mobile menu, **Option+X** to export, and **Option+S** to save the current session. **Cmd+Enter** loads pasted quizzes/decks or saves flashcard edits; **Cmd+Z** undoes a flashcard rating. Option shortcuts use physical key codes so macOS symbols do not break navigation. Shortcut help displays Mac labels automatically. Windows/Linux retain Alt navigation and Ctrl actions; standard browser shortcuts remain available.
+On Mac, use **Option+1–5** for page navigation, **Option+I** to import a quiz, **Option+M** for the mobile menu, **Option+X** to export, and **Option+S** to save the current session. **Cmd+Enter** loads pasted quizzes/decks or saves flashcard edits; **Cmd+Z** undoes a flashcard rating. Option shortcuts use physical key codes so macOS symbols do not break navigation. Shortcut help displays Mac labels automatically. Windows/Linux retain Alt navigation and Ctrl actions; standard browser shortcuts remain available.
 
 Continue studying includes a keyword search across saved quiz titles and question content. Choose Title & content, Title only, or Content only. Multiple keywords must all match; matching titles come first. Searching without a calendar date includes prior loaded quizzes and completed results, preferring a resumable session for each quiz. A selected date limits the search to that day's history. Questions, options, matching prompts, sections and hints are searchable; explanations are searchable for Practice/completed work. Unsubmitted Exam explanations and correct answers stay hidden. Clear the search to return to in-progress sessions. **Option+F** on Mac / **Alt+F** elsewhere opens this search.
 
-Quiz and practice pages can run on a static HTTP server; AI generation requires the app server or a Vercel deployment.
+The study app works on a static HTTP server. Run `npm run dev` for local project prompt-file saving.
 
 ## Editing the interface
 
@@ -76,5 +68,5 @@ The page uses `views/flashcards.html`, `css/flashcards.css`, and `js/flashcards.
 ## Deploying
 
 Vercel runs `npm run build` and serves `public/`, as configured in `vercel.json`.
-The build copies the generated page, JavaScript, stylesheets, and prompt library into that folder. Vercel also deploys the functions in `api/`; API keys are supplied per request, so no shared server key is required.
-For a local preview including AI generation, run `npm run dev`. For a static study-page preview, run `python -m http.server 8000 --directory public` after building; this does not serve the API endpoints.
+The build copies the generated page, JavaScript, stylesheets, and prompt library into that folder. Experimental AI files are excluded.
+Run `npm run dev` for the local study app and prompt-file saving. For a static preview, run `python -m http.server 8000 --directory public` after building.

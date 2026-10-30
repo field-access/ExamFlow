@@ -27,7 +27,6 @@
 <link rel="stylesheet" href="css/theme-picker.css">
 <link rel="stylesheet" href="css/home-focus.css">
 <link rel="stylesheet" href="css/library-storage.css">
-<link rel="stylesheet" href="css/generate.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -68,8 +67,6 @@
     <button id="navFlashcards" onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
     <button id="navPlanner" onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button>
     <button id="navSettings" onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
-    <button id="navNotes" onclick="openNotes()" title="Open Refmaps in a new tab (Alt+6)"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
-    <button id="navGenerate" onclick="showView('generate')" title="Generate a quiz with Gemini, OpenAI or Claude (Alt+7)"><svg class="ui-icon"><use href="#icon-brain"/></svg>Generate</button>
   </nav>
   <div class="global-exam-title" id="globalExamTitle" aria-live="polite"></div>
   <div class="header-right" hidden>
@@ -81,8 +78,6 @@
 <nav id="mobileNav" class="mobile-nav" aria-label="Mobile navigation">
   <button onclick="showView('flashcards')"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Flashcards</button>
   <button onclick="showView('home')"><svg class="ui-icon"><use href="#icon-home"/></svg>Home</button><button onclick="showView('exam')"><svg class="ui-icon"><use href="#icon-file"/></svg>Quiz</button><button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan</button><button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
-  <button onclick="openNotes()" title="Open Refmaps in a new tab"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
-  <button onclick="showView('generate')"><svg class="ui-icon"><use href="#icon-brain"/></svg>Generate</button>
 </nav>
 
 
@@ -226,7 +221,6 @@
     <button class="active"><svg class="ui-icon"><use href="#icon-list"/></svg>Questions</button>
     <button onclick="showView('planner')"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Future tests</button>
     <button onclick="showView('settings')"><svg class="ui-icon"><use href="#icon-settings"/></svg>Settings</button>
-    <button onclick="openNotes()" title="Open Refmaps in a new tab"><svg class="ui-icon"><use href="#icon-bookmark"/></svg>Notes <span aria-hidden="true">↗</span></button>
   </div>
   <div class="progress-mini"><small>Progress</small><strong id="progressText">0 / 0</strong><div class="bar"><i id="progressBar"></i></div></div>
   <div class="session-list"><div class="side-title">Saved sessions</div><div id="sessionList"></div></div>
@@ -483,7 +477,7 @@
 
 <section class="setting card keyboard-shortcuts-card" aria-label="Keyboard shortcuts">
 <div class="shortcut-grid">
-<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>7</kbd></span><span>Home / quiz / flashcards / plan / settings / notes ↗ / generate</span></div>
+<div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>1</kbd>–<kbd>5</kbd></span><span>Home / quiz / flashcards / plan / settings</span></div>
 <div><span class="shortcut-keys"><kbd>Space</kbd> · <kbd>1</kbd>–<kbd>4</kbd> · <kbd>U</kbd></span><span>Flashcards: flip / rate / undo</span></div>
 <div><span class="shortcut-keys"><kbd>N</kbd> · <kbd>B</kbd> · <kbd>?</kbd></span><span>Flashcards: add deck / library / shortcut help</span></div>
 <div><span class="shortcut-keys"><kbd>Alt</kbd> + <kbd>M</kbd></span><span>Mobile menu</span></div>
@@ -572,35 +566,6 @@
   </dialog>
 </section>
 
-<section id="generateView" class="view">
-  <div class="gen-page">
-    <div class="gen-heading"><h1>Generate a quiz</h1><p>Turn a topic or your study notes into a CBQ with Gemini, OpenAI or Claude.</p></div>
-    <div id="genServerNotice" class="gen-server-notice" hidden><strong>Start the app server to generate quizzes</strong><p>Open a terminal in the project folder and run <code>npm run dev</code>, then visit <a href="http://127.0.0.1:3000" target="_blank" rel="noopener noreferrer">http://127.0.0.1:3000 ↗</a>. Your study pages still work when opened as a file, but AI generation needs a server.</p></div>
-    <section class="gen-panel" aria-labelledby="genConnectionTitle">
-      <div class="gen-provider"><label for="genProvider">AI provider</label><select id="genProvider"><option value="gemini">Gemini</option><option value="openai">OpenAI (ChatGPT models)</option><option value="claude">Claude (Anthropic)</option></select></div>
-      <details id="genConnection" open><summary id="genConnectionTitle"><span id="genConnectionLabel">Gemini connection</span> <span id="genConnectionState">Not connected</span></summary>
-        <div class="gen-key-row"><label id="genKeyLabel" for="genApiKey">Your Gemini API key</label><div><input id="genApiKey" type="password" maxlength="1024" autocomplete="off" spellcheck="false" placeholder="Paste your complete API key"><button id="genConnect" class="btn" type="button">Connect</button><button id="genForget" class="btn" type="button" title="Remove this provider’s key from the page and browser storage">Forget key</button></div></div>
-        <label class="gen-checkbox" for="genRememberKey"><input id="genRememberKey" type="checkbox">Remember key on this device</label>
-        <p class="gen-key-note"><span id="genKeyNote">Used only for this visit and sent through this app’s server to Google. Not included in saved data.</span> <a id="genKeyLink" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Get a Gemini key ↗</a></p>
-      </details>
-    </section>
-    <form id="genForm" class="gen-panel">
-      <label for="genSource">Topic or source</label>
-      <textarea id="genSource" maxlength="30000" required placeholder="Describe a topic, paste your notes, or add the problem you want to understand…"></textarea>
-      <div class="gen-options"><div><label for="genModel">Model</label><select id="genModel" required disabled><option value="">Connect your key first</option></select><label id="genFreeFilter" class="gen-checkbox" for="genFreeOnly"><input id="genFreeOnly" type="checkbox" checked>Free-tier models only</label></div><div><label for="genPrompt">Saved CBQ prompt</label><select id="genPrompt" required><option value="">Loading saved prompts…</option></select></div><div><label for="genCount">Questions</label><select id="genCount"><option value="0">Follow prompt</option><option value="5">5 questions</option><option value="10">10 questions</option><option value="15">15 questions</option><option value="25">25 questions</option></select></div></div>
-      <p class="gen-model-note"><span id="genModelNote">Free-tier eligibility follows published pricing; quota and billing depend on your project.</span> <a id="genModelPricing" href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener noreferrer">Check pricing ↗</a></p>
-      <details class="gen-prompt-preview"><summary>View selected prompt</summary><pre id="genPromptText"></pre><button id="genEditPrompts" class="btn" type="button">Manage prompts in Settings</button></details>
-      <div class="gen-footer"><small id="genBilling">Uses your Gemini project’s quota and billing.</small><div><button id="genCancel" class="btn" type="button" hidden>Cancel</button><button id="genSubmit" class="btn primary" type="submit" disabled>Generate quiz</button></div></div>
-    </form>
-    <p id="genStatus" class="gen-status" role="status" aria-live="polite"></p>
-    <section id="genResult" class="gen-panel" hidden aria-labelledby="genResultTitle">
-      <div class="gen-result-head"><div><h2 id="genResultTitle">Generated quiz</h2><p id="genResultMeta"></p></div><div class="gen-result-actions"><button id="genDownload" class="btn" type="button">Download JSON</button><button id="genOpenQuiz" class="btn primary" type="button">Open quiz →</button></div></div>
-      <details><summary>Preview the questions</summary><ol id="genQuestions"></ol></details>
-      <details id="genJsonDetails"><summary>View or edit JSON</summary><textarea id="genJson" spellcheck="false" aria-label="Generated quiz JSON"></textarea><small>Edits are validated when you open the quiz.</small></details>
-    </section>
-  </div>
-</section>
-
 </div>
 
 <!-- IMPORTER -->
@@ -648,7 +613,6 @@
 <script src="js/flashcards.js"></script>
 <script src="js/prompt-lab.js"></script>
 <script src="js/session-files.js"></script>
-<script src="js/gemini-generator.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
