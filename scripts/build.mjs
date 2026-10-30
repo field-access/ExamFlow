@@ -24,7 +24,7 @@ const output = path.join(root, 'public');
 await mkdir(output, { recursive: true });
 await writeFile(path.join(root, 'index.html'), html);
 await writeFile(path.join(output, 'index.html'), html);
-for (const asset of ['app.js', 'styles.css', 'seed-prompts.json', 'flashcard-seed-prompt.txt', 'css', 'js']) {
+for (const asset of ['app.js', 'styles.css', 'original-prompts.json', 'seed-prompts.json', 'flashcard-seed-prompt.txt', 'css', 'js']) {
   await cp(path.join(root, asset), path.join(output, asset), { recursive: true });
 }
 console.log('Built index.html and static assets in public/');

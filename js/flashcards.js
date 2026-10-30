@@ -187,9 +187,12 @@
   async function copyPrompt(btn) {
     if (btn) btn.disabled = true;
     try {
-      const response = await fetch('flashcard-seed-prompt.txt');
-      if (!response.ok) throw new Error('Prompt unavailable');
-      const value = await response.text();
+      let value = typeof getPromptText === 'function' ? getPromptText('flashcards') : '';
+      if (!value) {
+        const response = await fetch('flashcard-seed-prompt.txt');
+        if (!response.ok) throw new Error('Prompt unavailable');
+        value = await response.text();
+      }
       try { await navigator.clipboard.writeText(value); toast('Flashcard prompt copied. Paste it into your AI chat.'); }
       catch (_) {
         const dialog = document.createElement('dialog');

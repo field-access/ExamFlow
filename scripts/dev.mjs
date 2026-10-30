@@ -4,6 +4,7 @@ import path from 'node:path';
 import { readFile, realpath } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { promptFileRequest } from './prompt-file.mjs';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const publicRoot=await realpath(path.join(root,'public')).catch(()=>null);
@@ -20,6 +21,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.headers.origin&&!['http://127.0.0.1:'+port,'http://localhost:'+port].includes(req.headers.origin)){json(res,403,{error:'Open the app from this local server.'});return}
   try{
     const pathname=new URL(req.url,'http://127.0.0.1:'+port).pathname;
+    if(pathname==='/api/prompts'){await promptFileRequest(req,res,root,json);return}
     if(Object.hasOwn(handlers,pathname)){
       if(req.method==='POST'){
         const chunks=[];let size=0;

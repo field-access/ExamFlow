@@ -10,6 +10,10 @@ IndexedDB remains tied to the browser profile and site address. Clearing site da
 
 The primary adapter is js/library-storage.js, with CSS in css/library-storage.css.
 
+On the Quiz page, **Save** (Alt/Option+S) saves the current attempt to the browser and confirms success after IndexedDB finishes writing. **Session JSON** downloads just this attempt, including question order, answers, review/verification marks and both timers. It captures the live state immediately, even if autosave is pending or database saving fails. Continue studying also offers **Download session JSON** in each session's small menu. Restore a session file with the quiz importer (choose the file and Load Quiz) or Settings → Import JSON; it adds the attempt without replacing other sessions. Reimporting an existing ID creates another attempt, preserving newer saved work.
+
+Settings → **Download library JSON** exports the full library and includes the latest active session. Results → **Download result JSON** exports the selected result. JSON downloads are ordinary local files; IndexedDB remains the browser save location. API keys are excluded. Imported sessions are validated before writing, and replacing sessions with a full backup stops stale active autosaves until you reopen a session.
+
 ## Generate quizzes with AI
 
 Open **Generate** (Alt/Option+7) to use **Gemini, OpenAI or Claude**. Choose the provider, paste its API key and click **Connect** to fetch the available supported models. Choose a saved CBQ prompt, enter a topic or source, and select a question count or follow the prompt. Settings still manages the prompt slots; default prompts remain in separate project files.
@@ -41,7 +45,9 @@ Interface sizing is in `css/interface.css`; the home study calendar and cards us
 `js/study-dashboard.js` and `css/study-dashboard.css`. Study activity is backed up
 alongside sessions and results, and included in data exports.
 Button hierarchy and icon accents are maintained in `css/controls.css`.
-Default seed prompts live in `seed-prompts.json`. Settings saves custom slots and drafts in the browser.
+Prompt Lab has three **Originals**: CBQ prompt (the hero copy action), Flashcard prompt (hero and Flashcards copy actions), and Question payload (Quiz → ChatGPT). Editing and saving these changes their respective actions. **Restore original** restores the selected slot from `original-prompts.json`. Selecting or creating an **Experimental** slot only changes the editor; it does not replace a hero or payload prompt. The initial experimental seeds live in `seed-prompts.json`.
+
+Prompt Lab exposes only Save and Copy beside the editor. Unsaved changes are retained in browser drafts; Copy copies the editor text, while hero actions use saved original text. With `npm run dev`, saving, restoring, importing or deleting a prompt writes the saved collection to `prompt-library.json` in the project folder through the local-only `/api/prompts` route. The write uses an atomic temporary-file rename; shipped originals stay in their separate JSON file for restoration. The local file loads on startup and contains prompts only. On Vercel/static hosting, edits save to IndexedDB; the small **⋯** menu offers Export JSON / Import JSON for a portable `prompt-library.json` file. Browser data resets do not delete a project prompt file.
 
 ## Flashcards
 

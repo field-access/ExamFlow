@@ -53,11 +53,11 @@
   function refresh(){
     if(!$('genPrompt')||busy)return;
     const selected=$('genPrompt').value;
-    const prompts=promptLibrary.prompts.filter(p=>p.text.trim());
+    const prompts=promptLibrary.prompts.filter(p=>p.text.trim()&&promptRole(p)!=='flashcards');
     $('genPrompt').replaceChildren();
     for(const prompt of prompts){const option=document.createElement('option');option.value=prompt.id;option.textContent=prompt.name;$('genPrompt').append(option)}
     if(!prompts.length){const option=document.createElement('option');option.value='';option.textContent='Add a saved CBQ prompt in Settings';$('genPrompt').append(option)}
-    else $('genPrompt').value=prompts.some(p=>p.id===selected)?selected:prompts.some(p=>p.id===promptLibrary.activeId)?promptLibrary.activeId:prompts[0].id;
+    else $('genPrompt').value=prompts.some(p=>p.id===selected)?selected:prompts.find(p=>promptRole(p)==='cbq')?.id||prompts[0].id;
     showPrompt();updateBusy(false);
   }
   function showPrompt(){const prompt=promptLibrary.prompts.find(p=>p.id===$('genPrompt').value);$('genPromptText').textContent=prompt?.text||'Save a CBQ prompt in Settings first.'}

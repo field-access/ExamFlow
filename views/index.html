@@ -252,6 +252,8 @@
       <button class="modebtn" type="button" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT (G)"><svg class="ui-icon"><use href="#icon-external"/></svg>ChatGPT</button>
       <button id="copyQuestionBtn" class="modebtn copy-question-btn" type="button" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question</button>
       <button class="modebtn" type="button" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer</button>
+      <button class="modebtn" type="button" onclick="saveSessionConfirmed()" title="Save progress in this browser (Alt/Option+S)">Save</button>
+      <button class="modebtn" type="button" onclick="exportSessionJSON()" title="Download this session with answers, review marks and timers"><svg class="ui-icon"><use href="#icon-file"/></svg>Session JSON</button>
     </div>
   </div>
   <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
@@ -322,7 +324,7 @@
       <div><h1>Test Results</h1><p id="resultSubtitle">CBQ · Practice Mode</p></div>
     </div>
     <div class="results-actions">
-      <button class="btn primary" onclick="saveResultCopy()">▣ Save Result</button>
+      <button class="btn primary" onclick="saveResultCopy()">▣ Download result JSON</button>
       <button class="btn" onclick="showView('home')">← Change Exam</button>
       <button class="btn" onclick="retakeLastTest()">↻ Retake</button>
     </div>
@@ -445,6 +447,8 @@
 <script src="js/flashcards-core.js"></script>
 <script src="js/cbq-review-preview.js"></script>
 <script src="js/flashcards.js"></script>
+<script src="js/prompt-lab.js"></script>
+<script src="js/session-files.js"></script>
 <script src="js/gemini-generator.js"></script>
 <script src="app.js"></script>
 </body>

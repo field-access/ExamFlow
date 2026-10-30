@@ -129,7 +129,7 @@ function renderStudyWorkspace(sessions) {
   const cards=records.map(item=>{
     const session=item.sessionId&&sessions.find(s=>s.id===item.sessionId),completed=item.kind==='result',flashcard=item.kind==='flashcards';
     const preview=flashcard?'':window.CBQReviewPreview?.controls(completed?savedResults.find(r=>r.id===item.resultId):session,completed?'result':'session')||'';
-    const menu=session&&!completed&&!flashcard?`<details class="study-session-menu"><summary aria-label="Session options for ${esc(item.name||'Untitled quiz')}" title="Session options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-delete-study-session="${esc(session.id)}">Delete session</button></div></details>`:'';
+    const menu=session&&!completed&&!flashcard?`<details class="study-session-menu"><summary aria-label="Session options for ${esc(item.name||'Untitled quiz')}" title="Session options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-export-study-session="${esc(session.id)}">Download session JSON</button><button type="button" data-delete-study-session="${esc(session.id)}">Delete session</button></div></details>`:'';
     const action=flashcard?'flashcards':completed&&resultMap.has(item.resultId)?'result':session?'session':item.examId&&examMap.has(item.examId)?'quiz':'';
     const actionId=completed?item.resultId:session?session.id:item.examId||'';
     const progress=Math.min(100,Math.round((item.answered||0)/Math.max(item.total||0,1)*100));
@@ -147,6 +147,8 @@ document.addEventListener('click',event=>{
   if(open){const kind=open.dataset.studyOpen,sourceId=open.dataset.studyId;if(kind==='flashcards')showView('flashcards');else if(kind==='result')openStudyResult(sourceId);else if(kind==='session')restoreSession(sourceId);else if(kind==='quiz')openRecentQuiz(sourceId);return}
   const menu=event.target.closest('.study-session-menu');
   document.querySelectorAll('.study-session-menu[open]').forEach(item=>{if(item!==menu)item.open=false});
+  const download=event.target.closest('[data-export-study-session]');
+  if(download){exportSessionJSON(download.dataset.exportStudySession);if(menu)menu.open=false;return}
   const button=event.target.closest('[data-delete-study-session]');
   if(button){
     deleteSession(button.dataset.deleteStudySession);

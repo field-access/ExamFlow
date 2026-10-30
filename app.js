@@ -580,7 +580,11 @@ function closeImporter(){document.getElementById("importer").classList.remove("s
 function readFile(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>document.getElementById("jsonInput").value=r.result;r.readAsText(f)}
 function loadQuiz(){
  try{
-   const parsed=parseQuiz(parseQuizInput(document.getElementById("jsonInput").value));
+   const source=parseQuizInput(document.getElementById("jsonInput").value);
+   if(source?.format==="quizflow-session"){
+     importSessionJSON(source).catch(error=>{document.getElementById("jsonStatus").className="status err";document.getElementById("jsonStatus").textContent="✕ "+error.message});return;
+   }
+   const parsed=parseQuiz(source);
    questions=prepareShuffledQuiz(parsed.questions);sections=parsed.sections;examName=parsed.name;examId=id();
    answers=Array(questions.length).fill(null);reviews=new Set();checkedQuestions=new Set();matchOrders={};current=0;
    quizDurationMinutes=clampDurationMinutes(parsed.durationMinutes,settings.defaultDuration||5);seconds=quizDurationMinutes*60;timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;sessionId=null;examFinished=false;
@@ -1064,7 +1068,7 @@ function examflowKeyboardHandler(e){
   if(e.altKey && !e.shiftKey && optionKey==="i"){e.preventDefault();openImporter();return}
   if(e.altKey && !e.shiftKey && optionKey==="x"){e.preventDefault();exportData();return}
   if(e.altKey && !e.shiftKey && optionKey==="s"){
-    if(document.getElementById("examView")?.classList.contains("active")){e.preventDefault();saveSession();toast("Session saved ✓")}
+    if(document.getElementById("examView")?.classList.contains("active")){e.preventDefault();saveSessionConfirmed()}
     return;
   }
   if(e.altKey && !e.shiftKey && optionKey==="f"){e.preventDefault();showView("home");document.getElementById("studyQuizSearch")?.focus({preventScroll:false});return}
@@ -1146,159 +1150,10 @@ document.addEventListener("pointerdown",e=>{
   setTimeout(()=>b.classList.remove("click-pulse"),180);
 });
 
-const CBQ_MODE_GUIDE=`LANGUAGE STYLE:
-Use ASD-STE100-inspired controlled English for about 80% of the wording.
-- Use short sentences.
-- Use simple grammar and one idea at a time.
-- Use clear technical terms.
-- Avoid unnecessary synonyms and decorative academic wording.
-- Keep mathematical and computer science terms precise.
-- Simplify the language, not the thinking. Keep the reasoning deep.
-
-TEXT FORMATTING:
-Use Markdown where it improves readability: **bold**, *italic*, ++underline++, inline or fenced code, and bullet or numbered lists. Do not use raw HTML.
-
-CBQ COMMAND MODES:
-Read any CBQ command included with the topic, source, or question. A command starts with CBQ/. Commands can be combined. Apply every requested mode together.
-- CBQ/mental: mental-set and problem-solving aptitude.
-- CBQ/depth: deep conceptual understanding.
-- CBQ/math: mathematical derivation and reasoning.
-- CBQ/bloom: progress through Bloom's taxonomy.
-- CBQ/normal: use mixed question formats.
-- CBQ/code: reason about code or pseudocode.
-- CBQ/RQ: reconstruct code line by line.
-- CBQ/hint: link hints across a chain of reasoning.
-- CBQ/active: use active recall and many fill-in-the-blank questions.
-- CBQ/match: match related items, relationships, or formulas.
-- CBQ/5x25: teach 5 core ideas, then create 25 reinforcement questions.
-- CBQ/leetcode: transfer the concept to a LeetCode-style problem.
-- CBQ/source: ground coverage in the supplied source, slides, or notes.
-- CBQ/diagnose: detect misconceptions and repair them.
-- CBQ/transfer: apply the concept to novel situations.
-- CBQ/reconstruct: rebuild an algorithm or process from reasoning.
-
-PRIMARY MODES:
-CBQ/mental, CBQ/depth, CBQ/math, CBQ/code, CBQ/RQ, CBQ/hint, CBQ/leetcode, CBQ/source, CBQ/diagnose, and CBQ/transfer are the main specialized modes.
-
-COMBINED MODES:
-- CBQ/mental/depth: build a mental model and deepen understanding step by step.
-- CBQ/mental/code: build problem-solving skill through code.
-- CBQ/mental/leetcode: teach problem-solving patterns, then transfer them to a LeetCode-style problem.
-- CBQ/depth/math: derive the mathematical idea instead of memorizing a formula.
-- CBQ/source/mental: use the supplied source while training problem-solving aptitude.
-- CBQ/code/RQ: understand an implementation, then reconstruct it line by line.
-- CBQ/mental/diagnose/transfer: identify the reasoning pattern, find mistakes, then apply the idea to a new problem.
-For other combinations, combine their intentions without dropping a requested mode.
-
-DEFAULT MODE:
-If the user says only "CBQ" and gives no specialized command, use CBQ/mental/depth: deep understanding plus problem-solving aptitude. A supplied CBQ/ command replaces this default or adds specialized modes.
-Unless CBQ/5x25 is requested, create exactly 5 connected, progressively deeper questions. CBQ/5x25 instead requires 5 core ideas followed by 25 reinforcement questions.`;
-
-let promptLibrary={version:1,activeId:null,prompts:[]};
-const promptDrafts=new Map();
-const fixedQuestionPrompt="Create 5 connected Concept Breakdown Quiz questions that build reasoning toward this problem, ending with transfer. Use plain English. Honor CBQ/ modes in the source (default mental/depth; 5x25 means 5 core ideas + 25 questions). Include answers and concise explanations; optional hints. Return only a JSON code block using this ExamFlow structure (MCQs: 2 options, answer A or B). Escape LaTeX backslashes in JSON.\n{\"name\":\"CBQ\",\"sections\":[{\"name\":\"Reasoning\",\"timeMinutes\":10,\"marks\":1,\"negativeMarks\":0,\"questions\":[{\"type\":\"mcq\",\"question\":\"…\",\"options\":[\"…\",\"…\"],\"answer\":\"A\",\"explanation\":\"…\"}]}]}\nSource: {{question}}";
-function validPromptLibrary(data){
- if(!data||data.version!==1||!Array.isArray(data.prompts)||!data.prompts.length)throw Error("No prompt slots found.");
- const ids=new Set();
- for(const p of data.prompts){
-  if(!p||typeof p.id!=="string"||ids.has(p.id)||typeof p.name!=="string"||!p.name.trim()||typeof p.text!=="string")throw Error("Each slot needs a unique ID, name and prompt.");
-  ids.add(p.id);
- }
- return {version:1,prompts:data.prompts.map(p=>({id:p.id,name:p.name,text:p.text})),activeId:ids.has(data.activeId)?data.activeId:data.prompts[0].id};
-}
-function activePrompt(){return promptLibrary.prompts.find(p=>p.id===promptLibrary.activeId)}
-function getPromptText(){return activePrompt()?.text||""}
-function promptStatus(message,error=false){
- const status=document.getElementById("seedPromptStatus");
- status.textContent=message;status.style.color=error?"var(--bad)":"var(--muted)";
-}
-function renderPromptSlots(){
- const list=document.getElementById("promptSlotList");if(!list)return;
- list.replaceChildren();
- for(const p of promptLibrary.prompts){
-  const draft=promptDrafts.get(p.id),name=draft?.name||p.name,text=draft?.text??p.text;
-  const button=document.createElement("button");button.type="button";button.className="prompt-slot"+(p.id===promptLibrary.activeId?" is-active":"");button.setAttribute("aria-pressed",String(p.id===promptLibrary.activeId));
-  const title=document.createElement("strong");title.textContent=name;
-  const meta=document.createElement("span");meta.textContent=`${text.length.toLocaleString()} chars${draft?" · Draft":""}${p.id===promptLibrary.activeId&&p.text.trim()?" · Used for copying":""}`;
-  button.append(title,meta);button.onclick=()=>selectPromptSlot(p.id);list.append(button);
- }
- if(!list.children.length){const empty=document.createElement("p");empty.className="prompt-empty";empty.textContent="No prompts yet.";list.append(empty)}
- document.getElementById("promptSlotCount").textContent=`${promptLibrary.prompts.length} slots`;
-}
-function renderPromptSettings(){
- const editor=document.getElementById("seedPromptEditor");if(!editor)return;
- const p=activePrompt(),draft=p&&promptDrafts.get(p.id);
- document.getElementById("promptSlotName").value=draft?.name??p?.name??"";
- editor.value=draft?.text??p?.text??"";
- document.querySelectorAll(".prompt-library-edit").forEach(el=>el.disabled=!p);
- const remove=document.getElementById("deletePromptBtn");if(remove)remove.disabled=promptLibrary.prompts.length<2;
- renderPromptSlots();
- promptStatus(p?`${editor.value.length.toLocaleString()} characters · ${draft?"Draft preserved":"Saved slot"}`:"No prompts loaded. Serve the project over HTTP to load the prompt library.");
-}
-function editPrompt(){
- const p=activePrompt();if(!p)return;
- promptDrafts.set(p.id,{name:document.getElementById("promptSlotName").value,text:document.getElementById("seedPromptEditor").value});
- backupPromptLibrary();renderPromptSlots();promptStatus(`${document.getElementById("seedPromptEditor").value.length.toLocaleString()} characters · Draft preserved`);
-}
-function selectPromptSlot(value){if(!promptLibrary.prompts.some(p=>p.id===value))return;promptLibrary.activeId=value;backupPromptLibrary();renderPromptSettings()}
-function backupPromptLibrary(){put("examflow_prompt_library_v1",{...promptLibrary,drafts:Object.fromEntries(promptDrafts)})}
-function savePrompt(){
- const p=activePrompt();if(!p)return false;
- const name=document.getElementById("promptSlotName").value.trim(),text=document.getElementById("seedPromptEditor").value;
- if(!name||!text.trim()){promptStatus("Enter a slot name and prompt.",true);return false}
- p.name=name;p.text=text;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();promptStatus("Prompt saved.");return true;
-}
-function addPromptSlot(duplicate=false){
- const current=activePrompt(),draft=current&&promptDrafts.get(current.id);
- if(!current){promptStatus("Load the prompt library first.",true);return}
- const p={id:id(),name:duplicate?`${draft?.name||current?.name||"Prompt"} copy`:`New prompt ${promptLibrary.prompts.length+1}`,text:duplicate?(draft?.text??current.text):""};
- promptLibrary.prompts.push(p);promptLibrary.activeId=p.id;
- if(!duplicate)promptDrafts.set(p.id,{name:p.name,text:""});
- backupPromptLibrary();renderPromptSettings();document.getElementById("promptSlotName").focus();
-}
-function discardPromptDraft(){
- const p=activePrompt();if(!p)return;promptDrafts.delete(p.id);backupPromptLibrary();renderPromptSettings();
-}
-function deletePromptSlot(){
- const p=activePrompt();if(!p||promptLibrary.prompts.length<2)return;
- if(!confirm(`Delete “${p.name}” and its draft?`))return;
- promptLibrary.prompts=promptLibrary.prompts.filter(item=>item.id!==p.id);promptDrafts.delete(p.id);promptLibrary.activeId=promptLibrary.prompts[0].id;backupPromptLibrary();renderPromptSettings();
-}
-function copyPromptDraft(){
- const text=document.getElementById("seedPromptEditor").value;if(!text.trim()){promptStatus("Write a prompt before copying.",true);return}
- copyBeginnerSchema(text);
-}
-async function initPromptLibrary(){
- try{
-  const response=await fetch("seed-prompts.json");if(!response.ok)throw Error("Prompt file unavailable");
-  const defaults=validPromptLibrary(await response.json());
-  promptLibrary=defaults;
- }catch(error){}
- try{
-  const backup=get("examflow_prompt_library_v1",null);
-  if(backup){
-   const saved=validPromptLibrary(backup);
-   // Add newly shipped slots without overwriting existing custom prompts.
-   for(const p of promptLibrary.prompts)if(!saved.prompts.some(item=>item.id===p.id)){saved.prompts.push(p);}
-   promptLibrary={version:1,activeId:saved.activeId,prompts:saved.prompts};
-
-   for(const [slotId,draft] of Object.entries(backup.drafts||{}))if(saved.prompts.some(p=>p.id===slotId)&&typeof draft?.text==="string"&&typeof draft?.name==="string")promptDrafts.set(slotId,draft);
-  }
- }catch(error){}
- // Repair blank slots made by the previous version, which copied saved text behind an empty draft.
- for(const p of promptLibrary.prompts){
-  if(/^New prompt \d+$/.test(p.name)&&promptDrafts.get(p.id)?.text==="")p.text="";
- }
- if(settings.seedPrompt&&promptLibrary.prompts.length&&!promptLibrary.prompts.some(p=>p.id==="legacy")){
-  promptLibrary.prompts.push({id:"legacy",name:"Previous custom prompt",text:settings.seedPrompt});promptLibrary.activeId="legacy";backupPromptLibrary();
- }
- renderPromptSettings();
-}
-
 function copyBeginnerSchema(override){
   const text=typeof override==="string"?override:getPromptText();
   if(!text){toast("Choose a saved prompt with text in Settings first");return}
-  const done=()=>toast("CBQ prompt copied ✓");
+  const done=()=>toast(typeof override==="string"?"Prompt copied ✓":"CBQ prompt copied ✓");
   if(navigator.clipboard?.writeText){
     navigator.clipboard.writeText(text).then(done).catch(()=>{
       const ta=document.createElement("textarea");
@@ -1496,21 +1351,20 @@ function finishTest(automatic=false){
 
 const deletedSessionIds=new Set();
 function saveSession(){
- if(!questions.length||deletedSessionIds.has(sessionId))return;
- const sessions=get(K.sessions,[]),now=new Date().toISOString(),sid=sessionId||id();sessionId=sid;
- const item={id:sid,examId:examId||sid,name:examName,questions,answers,reviews:[...reviews],checkedQuestions:[...checkedQuestions],matchOrders,current,seconds,quizDurationMinutes,mode,sections,examFinished,examTimerSeconds:timerState.examSeconds,practiceTimerSeconds:timerState.practiceSeconds,practiceTimerRunning:timerState.running,updatedAt:now};
- const old=sessions.find(x=>x.id===sid);if(old)Object.assign(old,item);else sessions.unshift(item);
- put(K.sessions,sessions);recordStudyActivity(item);renderSessions()
+ if(!questions.length||deletedSessionIds.has(sessionId))return null;
+ const sessions=get(K.sessions,[]),item=captureCurrentSession();sessionId=item.id;
+ const old=sessions.find(x=>x.id===item.id);if(old)Object.assign(old,item);else sessions.unshift(item);
+ put(K.sessions,sessions);recordStudyActivity(item);renderSessions();return item;
 }
 let saveTimer;function saveSessionSoon(){clearTimeout(saveTimer);saveTimer=setTimeout(saveSession,120)}
 function renderSessions(){
  const el=document.getElementById("sessionList"),ss=get(K.sessions,[]);
- el.innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="session-item"><button class="session-load" onclick="restoreSession('${s.id}')" title="${esc(s.name)}">${esc(s.name)} · ${s.answers.filter(Boolean).length}/${s.questions.length}</button><button class="session-delete" onclick="deleteSession('${s.id}')">×</button></div>`).join(""):'<div class="empty">No saved sessions.</div>';
+ el.innerHTML=ss.length?ss.slice(0,20).map(s=>`<div class="session-item"><button class="session-load" onclick="restoreSession('${s.id}')" title="${esc(s.name)}">${esc(s.name)} · ${studyProgress(s)}/${s.questions.length}</button><button class="session-delete" onclick="deleteSession('${s.id}')">×</button></div>`).join(""):'<div class="empty">No saved sessions.</div>';
 }
 function restoreSession(sid){
  const s=get(K.sessions,[]).find(x=>x.id===sid);if(!s)return;
  deletedSessionIds.delete(sid);
- sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(60*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=clampDurationMinutes(s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=s.practiceTimerSeconds||5*60;timerState.running=!!s.practiceTimerRunning;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
+ sessionId=s.id;examId=s.examId||s.id;examName=s.name;questions=s.questions;answers=s.answers||Array(questions.length).fill(null);reviews=new Set(s.reviews||[]);checkedQuestions=new Set(s.checkedQuestions||[]);matchOrders=s.matchOrders||{};current=Math.min(s.current||0,questions.length-1);seconds=s.seconds===0?0:Math.min(60*60,Math.max(1,s.seconds||5*60));quizDurationMinutes=clampDurationMinutes(s.quizDurationMinutes||Math.ceil(Math.max(seconds,1)/60));timerState.examSeconds=Number.isFinite(s.examTimerSeconds)?s.examTimerSeconds:seconds;timerState.practiceSeconds=Number.isFinite(s.practiceTimerSeconds)?s.practiceTimerSeconds:5*60;timerState.running=!!(s.timerRunning??s.practiceTimerRunning)&&!s.examFinished;examFinished=!!s.examFinished;mode=s.mode||settings.defaultMode;sections=s.sections||[];registerActiveExam();
  if(document.getElementById("examTitle"))document.getElementById("examTitle").textContent=examName;document.getElementById("headerQuizName").textContent=examName;showView("exam");render();toast("Session restored ✓")
 }
 function deleteSession(sid){
@@ -1537,7 +1391,7 @@ async function redirectQuestionToChatGPT(){
  if(Array.isArray(q.pairs)&&q.pairs.length)
    source+=`\nPairs: ${q.pairs.map(p=>`${p.left} → ${p.right}`).join(" | ")}`;
 
- const template=fixedQuestionPrompt;
+ const template=getPromptText("payload");
  if(!template){toast("Load seed-prompts.json in Settings first");return}
  const prompt=template.includes("{{question}}")
    ?template.split("{{question}}").join(source)
@@ -1784,7 +1638,10 @@ function practiceMarkedQuestions(){
  toast(`Practice ready · ${questions.length} marked question${questions.length===1?"":"s"}`);
 }
 
-function saveResultCopy(){toast("Result is already saved locally ✓")}
+function saveResultCopy(){
+ if(!lastResultSnapshot){toast("No result to download.");return}
+ downloadQuizJSON({format:"quizflow-result",version:1,exportedAt:new Date().toISOString(),result:lastResultSnapshot},quizJSONFilename(lastResultSnapshot.name,"result"));toast("Result JSON downloaded.");
+}
 function retakeLastTest(){
  if(!lastResultSnapshot)return;
  const qs=lastResultSnapshot.questions;
@@ -1959,6 +1816,12 @@ async function importDataFile(event){
   try{
     const raw=await file.text();
     const parsed=JSON.parse(raw);
+    if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))throw new Error("Choose a session JSON or QuizFlow backup.");
+    if(parsed.format==="quizflow-session"){
+      await importSessionJSON(parsed);
+      if(status){status.hidden=false;status.textContent="✓ Session imported and restored.";status.style.color="var(--good)"}
+      return;
+    }
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
@@ -1966,9 +1829,11 @@ async function importDataFile(event){
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not a QuizFlow data backup. Use Add CBQ Quiz.");
     const flashcardBackup=parsed.flashcards!==undefined?Flashcards.validateBackup(parsed.flashcards):null;
+    for(const name of ['results','plans','sessions','study','exams','recent'])if(parsed[name]!==undefined&&!Array.isArray(parsed[name]))throw new Error(name+" must be an array.");
+    const importedSessions=parsed.sessions?.map(validateSessionJSON);
 
     const overwrite=confirm(
-      "Import this QuizFlow backup?\\n\\n" +
+      "Import this QuizFlow backup?\n\n" +
       "This will replace the settings, results, goals, plans, sessions, quiz history and flashcards included in the backup."
     );
     if(!overwrite){
@@ -1984,10 +1849,12 @@ async function importDataFile(event){
     if(flashcardBackup)entries.set(K.flashcards,JSON.stringify(flashcardBackup));
     for(const name of ['settings','goal'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(parsed[name]||{}));
     for(const name of ['results','plans','sessions','study','exams','recent'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(Array.isArray(parsed[name])?parsed[name]:[]));
+    if(importedSessions)entries.set(K.sessions,JSON.stringify(importedSessions));
     if(parsed.examDeadline!==undefined){
       entries.set("examflow_exam_deadline",parsed.examDeadline?String(parsed.examDeadline):null);
     }
     await QuizStorage.batch([...entries]);
+    if(entries.has(K.sessions)&&sessionId){clearTimeout(saveTimer);deletedSessionIds.add(sessionId);timerState.running=false;updateTimerUI()}
     Flashcards.refresh();if(entries.has("examflow_prompt_library_v1"))await initPromptLibrary();
 
     settings=loadSettings();
@@ -2011,8 +1878,15 @@ async function importDataFile(event){
   }
 }
 
-function exportData(){
- const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions:get(K.sessions,[]),exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records:QuizStorage.snapshot()}},a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));a.download="examflow-data.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)
+async function exportData(){
+ await QuizStorage.ready;clearTimeout(saveTimer);
+ const latest=!deletedSessionIds.has(sessionId)?captureCurrentSession():null;
+ if(latest&&!sessionId)sessionId=latest.id;
+ let failed=false;try{if(latest)saveSession();await QuizStorage.flush()}catch{failed=true}
+ const sessions=get(K.sessions,[]);
+ if(latest){const index=sessions.findIndex(s=>s.id===latest.id);if(index>=0)sessions[index]=latest;else sessions.unshift(latest)}
+ const data={flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions,exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records:QuizStorage.snapshot()}};
+ downloadQuizJSON(data,"quizflow-data.json");toast(failed?"JSON backup downloaded with your latest progress. Browser saving still needs attention.":"JSON backup downloaded.");
 }
 async function resetData(){
  if(!confirm("Reset all local QuizFlow data?"))return;
