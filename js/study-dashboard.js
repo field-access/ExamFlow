@@ -129,7 +129,8 @@ function renderStudyWorkspace(sessions) {
   const cards=records.map(item=>{
     const session=item.sessionId&&sessions.find(s=>s.id===item.sessionId),completed=item.kind==='result',flashcard=item.kind==='flashcards';
     const preview=flashcard?'':window.CBQReviewPreview?.controls(completed?savedResults.find(r=>r.id===item.resultId):session,completed?'result':'session')||'';
-    const menu=session&&!completed&&!flashcard?`<details class="study-session-menu"><summary aria-label="Session options for ${esc(item.name||'Untitled quiz')}" title="Session options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-delete-study-session="${esc(session.id)}">Delete session</button></div></details>`:'';
+    const downloadKind=completed?"result":session?"session":"quiz",downloadId=completed?item.resultId:session?session.id:item.examId;
+    const menu=!flashcard&&downloadId?`<details class="study-session-menu"><summary aria-label="Quiz options for ${esc(item.name||'Untitled quiz')}" title="Quiz options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-download-study-quiz="${esc(downloadId)}" data-study-quiz-kind="${downloadKind}">Download quiz JSON</button>${session&&!completed?`<button type="button" data-delete-study-session="${esc(session.id)}">Delete session</button>`:''}</div></details>`:'';
     const action=flashcard?'flashcards':completed&&resultMap.has(item.resultId)?'result':session?'session':item.examId&&examMap.has(item.examId)?'quiz':'';
     const actionId=completed?item.resultId:session?session.id:item.examId||'';
     const progress=Math.min(100,Math.round((item.answered||0)/Math.max(item.total||0,1)*100));
@@ -147,6 +148,8 @@ document.addEventListener('click',event=>{
   if(open){const kind=open.dataset.studyOpen,sourceId=open.dataset.studyId;if(kind==='flashcards')showView('flashcards');else if(kind==='result')openStudyResult(sourceId);else if(kind==='session')restoreSession(sourceId);else if(kind==='quiz')openRecentQuiz(sourceId);return}
   const menu=event.target.closest('.study-session-menu');
   document.querySelectorAll('.study-session-menu[open]').forEach(item=>{if(item!==menu)item.open=false});
+  const download=event.target.closest('[data-download-study-quiz]');
+  if(download){downloadSavedQuiz(download.dataset.studyQuizKind,download.dataset.downloadStudyQuiz);if(menu)menu.open=false;return}
   const button=event.target.closest('[data-delete-study-session]');
   if(button){
     deleteSession(button.dataset.deleteStudySession);

@@ -20,8 +20,14 @@
         </div>
         <div id="fcPreview" class="fc-preview" hidden></div>
       </section>
-      <div class="fc-section-heading"><h2>Your decks</h2><span id="fcDeckCount"></span></div>
-      <div id="fcDecks" class="fc-decks"></div>
+      <div id="fcLibraryIndex" class="fc-library-index">
+        <aside id="fcDateIndex" class="fc-date-index" aria-label="Flashcard date index"></aside>
+        <div class="fc-library-lists">
+          <div class="fc-library-switch" role="group" aria-label="Flashcard collections"><button id="fcDeckCollection" type="button" class="btn" data-fc-collection="decks" aria-controls="fcDeckSection" aria-pressed="true">Your decks <span id="fcDeckCount"></span></button><button id="fcReviewCollection" type="button" class="btn" data-fc-collection="reviews" aria-controls="fcReviewSection" aria-pressed="false">Saved CBQ reviews <span id="fcSavedReviewCount"></span></button></div>
+          <section id="fcDeckSection" aria-labelledby="fcDeckCollection"><div id="fcDecks" class="fc-dated-decks"></div></section>
+          <section id="fcReviewSection" aria-labelledby="fcReviewCollection" hidden><div id="fcSavedReviews" class="fc-dated-decks"></div></section>
+        </div>
+      </div>
     </div>
     <section id="fcStudy" hidden aria-labelledby="fcStudyTitle">
       <div class="fc-study-toolbar"><button class="btn" data-fc="library">← Decks</button><div><h2 id="fcStudyTitle"></h2><span id="fcStudyMeta"></span></div><button class="btn" data-fc="undo" id="fcUndo" hidden title="Undo last rating (U)">Undo</button><button class="btn fc-help-button" data-fc="help" aria-label="Keyboard shortcuts" title="Keyboard shortcuts (?)">?</button></div>

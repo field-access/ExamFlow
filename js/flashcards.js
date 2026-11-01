@@ -59,17 +59,15 @@
   function renderLibrary() {
     const totals = state.decks.reduce((n, d) => { const c = C.counts(d); n.due += c.due; n.new += c.new; n.total += d.cards.length; return n; }, { due: 0, new: 0, total: 0 });
     $('fcStats').innerHTML = [[totals.due, 'Due for review'], [totals.new, 'New to learn'], [totals.total, 'Cards saved']].map(([n, label]) => '<div class="fc-stat"><strong>' + n + '</strong><span>' + label + '</span></div>').join('');
-    $('fcDeckCount').textContent = state.decks.length + (state.decks.length === 1 ? ' deck' : ' decks');
-    if (!state.decks.length) {
-      $('fcDecks').innerHTML = '<div class="fc-empty">' + icon('bookmark') + '<h3>No decks yet</h3><p>Add flashcard JSON or try a sample.</p>' + button('open-import', 'Add your first deck') + ' ' + button('example', 'Try a sample deck') + '</div>'; return;
-    }
-    $('fcDecks').innerHTML = state.decks.map(deck => {
+    FlashcardLibrary.render(state.decks, renderDeck);
+  }
+  function renderDeck(deck) {
       const n = C.counts(deck), tags = [...new Set(deck.cards.flatMap(c => c.tags))].sort();
       return '<article class="fc-deck" data-deck="' + html(deck.id) + '"><h3>' + html(deck.name) + '</h3>' + (deck.description ? '<p class="fc-description">' + html(deck.description) + '</p>' : '') + '<p class="fc-deck-counts">' + n.due + ' due · ' + n.new + ' new · ' + deck.cards.length + ' cards</p>' +
         '<div class="fc-actions"><button class="btn primary" data-fc="start" data-mode="due">Study</button>' + button('start', 'Browse', 'data-mode="browse"') + '</div><details><summary>Options</summary>' +
         '<div class="fc-deck-options"><label>Session size<select data-option="limit"><option value="10">10 cards</option><option value="20" selected>20 cards</option><option value="50">50 cards</option><option value="2000">All cards</option></select></label><label>Topic<select data-option="tag"><option value="">All topics</option>' + tags.map(t => '<option value="' + html(t) + '">' + html(t) + '</option>').join('') + '</select></label></div><label class="fc-shuffle"><input type="checkbox" data-option="shuffle">Shuffle this session</label>' +
         '<p>' + html(dueLabel(deck)) + '</p><div class="fc-actions">' + button('start', 'Practice all', 'data-mode="all"') + button('rename', 'Rename') + button('export', 'Export') + button('delete', 'Delete deck') + '</div><small>Practice all updates your schedule. Browse keeps it unchanged.</small></details></article>';
-    }).join('');
+
   }
   function openImport() {
     if (state.session && !save({ ...state, session: null })) return;
@@ -95,6 +93,7 @@
       if (target) { const merged = C.mergeDeck(target, pending); next.decks = next.decks.map(d => d.id === target.id ? merged.deck : d); added = merged.added; }
       else { if (next.decks.length >= 500) throw new Error('Your library is full. Combine or remove a deck first.'); const d = C.createDeck(pending); next.decks.unshift(d); added = d.cards.length; }
       if (!save(next)) return;
+      FlashcardLibrary.clearDate(target && FlashcardLibrary.saved(target) ? 'reviews' : 'decks');
       notice(added ? added + (added === 1 ? ' card saved.' : ' cards saved.') : 'These cards are already saved. Your review progress is unchanged.');
       pending = null; $('fcJson').value = ''; $('fcPreview').hidden = true; closeImport(); $('fcImportStatus').textContent = ''; renderLibrary();
     } catch (e) { notice(e.message, true); }
@@ -261,12 +260,21 @@
     try {
       read();
       const { front, back } = CBQQuestionCard.content(q);
-      const parsed = C.parse(JSON.stringify({ name: 'Saved quiz explanations', cards: [{ front, back, tags: [String(sourceName || 'CBQ').slice(0, 60)] }] }));
-      const next = copy(state), existing = next.decks.find(d => d.name === parsed.name);
+      const origin = String(sourceName || 'CBQ').slice(0,160);
+      const parsed = C.parse(JSON.stringify({ name: origin, cards: [{ front, back, tags: [origin.slice(0,60)] }] }));
+      const next = copy(state), existing = next.decks.find(d => d.kind === 'cbq-review' && d.sourceName === origin);
+      const legacyDuplicate = next.decks.some(d => d.kind === 'cbq-review' && !d.sourceName && d.cards.some(c => c.tags.includes(origin.slice(0,60)) && C.fingerprint(c) === C.fingerprint(parsed.cards[0])));
+      if (legacyDuplicate) { FlashcardLibrary.clearDate('reviews'); toast('This flashcard is already in Saved CBQ reviews.'); return true; }
       let added = 1;
-      if (existing) { const merged = C.mergeDeck(existing, parsed); added = merged.added; next.decks = next.decks.map(d => d.id === existing.id ? merged.deck : d); }
-      else { if (next.decks.length >= 500) throw new Error('The flashcard library is full. Remove or combine a deck first.'); next.decks.unshift(C.createDeck(parsed)); }
-      if (save(next)) { undo = null; toast(added ? 'Saved to Flashcards → Saved quiz explanations' : 'This flashcard is already saved'); return true; }
+      if (existing) {
+        const merged = C.mergeDeck(existing, parsed); added = merged.added;
+        if (added) merged.deck.lastSavedAt = Date.now();
+        next.decks = next.decks.map(d => d.id === existing.id ? merged.deck : d);
+      } else {
+        if (next.decks.length >= 500) throw new Error('The flashcard library is full. Remove or combine a deck first.');
+        next.decks.unshift({ ...C.createDeck(parsed), kind: 'cbq-review', sourceName: origin, lastSavedAt: Date.now() });
+      }
+      if (save(next)) { undo = null; FlashcardLibrary.clearDate('reviews'); toast(added ? 'Saved to Flashcards → Saved CBQ reviews' : 'This flashcard is already saved'); return true; }
       toast('Could not save the flashcard. Check browser storage.');
     } catch (e) { toast('Flashcard not saved: ' + e.message); }
     return false;
@@ -313,7 +321,7 @@
     }
     return false;
   }
-  window.Flashcards = { refresh, saveQuestion, copyPrompt, handleKey, validateBackup: C.validateStore };
+  window.Flashcards = { refresh, renderLibrary, saveQuestion, copyPrompt, handleKey, validateBackup: C.validateStore };
   document.addEventListener('DOMContentLoaded', () => {
     $('flashcardsView').addEventListener('click', handle);
     $('fcJson').addEventListener('input', () => { pending = null; $('fcPreview').hidden = true; $('fcImportStatus').textContent = ''; });
@@ -329,7 +337,7 @@
       if (!$('flashcardsView').classList.contains('active') || state.session) return;
       const sums = state.decks.reduce((n, d) => { const c = C.counts(d); n[0] += c.due; n[1] += c.new; n[2] += d.cards.length; return n; }, [0, 0, 0]);
       $('fcStats').querySelectorAll('strong').forEach((el, i) => el.textContent = sums[i]);
-      $('fcDecks').querySelectorAll('[data-deck]').forEach(el => { const d = state.decks.find(d => d.id === el.dataset.deck); if (!d) return; const c = C.counts(d); el.querySelector('.fc-deck-counts').textContent = c.due + ' due · ' + c.new + ' new · ' + d.cards.length + ' cards'; });
+      $('fcLibraryIndex').querySelectorAll('[data-deck]').forEach(el => { const d = state.decks.find(d => d.id === el.dataset.deck); if (!d) return; const c = C.counts(d); el.querySelector('.fc-deck-counts').textContent = c.due + ' due · ' + c.new + ' new · ' + d.cards.length + ' cards'; });
     }, 30000);
   });
 })();

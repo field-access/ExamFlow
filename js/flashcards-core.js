@@ -86,7 +86,8 @@
         cardIds.add(card.id);
         return { ...content, id: card.id, progress: { state: p.state, due: p.due, interval: p.interval, reviews: p.reviews, lapses: p.lapses, lastReviewed: p.lastReviewed } };
       });
-      return { id: deck.id, name: text(deck.name, 'Deck name', 160), description: deck.description ? text(deck.description, 'Description', 1000) : '', createdAt: Number(deck.createdAt) || 0, updatedAt: Number(deck.updatedAt) || 0, cards };
+      return { id: deck.id, name: text(deck.name, 'Deck name', 160), description: deck.description ? text(deck.description, 'Description', 1000) : '', createdAt: Number(deck.createdAt) || 0, updatedAt: Number(deck.updatedAt) || 0,
+        ...(deck.kind==='cbq-review'||deck.name==='Saved quiz explanations'?{kind:'cbq-review',sourceName:typeof deck.sourceName==='string'?deck.sourceName.slice(0,160):'',lastSavedAt:Number(deck.lastSavedAt)||Number(deck.createdAt)||0}:{}),cards };
     });
     // Active sessions are disposable; accept them only when all referenced cards exist.
     let session = null;

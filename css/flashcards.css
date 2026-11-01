@@ -67,6 +67,36 @@ body:has(#flashcardsView.active) { background: var(--bg); }
 .fc-empty p { max-width: 420px; margin: 10px auto 20px; color: var(--muted); font-size: 14px; }
 .is-studying .fc-heading { display: none; }
 .is-importing #fcStats, .is-importing .fc-section-heading, .is-importing #fcDecks { display: none; }
+.is-importing #fcLibraryIndex { display: none; }
+.fc-library-index { display:grid; grid-template-columns:220px minmax(0,1fr); gap:24px; align-items:start; }
+.fc-library-lists,.fc-dated-decks,.fc-date-group { min-width:0; }
+.fc-date-index { padding:16px; border:1px solid var(--line); border-radius:14px; background:var(--surface); }
+.fc-month-nav { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:12px; }
+.fc-month-nav strong { font-size:14px; text-align:center; }
+#flashcardsView .fc-month-nav .btn { padding:4px; width:32px; min-height:32px; flex:none; }
+.fc-calendar-weekdays,.fc-calendar-days { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:3px; text-align:center; }
+.fc-calendar-weekdays { margin-bottom:6px; color:var(--muted); font-size:12px; }
+.fc-calendar-days button { position:relative; min-width:0; min-height:32px; padding:4px 0; border:1px solid transparent; border-radius:6px; background:transparent; color:var(--text); font:inherit; font-size:12px; cursor:pointer; }
+.fc-calendar-days .has-decks { background:var(--fc-tint); font-weight:700; }
+.fc-calendar-days .has-decks::after { content:''; position:absolute; width:3px; height:3px; bottom:3px; left:calc(50% - 1.5px); border-radius:50%; background:var(--primary); }
+.fc-calendar-days .is-selected { background:var(--primary); color:var(--surface); }
+.fc-calendar-days .is-selected::after { background:currentColor; }
+.fc-calendar-days .is-today { border-color:var(--primary); }
+#flashcardsView .fc-date-index label { margin:16px 0 6px; font-size:12px; color:var(--muted); }
+#flashcardsView #fcDateJump { width:100%; min-width:0; box-sizing:border-box; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--surface); color:var(--text); font:inherit; font-size:13px; }
+#flashcardsView .fc-all-dates { width:100%; margin-top:8px; min-height:36px; }
+.fc-selected-date { margin:10px 0 0; color:var(--muted); font-size:12px; }
+#flashcardsView .fc-date-group>h3 { margin:0 0 10px; color:var(--muted); font-size:14px; font-weight:500; }
+.fc-date-group + .fc-date-group { margin-top:22px; }
+.fc-library-switch { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+#flashcardsView .fc-library-switch .btn { border-color:transparent; background:transparent; color:var(--muted); }
+#flashcardsView .fc-library-switch .is-active { background:var(--fc-tint); border-color:var(--line); color:var(--primary); }
+.fc-library-switch span { font-size:12px; font-weight:400; }
+.fc-date-empty { padding:18px; border:1px dashed var(--line); border-radius:12px; color:var(--muted); font-size:14px; }
+@media(max-width:800px){
+ .fc-library-index { grid-template-columns:minmax(0,1fr); gap:22px; }
+ .fc-date-index { width:100%; max-width:340px; margin:auto; box-sizing:border-box; }
+}
 .fc-study-toolbar { margin-bottom: 22px; flex-wrap: wrap; gap: 12px; }
 .fc-study-toolbar > div { flex: 1; min-width: 0; }
 .fc-study-toolbar h2 { overflow-wrap: anywhere; margin-bottom: 4px !important; font-size: 19px !important; }

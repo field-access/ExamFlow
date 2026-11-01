@@ -10,7 +10,7 @@ IndexedDB remains tied to the browser profile and site address. Clearing site da
 
 The primary adapter is js/library-storage.js, with CSS in css/library-storage.css.
 
-Quiz progress and results save automatically in the browser. On the Quiz page, **Save** (Alt/Option+S) also saves the current attempt and confirms success after IndexedDB finishes writing. JSON downloads are kept in Settings → Local data. Previously exported session files can still be restored with the quiz importer or Settings → Import JSON without replacing other sessions.
+Quiz progress and results save automatically in the browser; the Quiz page has no manual Save button. Continue studying offers **Download quiz JSON** in each quiz's **⋯** menu. This downloads reusable quiz questions, correct answers and explanations, without the user's attempt answers, marks for review or timer state. Load it through the quiz importer to start a new attempt. The full library backup remains in Settings → Local data. Previously exported session files can still be restored with the quiz importer or Settings → Import JSON without replacing other sessions.
 
 Settings → Local data → **Download JSON** exports the full library and includes the latest active session and results. It creates an ordinary `quizflow-data.json` file for offline backup or sharing; the recipient can use Settings → **Import JSON** to load it. Export reads the in-memory library, including pending writes, and does not require an IndexedDB save or internet connection. IndexedDB remains the browser save location; API keys are excluded from files. Imported sessions are validated before writing, and replacing sessions with a full backup stops stale active autosaves until you reopen a session. Browser protection, retry and reset controls are under the Local data panel's **⋯** menu.
 
@@ -43,7 +43,9 @@ Prompt Lab exposes only Save and Copy beside the editor. Unsaved changes are ret
 
 ## Flashcards
 
-Open **Flashcards → Add a deck** to paste JSON or import a file. Copy the generation prompt or try the sample deck from the importer. The seed prompt is editable in `flashcard-seed-prompt.txt`.
+Open **Flashcards → Add a deck** to paste JSON or import a file. Copy the generation prompt or try the sample deck from the importer. Edit the original Flashcard prompt in Settings → Prompt Lab; shipped defaults live in `original-prompts.json`.
+
+The flashcard library groups decks by date, newest first. Its calendar marks dates with saved decks; select a day, jump to a date, or choose All dates. **Your decks** contains imported decks. **Saved CBQ reviews** separately contains flashcards saved from quiz questions, grouped by source quiz. Study and Browse use the same existing scheduling controls. New CBQ cards update the group's saved date; ratings do not move its date. The existing Saved quiz explanations deck appears in this area with its cards and schedules preserved. Deck category and source metadata are included in full library backups.
 
 ```json
 {"name":"My topic","cards":[{"front":"Why does this work?","back":"A short answer and explanation.","tags":["reasoning"]}]}

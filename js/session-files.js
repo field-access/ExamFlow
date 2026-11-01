@@ -4,6 +4,22 @@ function downloadQuizJSON(data,filename){
  const link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
+function downloadSavedQuiz(kind,sourceId){
+ const key={session:K.sessions,result:K.results,quiz:K.exams}[kind];
+ const source=key&&get(key,[]).find(item=>item.id===sourceId);
+ if(!source?.questions?.length){toast('This saved quiz is no longer available.');return}
+ const sections=[];
+ for(const q of source.questions){
+  const name=q.section||'General';let section=sections.at(-1);
+  if(!section||section.name!==name){section={name,questions:[]};sections.push(section)}
+  const question={type:q.type||'mcq',question:q.text||q.question||'',answer:q.type==='true_false'?q.answer==='A'||q.answer===true||String(q.answer).toLowerCase()==='true':q.answer};
+  for(const field of ['options','acceptedAnswers','pairs','image','hint','explanation','marks','negativeMarks'])if(q[field]!==undefined)question[field]=q[field];
+  section.questions.push(question);
+ }
+ const filename=String(source.name||'quiz').replace(/[<>:"/\\|?*\x00-\x1f]/g,'-').slice(0,90)+'-quiz.json';
+ downloadQuizJSON({name:source.name||'Saved quiz',timeMinutes:clampDurationMinutes(source.quizDurationMinutes||source.durationMinutes||5),sections},filename);
+ toast('Quiz JSON downloaded.');
+}
 function captureCurrentSession(){
  if(!questions.length)return null;
  const sid=sessionId||id();
