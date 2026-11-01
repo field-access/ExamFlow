@@ -2,6 +2,8 @@
 
 ## Local library
 
+Each saved quiz in **Continue studying** has a **⋯** menu with Download quiz JSON, Edit title, and Delete saved quiz. Editing a title updates its linked sessions and history. Deleting asks for confirmation and removes that quiz's JSON, sessions, results and activity; saved flashcard decks and planned quizzes are retained.
+
 When the app opens, a dismissible **Study suggestions** panel shows your saved exam date/countdown and up to two useful next steps. It uses the same pending reviews as Plan, and prioritizes due flashcards, quiz mistakes/marked questions, overdue tasks, planned quizzes and important dates. Suggestions open the relevant review or page directly. All suggestions are computed locally from your saved library; no API is used. The panel closes when you dismiss it, change pages or receive a normal action notification.
 
 Quizzes, results, sessions, prompt slots, planner data and flashcards now use IndexedDB as the primary store. A memory cache keeps the existing interface responsive; growing libraries no longer need to fit in localStorage. The first launch migrates legacy browser data and eligible recovery snapshots, committing the new database before removing old cache entries. Existing backup snapshots are retained for recovery but are no longer rewritten on every answer.

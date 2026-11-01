@@ -48,8 +48,10 @@
 .study-session-menu summary:hover,.study-session-menu[open] summary { color:var(--primary); background:var(--surface2); }
 .study-session-menu summary:focus-visible,.study-session-menu-panel button:focus-visible { outline:2px solid var(--primary); outline-offset:2px; }
 .study-session-menu-panel { position:absolute; top:calc(100% + 6px); right:0; z-index:20; min-width:155px; padding:6px; border:1px solid var(--line); border-radius:10px; background:var(--surface); box-shadow:var(--ux-shadow-md); }
-.study-session-menu-panel button { display:block; width:100%; border:0; border-radius:6px; background:transparent; color:var(--bad); padding:10px 12px; text-align:left; font-family:inherit; font-size:13px; font-weight:500; line-height:1.4; cursor:pointer; }
-.study-session-menu-panel button:hover { background:color-mix(in srgb,var(--bad) 8%,var(--surface)); }
+.study-session-menu-panel button { display:block; width:100%; border:0; border-radius:6px; background:transparent; color:var(--text); padding:10px 12px; text-align:left; font-family:inherit; font-size:13px; font-weight:500; line-height:1.4; cursor:pointer; }
+.study-session-menu-panel button:hover { background:var(--surface2); }
+.study-session-menu-panel .study-menu-delete { color:var(--bad); }
+.study-session-menu-panel .study-menu-delete:hover { background:color-mix(in srgb,var(--bad) 8%,var(--surface)); }
 .study-session-card h4 { margin:12px 0 8px; font-size:16px; line-height:1.4; overflow-wrap:anywhere; }
 .study-session-card p { margin:0 0 12px; font-size:13px; color:var(--muted); }
 .study-progress { height:5px; border-radius:8px; background:var(--surface2); overflow:hidden; }

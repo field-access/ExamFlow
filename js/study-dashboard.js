@@ -130,7 +130,7 @@ function renderStudyWorkspace(sessions) {
     const session=item.sessionId&&sessions.find(s=>s.id===item.sessionId),completed=item.kind==='result',flashcard=item.kind==='flashcards';
     const preview=flashcard?'':window.CBQReviewPreview?.controls(completed?savedResults.find(r=>r.id===item.resultId):session,completed?'result':'session')||'';
     const downloadKind=completed?"result":session?"session":"quiz",downloadId=completed?item.resultId:session?session.id:item.examId;
-    const menu=!flashcard&&downloadId?`<details class="study-session-menu"><summary aria-label="Quiz options for ${esc(item.name||'Untitled quiz')}" title="Quiz options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-download-study-quiz="${esc(downloadId)}" data-study-quiz-kind="${downloadKind}">Download quiz JSON</button>${session&&!completed?`<button type="button" data-delete-study-session="${esc(session.id)}">Delete session</button>`:''}</div></details>`:'';
+    const menu=!flashcard&&downloadId?`<details class="study-session-menu"><summary aria-label="Quiz options for ${esc(item.name||'Untitled quiz')}" title="Quiz options">⋯</summary><div class="study-session-menu-panel"><button type="button" data-download-study-quiz="${esc(downloadId)}" data-study-quiz-kind="${downloadKind}">Download quiz JSON</button><button type="button" data-rename-study-quiz="${esc(downloadId)}" data-study-quiz-kind="${downloadKind}">Edit title</button><button type="button" class="study-menu-delete" data-delete-study-quiz="${esc(downloadId)}" data-study-quiz-kind="${downloadKind}">Delete saved quiz</button></div></details>`:'';
     const action=flashcard?'flashcards':completed&&resultMap.has(item.resultId)?'result':session?'session':item.examId&&examMap.has(item.examId)?'quiz':'';
     const actionId=completed?item.resultId:session?session.id:item.examId||'';
     const progress=Math.min(100,Math.round((item.answered||0)/Math.max(item.total||0,1)*100));
@@ -150,6 +150,10 @@ document.addEventListener('click',event=>{
   document.querySelectorAll('.study-session-menu[open]').forEach(item=>{if(item!==menu)item.open=false});
   const download=event.target.closest('[data-download-study-quiz]');
   if(download){downloadSavedQuiz(download.dataset.studyQuizKind,download.dataset.downloadStudyQuiz);if(menu)menu.open=false;return}
+  const rename=event.target.closest('[data-rename-study-quiz]');
+  if(rename){renameSavedQuiz(rename.dataset.studyQuizKind,rename.dataset.renameStudyQuiz);if(menu)menu.open=false;document.getElementById('studyQuizSearch')?.focus({preventScroll:true});return}
+  const remove=event.target.closest('[data-delete-study-quiz]');
+  if(remove){deleteSavedQuiz(remove.dataset.studyQuizKind,remove.dataset.deleteStudyQuiz);if(menu)menu.open=false;document.getElementById('studyQuizSearch')?.focus({preventScroll:true});return}
   const button=event.target.closest('[data-delete-study-session]');
   if(button){
     deleteSession(button.dataset.deleteStudySession);

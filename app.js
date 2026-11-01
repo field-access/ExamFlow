@@ -1450,6 +1450,56 @@ function deleteSession(sid){
  renderSessions();renderDashboard();renderHome();
  toast("Session deleted");
 }
+function savedQuizGroup(kind,sourceId){
+ const key={session:K.sessions,result:K.results,quiz:K.exams}[kind];
+ const source=key&&get(key,[]).find(item=>item.id===sourceId);
+ if(!source)return null;
+ const quizId=source.examId||source.id;
+ const related=item=>item.examId===quizId||item.id===quizId;
+ const sessions=get(K.sessions,[]).filter(item=>related(item)||(kind==='session'&&item.id===sourceId));
+ const results=get(K.results,[]).filter(item=>related(item)||(kind==='result'&&item.id===sourceId));
+ return {source,quizId,sessionIds:new Set(sessions.map(item=>item.id)),resultIds:new Set(results.map(item=>item.id))};
+}
+function renameSavedQuiz(kind,sourceId){
+ const group=savedQuizGroup(kind,sourceId);if(!group){toast('This saved quiz is no longer available.');return}
+ const entered=prompt('Edit saved quiz title',group.source.name||'Untitled quiz');if(entered===null)return;
+ const name=entered.trim();
+ if(!name){toast('Enter a quiz title.');return}
+ if(name.length>160){toast('Keep the title under 160 characters.');return}
+ if(name===group.source.name)return;
+ const {quizId,sessionIds,resultIds}=group;
+ put(K.sessions,get(K.sessions,[]).map(item=>sessionIds.has(item.id)?{...item,name}:item));
+ put(K.results,get(K.results,[]).map(item=>resultIds.has(item.id)?{...item,name}:item));
+ for(const key of [K.exams,K.recent])put(key,get(key,[]).map(item=>item.id===quizId?{...item,name}:item));
+ put(K.study,get(K.study,[]).map(item=>item.examId===quizId||sessionIds.has(item.sessionId)||resultIds.has(item.resultId)?{...item,name}:item));
+ if(examId===quizId||sessionIds.has(sessionId)){
+   examName=name;syncExamTitleBar();const title=document.getElementById('examTitle');if(title)title.textContent=name;
+ }
+ if(lastResultSnapshot&&(lastResultSnapshot.examId===quizId||resultIds.has(lastResultSnapshot.id)))lastResultSnapshot.name=name;
+ renderSessions();renderDashboard();renderHome();PlanReviewQueue.render();toast('Quiz title updated');
+}
+function deleteSavedQuiz(kind,sourceId){
+ const group=savedQuizGroup(kind,sourceId);if(!group){toast('This saved quiz is no longer available.');return}
+ if(!confirm(`Delete “${group.source.name||'Untitled quiz'}”?\n\nThis removes its saved quiz JSON, sessions, results and study history. Flashcard decks and planned quizzes are kept.`))return;
+ const {quizId,sessionIds,resultIds}=group;
+ sessionIds.forEach(sid=>deletedSessionIds.add(sid));
+ if(examId===quizId||sessionIds.has(sessionId)){
+   clearTimeout(saveTimer);timerState.running=false;
+   questions=[];answers=[];reviews=new Set();checkedQuestions=new Set();matchOrders={};sections=[];current=0;sessionId=null;examId=null;examFinished=false;examName='No quiz loaded';
+   document.getElementById('practiceAnswerPanel')?.remove();
+   document.getElementById('feedback').textContent='';document.getElementById('explanation').style.display='none';
+   document.getElementById('answeredCount').textContent='0';document.getElementById('reviewCount').textContent='0';document.getElementById('examProgressGrid').innerHTML='';
+   const title=document.getElementById('examTitle');if(title)title.textContent=examName;
+   syncExamTitleBar();updateTimerUI();render();
+ }
+ put(K.sessions,get(K.sessions,[]).filter(item=>!sessionIds.has(item.id)));
+ put(K.results,get(K.results,[]).filter(item=>!resultIds.has(item.id)));
+ for(const key of [K.exams,K.recent])put(key,get(key,[]).filter(item=>item.id!==quizId));
+ put(K.study,get(K.study,[]).filter(item=>item.examId!==quizId&&!sessionIds.has(item.sessionId)&&!resultIds.has(item.resultId)));
+ const receipt=get(K.reviewQueue,{});for(const sid of sessionIds)delete receipt['session:'+sid];for(const rid of resultIds)delete receipt['result:'+rid];put(K.reviewQueue,receipt);
+ if(lastResultSnapshot&&(lastResultSnapshot.examId===quizId||resultIds.has(lastResultSnapshot.id)))lastResultSnapshot=null;
+ renderSessions();renderDashboard();renderHome();PlanReviewQueue.render();toast('Saved quiz deleted');
+}
 
 
 async function redirectQuestionToChatGPT(){
