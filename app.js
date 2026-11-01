@@ -1,4 +1,4 @@
-const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",study:"examflow_study_activity_v1",flashcards:"examflow_flashcards_v1"};
+const K={sessions:"examflow_sessions_v2",results:"examflow_results_v2",goal:"examflow_goal_v2",plans:"examflow_plans_v2",settings:"examflow_settings_v2",exams:"examflow_exams_v1",recent:"examflow_recent_quizzes_v1",study:"examflow_study_activity_v1",flashcards:"examflow_flashcards_v1",reviewQueue:"examflow_review_queue_v1"};
 const sampleQuestions=[
 {text:"Which algorithm guarantees shortest paths from a source when edge weights are non-negative?",options:["DFS","Dijkstra's algorithm"],answer:"B",marks:2,negativeMarks:.5},
 {text:"What is the average-case lookup complexity of a good hash table?",options:["$O(1)$","$O(\\log n)$"],answer:"A"},
@@ -151,6 +151,7 @@ function getPlannerDates(){
 }
 function selectPlannerDate(value){
   if(!value)return;
+  document.getElementById('plannerDateEditor').open=true;
   plannerSelectedDate=value;
   const date=new Date(`${value}T00:00:00`);
   plannerCalendarMonth=new Date(date.getFullYear(),date.getMonth(),1);
@@ -678,6 +679,27 @@ function renderQuizInlineMarkdown(text){
     .replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g,"$1<em>$2</em>");
   return html.replace(/\uE000(\d+)\uE001/g,(_,index)=>tokens[Number(index)]);
 }
+function splitQuizTableRow(line){
+  const tokens=[];
+  // Pipes inside inline code or math belong to the cell, not the table layout.
+  const protectedLine=line.trim().replace(/(`+[^\n]*?`+|\$\$[^\n]+?\$\$|\\\[[^\n]+?\\\]|\\\([^\n]+?\\\)|\$[^$\n]+\$)/g,match=>`\uE002${tokens.push(match)-1}\uE003`);
+  const cells=[];
+  let cell='',separators=0;
+  for(let j=0;j<protectedLine.length;j++){
+    const char=protectedLine[j];
+    if(char==='|'){
+      let slashes=0,k=j-1;
+      while(k>=0&&protectedLine[k--]==='\\')slashes++;
+      if(slashes%2){cell=cell.slice(0,-1)+'|';continue}
+      cells.push(cell);cell='';separators++;
+    }else cell+=char;
+  }
+  if(!separators)return null;
+  cells.push(cell);
+  if(protectedLine.startsWith('|'))cells.shift();
+  if(protectedLine.endsWith('|')&&cells.at(-1)==='')cells.pop();
+  return cells.map(value=>value.trim().replace(/\uE002(\d+)\uE003/g,(_,index)=>tokens[Number(index)]));
+}
 function quizMarkdownHtml(text,{literalNewlines=true}={}){
   const source=String(text??"").replace(/\r\n?/g,"\n");
   const lines=(literalNewlines?source.replace(/\\n/g,"\n"):source).split("\n");
@@ -708,6 +730,22 @@ function quizMarkdownHtml(text,{literalNewlines=true}={}){
         if(i<lines.length)i++;
       }else i++;
       blocks.push(`<pre class="quiz-code-block"><code${lang?` class="language-${lang}"`:""}>${esc(code.join("\n"))}</code></pre>`);
+      continue;
+    }
+    const header=splitQuizTableRow(line);
+    const divider=i+1<lines.length?splitQuizTableRow(lines[i+1]):null;
+    if(header?.length&&divider?.length===header.length&&divider.every(cell=>/^:?-{3,}:?$/.test(cell))){
+      flushParagraph();
+      const alignment=divider.map(cell=>cell.startsWith(':')&&cell.endsWith(':')?'center':cell.endsWith(':')?'right':'left');
+      const renderCells=(cells,tag)=>header.map((_,column)=>`<${tag}${tag==='th'?' scope="col"':''} class="quiz-table-${alignment[column]}">${renderQuizInlineMarkdown(cells[column]||'')}</${tag}>`).join('');
+      const rows=[];
+      i+=2;
+      while(i<lines.length){
+        const cells=splitQuizTableRow(lines[i]);
+        if(!cells)break;
+        rows.push(`<tr>${renderCells(cells,'td')}</tr>`);i++;
+      }
+      blocks.push(`<div class="quiz-table-scroll" role="region" aria-label="Table" tabindex="0"><table class="quiz-table"><thead><tr>${renderCells(header,'th')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`);
       continue;
     }
     const heading=trimmed.match(/^(#{1,3})\s+(.+)$/);
@@ -1010,6 +1048,10 @@ function examflowSelectOptionByNumber(n){
 }
 function examflowKeyboardHandler(e){
   const key=e.key, lower=key.toLowerCase(), typing=isTypingTarget(e.target);
+  if(document.getElementById('planComposer')?.open){
+    if((e.ctrlKey||e.metaKey)&&key==='Enter'){e.preventDefault();saveQuickPlan()}
+    return;
+  }
   if(window.CBQReviewPreview?.handleKey(e))return;
   if(window.Flashcards?.handleKey(e))return;
   if(e.target.id==="studyQuizSearch"&&(e.ctrlKey||e.metaKey))return;
@@ -1267,9 +1309,11 @@ function render(){
    document.getElementById("progressText").textContent="0 / 0";document.getElementById("progressBar").style.width="0%";
    const copyQuestionBtn=document.getElementById("copyQuestionBtn");
    if(copyQuestionBtn)copyQuestionBtn.disabled=true;
+   document.getElementById('deleteQuestionBtn').disabled=true;
    return;
  }
  const q=questions[current],count=answers.filter(Boolean).length;
+ document.getElementById('deleteQuestionBtn').disabled=examFinished;
  const apExisting=document.getElementById("practiceAnswerPanel");
  if(apExisting && apExisting.dataset.question!==String(current))apExisting.remove();
  document.getElementById("currentLabel").textContent=current+1;document.getElementById("totalLabel").textContent=questions.length;
@@ -1329,6 +1373,39 @@ function toggleHint(){
 function choose(letter){if(examFinished)return;answers[current]=letter;checkedQuestions.delete(current);render();saveSessionSoon()}
 function clearAnswer(){if(examFinished)return;answers[current]=null;checkedQuestions.delete(current);render();saveSessionSoon()}
 function toggleReview(){if(examFinished)return;reviews.has(current)?reviews.delete(current):reviews.add(current);render();saveSessionSoon()}
+function deleteCurrentQuestion(){
+ if(!questions.length||examFinished)return;
+ const index=current,last=questions.length===1;
+ if(!confirm(last?'Delete the last question? This removes this saved session.':'Delete this question from the quiz and saved progress? Your other answers will be kept.'))return;
+ clearTimeout(saveTimer);
+ document.querySelector('.question-options')?.removeAttribute('open');
+ PlanReviewQueue.removeQuestion(sessionId,index);
+ const remap=values=>new Set([...values].filter(n=>n!==index).map(n=>n>index?n-1:n));
+ questions.splice(index,1);answers.splice(index,1);
+ reviews=remap(reviews);checkedQuestions=remap(checkedQuestions);
+ matchOrders=Object.fromEntries(Object.entries(matchOrders).filter(([key])=>Number(key)!==index).map(([key,value])=>[Number(key)>index?Number(key)-1:Number(key),value]));
+ sections=sections.filter(section=>questions.some(q=>q.section===(section.name||'General')));
+ current=Math.max(0,Math.min(index,questions.length-1));
+ document.getElementById('practiceAnswerPanel')?.remove();
+ if(last){
+   const removedId=sessionId,removedExam=examId;
+   timerState.running=false;
+   if(removedId){deletedSessionIds.add(removedId);put(K.sessions,get(K.sessions,[]).filter(s=>s.id!==removedId));put(K.study,get(K.study,[]).filter(s=>s.sessionId!==removedId))}
+   if(!get(K.sessions,[]).some(s=>s.examId===removedExam)){
+     put(K.exams,get(K.exams,[]).filter(e=>e.id!==removedExam));put(K.recent,get(K.recent,[]).filter(e=>e.id!==removedExam));
+   }
+   sessionId=null;examId=null;examName='No quiz loaded';
+   document.getElementById('feedback').textContent='';document.getElementById('explanation').style.display='none';
+   document.getElementById('answeredCount').textContent='0';document.getElementById('reviewCount').textContent='0';
+   document.getElementById('examProgressGrid').innerHTML='';updateTimerUI();
+ }else{
+   const progress=answers.filter((answer,i)=>answerIsPresent(answer,questions[i])).length,today=studyDateKey(Date.now());
+   put(K.study,get(K.study,[]).filter(item=>item.sessionId!==sessionId||item.date!==today||progress>0).map(item=>item.sessionId===sessionId?{...item,total:questions.length,answered:item.date===today?progress:Math.min(item.answered,questions.length)}:item));
+   registerActiveExam();saveSession();
+ }
+ syncExamTitleBar();render();renderSessions();renderDashboard();renderHome();PlanReviewQueue.render();
+ toast(last?'Saved session removed':'Question deleted · progress saved');
+}
 function nextQuestion(){if(current<questions.length-1){current++;render();if(!examFinished)saveSessionSoon()}else if(!examFinished)submitExam()}
 function previousQuestion(){if(current>0){current--;render();if(!examFinished)saveSessionSoon()}}
 function submitExam(){
@@ -1746,7 +1823,7 @@ function clearQuickPlan(){
   const box=document.getElementById("planJson"),status=document.getElementById("planJsonStatus");
   if(box)box.value="";
   if(status){
-    status.textContent="Paste → Plan Test · Ctrl/Cmd+Enter";
+    status.textContent=KeyboardShortcuts.mac?'Cmd+Enter to plan':'Ctrl+Enter to plan';
     status.style.color="";
   }
   box?.focus();
@@ -1754,7 +1831,7 @@ function clearQuickPlan(){
 function saveQuickPlan(){
   const box=document.getElementById("planJson"),status=document.getElementById("planJsonStatus");
   const raw=box?.value.trim();
-  if(!raw){toast("Paste quiz JSON first");return}
+  if(!raw){if(!document.getElementById('planComposer').open)openPlanComposer();else toast("Paste quiz JSON first");return}
   try{
     const source=parseQuizInput(raw);
     const quizSource=source.quiz||source.exam||source;
@@ -1769,6 +1846,7 @@ function saveQuickPlan(){
     box.value="";
     if(status){status.textContent=`✓ Planned: ${name} · ${date}`;status.style.color="var(--good)"}
     renderPlans();renderHome();toast("Test planned ✓");
+    closePlanComposer();
   }catch(e){
     if(status){status.textContent="✕ "+e.message+" Common paste formatting is supported."; status.style.color="var(--bad)"}
     toast("Invalid quiz JSON");
@@ -1792,7 +1870,8 @@ function savePlan(){
 function renderPlans(){
  const ps=get(K.plans,[]).slice().sort(planSortNewestFirst),el=document.getElementById("plansList");
  const pc=document.getElementById("plannerCount");if(pc)pc.textContent=String(ps.length);
- el.innerHTML=renderStackedRows(ps,p=>`<div class="planrow"><div class="planmain"><strong>${esc(p.name)}</strong><small>${p.date}${p.time?" · "+p.time:""}${p.notes?" · "+esc(p.notes):""}</small></div><div style="display:flex;gap:5px"><button class="btn primary" onclick="startPlan('${p.id}')">▶ Start</button><button class="btn" onclick="deletePlan('${p.id}')">×</button></div></div>`,`No upcoming tests.`);
+ el.innerHTML=renderStackedRows(ps,p=>`<div class="planrow"><div class="planmain"><strong title="${esc(p.name)}">${esc(p.name)}</strong><small>${esc(p.date||'')}${p.time?" · "+esc(p.time):""}${p.notes?" · "+esc(p.notes):""}</small></div><div class="plan-actions"><button class="btn primary plan-start" data-start-plan="${esc(p.id)}">▶ Start</button><button class="btn plan-delete" data-delete-plan="${esc(p.id)}" aria-label="Delete planned quiz ${esc(p.name)}">×</button></div></div>`,`No upcoming tests.`);
+ PlanReviewQueue.render();
 }
 function startPlan(pid){
  const p=get(K.plans,[]).find(x=>x.id===pid);if(!p)return;if(!p.json){toast("No quiz JSON attached to this plan");return}
@@ -1817,10 +1896,11 @@ async function importDataFile(event){
 
     // Accept only an ExamFlow backup structure. Quiz JSON belongs in
     // "Add CBQ Quiz" and is intentionally not mixed with application backup.
-    const allowed=["settings","results","goal","plans","sessions","exams","recent","study","flashcards"];
+    const allowed=["settings","results","goal","plans","sessions","exams","recent","study","flashcards","reviewQueue"];
     const hasBackup=allowed.some(k=>Object.prototype.hasOwnProperty.call(parsed,k));
     if(!hasBackup)throw new Error("This is a quiz JSON, not a QuizFlow data backup. Use Add CBQ Quiz.");
     const flashcardBackup=parsed.flashcards!==undefined?Flashcards.validateBackup(parsed.flashcards):null;
+    if(parsed.reviewQueue!==undefined)PlanReviewQueue.validateReceipts(parsed.reviewQueue);
     for(const name of ['results','plans','sessions','study','exams','recent'])if(parsed[name]!==undefined&&!Array.isArray(parsed[name]))throw new Error(name+" must be an array.");
     const importedSessions=parsed.sessions?.map(validateSessionJSON);
 
@@ -1839,7 +1919,7 @@ async function importDataFile(event){
       for(const [key,value] of Object.entries(parsed.storage.records))if(/^examflow_[a-z0-9_]+$/i.test(key)&&!Object.values(K).includes(key)&&key!=="examflow_last_reset"&&key!=="examflow_exam_deadline"&&typeof value==='string')entries.set(key,value);
     }
     if(flashcardBackup)entries.set(K.flashcards,JSON.stringify(flashcardBackup));
-    for(const name of ['settings','goal'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(parsed[name]||{}));
+    for(const name of ['settings','goal','reviewQueue'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(parsed[name]||{}));
     for(const name of ['results','plans','sessions','study','exams','recent'])if(parsed[name]!==undefined)entries.set(K[name],JSON.stringify(Array.isArray(parsed[name])?parsed[name]:[]));
     if(importedSessions)entries.set(K.sessions,JSON.stringify(importedSessions));
     if(parsed.examDeadline!==undefined){
@@ -1884,7 +1964,7 @@ async function exportData(button){
   if(latest){const index=sessions.findIndex(s=>s.id===latest.id);if(index>=0)sessions[index]=latest;else sessions.unshift(latest)}
   const records=QuizStorage.snapshot();
   if(latest)records[K.sessions]=JSON.stringify(sessions);
-  const data={format:"quizflow-library",version:1,exportedAt:new Date().toISOString(),flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions,exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records}};
+  const data={format:"quizflow-library",version:1,exportedAt:new Date().toISOString(),flashcards:get(K.flashcards,{version:1,decks:[],session:null}),study:get(K.study,[]),reviewQueue:get(K.reviewQueue,{}),settings,results:get(K.results,[]),goal:get(K.goal,{}),plans:get(K.plans,[]),sessions,exams:get(K.exams,[]),recent:get(K.recent,[]),examDeadline:getSavedExamDeadline(),storage:{version:1,records}};
   downloadQuizJSON(data,"quizflow-data.json");toast("JSON file downloaded. Ready to keep offline or share.");
  }catch(error){
   const status=document.getElementById("dataImportStatus");

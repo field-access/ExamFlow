@@ -43,6 +43,12 @@ Prompt Lab exposes only Save and Copy beside the editor. Unsaved changes are ret
 
 ## Flashcards
 
+Plan now includes a **Review queue** for due flashcards and the latest quiz attempt's mistakes and marked questions. Exam answers become available after submission. Quiz reviews open as flashcard previews; reveal the answer and choose **Reviewed** to clear a card from the queue without creating a deck or changing quiz answers. Review completion is saved in IndexedDB and included in library JSON backups. Due flashcard reviews use the existing rating schedule.
+
+The Plan page keeps reviews and planned quizzes in its main column, with the calendar and tasks alongside it. **Plan quiz** opens the JSON editor in a dialog; Ctrl/Cmd+Enter opens it from Plan and schedules the pasted quiz from inside it. Selecting a calendar day opens Date details. The layout stacks on small screens. Edit this page in `views/planner.html`.
+
+On the Quiz page, **⋯ → Delete question** removes an irrelevant question from the current quiz and saved session, keeping the remaining answers and review marks aligned. Deleting the last question removes that session. Completed results remain historical snapshots. Planned quizzes use equal-height rows and fixed Start buttons, with ten quizzes per side-by-side column; scroll horizontally when the columns exceed the available width.
+
 Open **Flashcards → Add a deck** to paste JSON or import a file. Copy the generation prompt or try the sample deck from the importer. Edit the original Flashcard prompt in Settings → Prompt Lab; shipped defaults live in `original-prompts.json`.
 
 The flashcard library groups decks by date, newest first. Its calendar marks dates with saved decks; select a day, jump to a date, or choose All dates. **Your decks** contains imported decks. **Saved CBQ reviews** separately contains flashcards saved from quiz questions, grouped by source quiz. Study and Browse use the same existing scheduling controls. New CBQ cards update the group's saved date; ratings do not move its date. The existing Saved quiz explanations deck appears in this area with its cards and schedules preserved. Deck category and source metadata are included in full library backups.

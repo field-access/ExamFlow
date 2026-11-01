@@ -2747,6 +2747,16 @@ body.dark .card{
 .quiz-rich-text li{padding-inline-start:.18em}
 .quiz-rich-text li+li{margin-top:.28em}
 .quiz-rich-text u{text-decoration-thickness:.09em;text-underline-offset:.15em}
+.quiz-rich-text .quiz-table-scroll{max-width:100%;min-width:0;overflow-x:auto;margin:.8em 0;border:1px solid var(--line);border-radius:10px;overscroll-behavior-inline:contain}
+.quiz-rich-text .quiz-table-scroll:focus-visible{outline:2px solid var(--primary);outline-offset:3px}
+.quiz-rich-text .quiz-table{width:100%;border-collapse:collapse;font-size:.94em;line-height:1.55}
+.quiz-rich-text .quiz-table th,.quiz-rich-text .quiz-table td{padding:.65em .9em;min-width:6em;vertical-align:top;border-bottom:1px solid var(--line);overflow-wrap:break-word}
+.quiz-rich-text .quiz-table th{font-weight:650;background:var(--surface2)}
+.quiz-rich-text .quiz-table tr:last-child td{border-bottom:0}
+.quiz-rich-text .quiz-table th+th,.quiz-rich-text .quiz-table td+td{border-inline-start:1px solid var(--line)}
+.quiz-rich-text .quiz-table-left{text-align:left}
+.quiz-rich-text .quiz-table-center{text-align:center}
+.quiz-rich-text .quiz-table-right{text-align:right}
 .option-text.quiz-rich-text{flex:1 1 auto;min-width:0}
 .option-text.quiz-rich-text p{margin:.15em 0}
 .option-text.quiz-rich-text ul,.option-text.quiz-rich-text ol{margin:.35em 0}

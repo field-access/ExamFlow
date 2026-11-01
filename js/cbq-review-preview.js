@@ -69,6 +69,7 @@
     $('cbqPreviewEmpty').hidden = !!card;
     $('cbqPreviewEmpty').textContent = complete ? 'You reached the end. Review again, or return to your quiz.' : 'No eligible questions here. Try another group.';
     $('cbqPreviewRestart').hidden = !complete;
+    $('cbqPreviewReviewed').hidden = true;
     $('cbqPreviewFlip').hidden = !card;
     $('cbqPreviewPrevious').disabled = !cards.length || state.cursor === 0;
     $('cbqPreviewNext').hidden = !card;
@@ -99,6 +100,7 @@
     $('cbqPreviewBackPanel').setAttribute('aria-hidden', String(!state.revealed));
     $('cbqPreviewFlip').textContent = state.revealed ? 'Show question' : 'Show answer';
     $('cbqPreviewFlip').setAttribute('aria-pressed', String(state.revealed));
+    $('cbqPreviewReviewed').hidden = !state.queueOnly || !state.revealed;
   }
   function flip() { if (state && queue()[state.cursor]) { state.revealed = !state.revealed; updateFlip(); } }
   function move(delta) {
@@ -109,14 +111,16 @@
     if ($('cbqPreviewNext').hidden) $('cbqPreviewRestart').focus();
     else if (document.activeElement === $('cbqPreviewRestart')) $('cbqPreviewFlip').focus();
   }
-  function open(kind, id) {
+  function open(kind, id, {queueOnly=false}={}) {
     const source = get(kind === 'result' ? K.results : K.sessions, []).find(s => s.id === id);
     if (!source) { toast('This saved quiz is no longer available.'); renderDashboard(); return; }
     const info = inspect(source, kind === 'result');
     if (!info.allowed) { toast('Answer preview is available after Exam submission.'); return; }
     if (!info.cards.length) { toast('No marked questions or verified mistakes to preview.'); renderDashboard(); return; }
     returnFocus = document.activeElement;
-    state = { name: source.name || 'CBQ review', cards: cloneData(info.cards), cursor: 0, filter: 'all', revealed: false };
+    const cards=queueOnly?PlanReviewQueue.pending(kind,source,info.cards):info.cards;
+    if(!cards.length){toast('This quiz review is already complete.');PlanReviewQueue.render();return}
+    state = { name: source.name || 'CBQ review', cards: cloneData(cards), cursor: 0, filter: 'all', revealed: false, queueOnly, kind, sourceId:id };
     render();
     $('cbqPreviewDialog').showModal();
     $('cbqPreviewFlip').focus();
@@ -131,7 +135,7 @@
     return true;
   }
   window.CBQQuestionCard = { content };
-  window.CBQReviewPreview = { controls, handleKey };
+  window.CBQReviewPreview = { controls, handleKey, inspect, open };
   document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', e => {
       const button = e.target.closest('[data-cbq-preview]');
@@ -142,6 +146,15 @@
       if (!button || !state) return;
       if (button.id === 'cbqPreviewClose') $('cbqPreviewDialog').close();
       else if (button.id === 'cbqPreviewFlip') flip();
+      else if (button.id === 'cbqPreviewReviewed' && state.queueOnly && state.revealed) {
+        const card=queue()[state.cursor];if(!card)return;
+        PlanReviewQueue.reviewed(state.kind,state.sourceId,card);
+        state.cards=state.cards.filter(c=>c.index!==card.index);
+        state.cursor=Math.min(state.cursor,Math.max(0,queue().length-1));
+        render();
+        if(!state.cards.length){$('cbqPreviewEmpty').textContent='Quiz review complete.';$('cbqPreviewClose').focus()}
+        else $('cbqPreviewFlip').focus();
+      }
       else if (button.id === 'cbqPreviewPrevious') move(-1);
       else if (button.id === 'cbqPreviewNext') move(1);
       else if (button.id === 'cbqPreviewRestart') { state.cursor = 0; render(); $('cbqPreviewFlip').focus(); }

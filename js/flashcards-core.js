@@ -92,7 +92,7 @@
     // Active sessions are disposable; accept them only when all referenced cards exist.
     let session = null;
     const s = data.session, deck = s && decks.find(d => d.id === s.deckId);
-    if (deck && ['due', 'all', 'browse'].includes(s.mode) && Array.isArray(s.queue) && s.queue.length && s.queue.length <= MAX_CARDS && new Set(s.queue).size === s.queue.length && s.queue.every(id => deck.cards.some(c => c.id === id)) && Number.isInteger(s.cursor) && s.cursor >= 0 && s.cursor <= s.queue.length) {
+    if (deck && ['due', 'review', 'all', 'browse'].includes(s.mode) && Array.isArray(s.queue) && s.queue.length && s.queue.length <= MAX_CARDS && new Set(s.queue).size === s.queue.length && s.queue.every(id => deck.cards.some(c => c.id === id)) && Number.isInteger(s.cursor) && s.cursor >= 0 && s.cursor <= s.queue.length) {
       session = { deckId: s.deckId, mode: s.mode, queue: s.queue, cursor: s.cursor, revealed: false, startedAt: Number(s.startedAt) || Date.now(), ratings: {} };
       for (const k of ['again', 'hard', 'good', 'easy']) session.ratings[k] = Number.isInteger(s.ratings?.[k]) && s.ratings[k] >= 0 ? s.ratings[k] : 0;
     }

@@ -1,0 +1,105 @@
+/* Ten planned quizzes per column; titles never determine button width. */
+#plannerView .planner-list-card{margin-top:0}
+#plannerView #plansList:focus-visible{outline:2px solid var(--primary);outline-offset:4px;border-radius:8px}
+#plannerView #plansList{max-width:100%;overflow-x:auto;padding-bottom:6px;overscroll-behavior-inline:contain}
+#plannerView #plansList .stacked-list{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(320px,1fr);gap:12px;align-items:start}
+#plannerView #plansList .stack-column{display:grid;gap:8px;min-width:0}
+#plannerView #plansList .planrow{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;height:92px;box-sizing:border-box;padding:12px;margin:0}
+#plannerView #plansList .planmain{min-width:0}
+#plannerView #plansList .planmain strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;font-size:15px;line-height:1.35;overflow:hidden;overflow-wrap:anywhere}
+#plannerView #plansList .planmain small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px;margin-top:5px}
+#plannerView .plan-actions{display:flex;align-items:center;gap:5px;flex-shrink:0}
+#plannerView .plan-actions .plan-start{width:82px;min-width:82px;min-height:38px;padding:8px!important;white-space:nowrap;font-size:13px!important}
+#plannerView .plan-actions .plan-delete{width:30px;min-width:30px;min-height:38px;padding:5px!important;background:transparent;box-shadow:none}
+#homeView .planrow{min-width:0;gap:12px}
+#homeView .planrow .planmain{flex:1;min-width:0}
+#homeView .planrow>.btn{flex:0 0 78px;min-width:78px;white-space:nowrap}
+#plannerView .planner-review-card{padding:22px;border-radius:16px;min-width:0}
+#planReviewQueue{display:grid;gap:0;max-height:520px;overflow-y:auto;overscroll-behavior:contain}
+#planReviewQueue .plan-review-row{display:grid;grid-template-columns:minmax(0,1fr) 76px;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--line)}
+#planReviewQueue .plan-review-row strong{display:block;font-size:15px;line-height:1.4;overflow-wrap:anywhere}
+#planReviewQueue .plan-review-row small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:4px}
+#planReviewQueue .plan-review-row .btn{width:76px;min-height:38px;font-size:13px!important;padding:8px;white-space:nowrap}
+#examView .question-options{position:relative;flex:none}
+#examView .question-options summary{list-style:none;cursor:pointer;min-width:36px}
+#examView .question-options summary::-webkit-details-marker{display:none}
+#examView .question-options>button{position:absolute;right:0;top:calc(100% + 6px);z-index:20;width:160px;background:var(--surface);color:var(--bad);border:1px solid var(--line);box-shadow:0 6px 20px #0002;white-space:nowrap}
+@media(max-width:600px){
+  #examView .question-tool-actions{grid-template-columns:repeat(3,minmax(0,1fr)) 36px}
+  #plannerView #plansList .stacked-list{grid-auto-columns:minmax(290px,1fr)}
+  #plannerView .planner-review-card{padding:16px}
+}
+
+/* A quiet main column for studying, with compact planning tools alongside it. */
+#plannerView .planner-page{max-width:1240px;width:calc(100% - 48px);margin:30px auto 40px}
+#plannerView .planner-hero{display:flex!important;justify-content:space-between;align-items:center;gap:20px;margin-bottom:24px!important}
+#plannerView .planner-hero h1{margin:0;font-family:inherit;font-size:30px!important;line-height:1.2;letter-spacing:-.035em}
+#plannerView .planner-hero p{margin:6px 0 0;font-size:14px;color:var(--muted)}
+#plannerView .planner-hero>.btn{width:auto!important;margin:0!important;flex:none}
+#plannerView .planner-workspace{grid-template-columns:minmax(0,1fr) 310px;gap:24px}
+#plannerView .planner-column{gap:20px}
+#plannerView :is(.planner-review-card,.planner-list-card,.planner-calendar-card,.planner-todo-card){padding:20px!important;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:none!important;min-width:0}
+#plannerView .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 16px;padding:0;border:0}
+#plannerView .panel-heading h3{margin:0;font-family:inherit;font-size:17px;font-weight:650}
+#plannerView .planner-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;box-sizing:border-box;background:var(--surface2);border:0;border-radius:7px;font-size:12px;color:var(--muted)}
+#plannerView .empty{padding:18px 0;text-align:left;line-height:1.6;background:none;border:0;font-size:14px}
+#plannerView #planReviewQueue{max-height:360px}
+#plannerView #planReviewQueue .plan-review-row:first-child{border-top:0;padding-top:0}
+#plannerView #planReviewQueue .plan-review-row:last-child{padding-bottom:0}
+#plannerView #planReviewQueue .plan-review-row strong{font-weight:550}
+#plannerView #plansList .planrow{height:88px;background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:10px 0}
+#plannerView #plansList .planmain strong{font-weight:550}
+#plannerView .plan-actions .plan-start{box-shadow:none!important}
+#plannerView .planner-calendar-card .calendar-toolbar{margin:0 0 12px;grid-template-columns:30px 1fr 30px}
+#plannerView .calendar-toolbar strong{font-family:inherit;font-size:15px;font-weight:600}
+#plannerView .calendar-toolbar .btn{border:0;background:transparent;box-shadow:none!important;min-height:30px;font-size:20px}
+#plannerView .calendar-weekdays{font-size:10px;letter-spacing:0;text-transform:none;margin-bottom:7px}
+#plannerView .calendar-days{gap:3px}
+#plannerView .calendar-day{min-height:33px;font-size:13px;border-radius:8px;box-shadow:none}
+#plannerView .calendar-legend{gap:14px;margin-top:12px;font-size:11px}
+#plannerView .planner-date-details{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}
+#plannerView .planner-date-details summary{cursor:pointer;font-size:13px;color:var(--muted);font-weight:500}
+#plannerView .calendar-editor{grid-template-columns:1fr;gap:8px;margin-top:12px;padding:0;border:0}
+#plannerView .calendar-editor label{font-size:12px;font-weight:500}
+#plannerView .calendar-editor input{width:100%;min-width:0;box-sizing:border-box}
+#plannerView .calendar-editor-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#plannerView .calendar-editor-actions .btn{min-width:0;font-size:12px!important;box-shadow:none!important;min-height:36px}
+#plannerView .calendar-editor-actions .btn:last-child{grid-column:1/-1;background:transparent;border-color:transparent;color:var(--muted)}
+#plannerView .deadline-summary{padding:12px 0 0;margin-top:14px;border-top:1px solid var(--line);background:none;border-radius:0}
+#plannerView .deadline-summary strong{font-family:inherit;font-size:13px;font-weight:550}
+#plannerView .deadline-summary span{font-size:12px;line-height:1.5}
+#plannerView .planner-todo-card{position:static}
+#plannerView .planner-todo-form{grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:0 0 12px}
+#plannerView .planner-todo-form input{width:100%;min-width:0;box-sizing:border-box;font-size:13px;min-height:38px;padding:8px}
+#plannerView #plannerTodoDeadline{grid-column:1/-1;font-size:12px;color:var(--muted);min-height:34px}
+#plannerView .planner-todo-row{font-size:13px;line-height:1.5;padding:12px 0}
+#plannerView .planner-todo-row small{font-size:11px}
+.planner-label-accessible{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#planComposer{width:min(640px,calc(100% - 32px));max-height:calc(100dvh - 40px);overflow:auto;box-sizing:border-box;padding:24px;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--text);box-shadow:0 24px 80px #0003}
+#planComposer::backdrop{background:#12161470}
+#plannerView #planComposer .planner-paste-card{padding:0!important;margin:0;border:0;background:none;box-shadow:none}
+#plannerView #planComposer .quick-plan-head{display:flex!important;justify-content:space-between;align-items:center;margin-bottom:18px;gap:16px}
+#planComposer h2{font-family:inherit;font-size:21px;margin:0;letter-spacing:-.02em}
+#plannerView #planComposer .quick-plan-head>.btn{width:34px;min-height:34px;padding:4px;margin:0;background:transparent;border:0;box-shadow:none}
+#planComposer .planner-input-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:13px;font-weight:500}
+#plannerView #planComposer .quick-plan-input{width:100%;box-sizing:border-box;min-height:clamp(180px,30vh,280px)!important;font-size:13px;border-radius:10px}
+#planComposer #planJsonStatus{font-size:12px;line-height:1.5;color:var(--muted);margin-top:10px}
+#plannerView #planComposer .quick-plan-foot{display:flex!important;justify-content:flex-end;gap:8px;margin-top:20px}
+#plannerView #planComposer .quick-plan-foot .btn{width:auto}
+@media(max-width:980px){
+  #plannerView .planner-workspace{grid-template-columns:minmax(0,1fr) 280px;gap:18px}
+}
+@media(max-width:760px){
+  #plannerView .planner-page{width:calc(100% - 28px)!important;margin:20px auto 28px!important}
+  #plannerView .planner-workspace{grid-template-columns:1fr}
+  #plannerView .planner-side-column{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+  #plannerView .planner-hero p{max-width:25ch;font-size:13px}
+  #plannerView .planner-hero h1{font-size:27px!important}
+}
+@media(max-width:540px){
+  #plannerView .planner-side-column{grid-template-columns:1fr}
+  #plannerView :is(.planner-review-card,.planner-list-card,.planner-calendar-card,.planner-todo-card){padding:16px!important}
+  #plannerView .planner-hero{gap:12px;margin-bottom:20px!important}
+  #plannerView .planner-hero>.btn{font-size:13px;padding:8px 10px}
+  #planComposer{padding:18px}
+}

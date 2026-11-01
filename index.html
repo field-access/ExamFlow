@@ -27,6 +27,7 @@
 <link rel="stylesheet" href="css/theme-picker.css">
 <link rel="stylesheet" href="css/home-focus.css">
 <link rel="stylesheet" href="css/library-storage.css">
+<link rel="stylesheet" href="css/plan-review.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -246,6 +247,7 @@
       <button class="modebtn" type="button" onclick="redirectQuestionToChatGPT()" title="Open this question in ChatGPT (G)"><svg class="ui-icon"><use href="#icon-external"/></svg>ChatGPT</button>
       <button id="copyQuestionBtn" class="modebtn copy-question-btn" type="button" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question</button>
       <button class="modebtn" type="button" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer</button>
+      <details class="question-options"><summary class="modebtn" aria-label="Question options">⋯</summary><button id="deleteQuestionBtn" class="btn" type="button" onclick="deleteCurrentQuestion()">Delete question</button></details>
     </div>
   </div>
   <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
@@ -367,41 +369,57 @@
 </div>
 </section>
 
-<!-- PLANNER -->
 <section id="plannerView" class="view">
-<div class="planner-page">
-  <div class="planner-hero"><div><div class="hero-kicker">TEST PLANNER</div><h1>Plan a test</h1><p>Schedule CBQs, track important dates, and keep study tasks together.</p></div><button class="btn" onclick="showView('home')">⌂ Home</button></div>
-
-  <section class="card quick-plan planner-paste-card">
-    <div class="quick-plan-head"><div><h3>Paste quiz JSON</h3><small>Scheduling fields: <code>date</code>, <code>examDate</code>, <code>scheduledDate</code>, <code>time</code>.</small></div><button id="planPasteBtn" class="btn primary" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste</button></div>
-    <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your CBQ JSON here..."></textarea>
-    <div class="quick-plan-foot"><div id="planJsonStatus" class="paste-status">Paste → Plan Test · Ctrl/Cmd+Enter</div><div class="quick-plan-actions"><button class="btn" type="button" onclick="clearQuickPlan()">Clear</button><button class="btn primary" type="button" onclick="saveQuickPlan()"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan Test</button></div></div>
-  </section>
-
-  <div class="planner-workspace">
-  <div class="planner-column">
-  <section class="card planner-calendar-card" aria-label="Study calendar">
-    <div class="planner-card-head"><div><div class="hero-kicker">STUDY CALENDAR</div><h2>Mark the dates that matter.</h2><p>Select a date to mark an exam or study day.</p></div></div>
-    <div class="calendar-toolbar"><button class="btn" type="button" onclick="shiftPlannerCalendar(-1)" aria-label="Previous month">←</button><strong id="plannerCalendarTitle"></strong><button class="btn" type="button" onclick="shiftPlannerCalendar(1)" aria-label="Next month">→</button></div>
-    <div id="plannerCalendar" class="planner-calendar"></div>
-    <div class="calendar-legend"><span><i class="calendar-dot exam"></i> Exam date</span><span><i class="calendar-dot important"></i> Important date</span></div>
-    <div class="calendar-editor">
-      <label for="plannerDateInput">Selected date</label>
-      <input id="plannerDateInput" type="date" onchange="selectPlannerDate(this.value)">
-      <input id="plannerDateLabel" type="text" placeholder="Label, e.g. Physics revision" maxlength="80">
-      <div class="calendar-editor-actions"><button class="btn primary" type="button" onclick="savePlannerDate('important')">Mark important</button><button class="btn" type="button" onclick="savePlannerDate('exam')">Set exam date</button><button class="btn" type="button" onclick="removePlannerDate()">Remove</button></div>
+  <div class="planner-page">
+    <div class="planner-hero">
+      <div><h1>Plan</h1><p>Your next study session, in one place.</p></div>
+      <button id="openPlanComposerBtn" class="btn primary" type="button" onclick="openPlanComposer()"><svg class="ui-icon"><use href="#icon-calendar"/></svg>Plan quiz</button>
     </div>
-    <div class="deadline-summary"><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate">Choose a date to start your countdown.</span></div>
-  </section>
-  <section class="panel card planner-list-card"><div class="panel-heading"><div><h3>Upcoming tests</h3><small>Your planned CBQs</small></div><span class="planner-count" id="plannerCount">0</span></div><div id="plansList"></div></section>
+    <div class="planner-workspace">
+      <main class="planner-column planner-main-column">
+        <section class="panel card planner-review-card" aria-labelledby="planReviewHeading">
+          <div class="panel-heading"><h3 id="planReviewHeading">Review queue</h3><span class="planner-count" id="planReviewCount">0</span></div>
+          <div id="planReviewQueue"></div>
+        </section>
+        <section class="panel card planner-list-card" aria-labelledby="plannedQuizHeading">
+          <div class="panel-heading"><h3 id="plannedQuizHeading">Planned quizzes</h3><span class="planner-count" id="plannerCount">0</span></div>
+          <div id="plansList" tabindex="0" role="region" aria-label="Planned quizzes in columns of ten"></div>
+        </section>
+      </main>
+      <aside class="planner-column planner-side-column" aria-label="Calendar and tasks">
+        <section class="card planner-calendar-card" aria-label="Study calendar">
+          <div class="calendar-toolbar"><button class="btn" type="button" onclick="shiftPlannerCalendar(-1)" aria-label="Previous month">‹</button><strong id="plannerCalendarTitle"></strong><button class="btn" type="button" onclick="shiftPlannerCalendar(1)" aria-label="Next month">›</button></div>
+          <div id="plannerCalendar" class="planner-calendar"></div>
+          <div class="calendar-legend"><span><i class="calendar-dot exam"></i> Exam</span><span><i class="calendar-dot important"></i> Important</span></div>
+          <details id="plannerDateEditor" class="planner-date-details">
+            <summary>Date details</summary>
+            <div class="calendar-editor">
+              <label for="plannerDateInput">Date</label><input id="plannerDateInput" type="date" onchange="selectPlannerDate(this.value)">
+              <label class="planner-label-accessible" for="plannerDateLabel">Date label</label><input id="plannerDateLabel" type="text" placeholder="Add a label" maxlength="80">
+              <div class="calendar-editor-actions"><button class="btn primary" type="button" onclick="savePlannerDate('important')">Mark important</button><button class="btn" type="button" onclick="savePlannerDate('exam')">Set exam</button><button class="btn" type="button" onclick="removePlannerDate()">Remove</button></div>
+            </div>
+          </details>
+          <div class="deadline-summary"><strong id="planExamCountdown">No exam date set</strong><span id="planExamDate"></span></div>
+        </section>
+        <section class="panel card planner-todo-card" aria-labelledby="planTasksHeading">
+          <div class="panel-heading"><h3 id="planTasksHeading">Tasks</h3></div>
+          <div class="planner-todo-form"><input type="text" id="plannerTodoInput" aria-label="Study task" placeholder="Add a task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><button class="btn" type="button" onclick="addPlannerTodo()">Add</button><input type="date" id="plannerTodoDeadline" aria-label="Task deadline"></div>
+          <div id="plannerTodoList"></div>
+        </section>
+      </aside>
+    </div>
   </div>
-  <section class="panel card planner-todo-card"><div class="panel-heading"><div><h3>Study todo list</h3><small>Keep tasks beside your calendar.</small></div></div>
-    <div class="planner-todo-form"><input type="text" id="plannerTodoInput" placeholder="Add a study task" onkeypress="if(event.key==='Enter') addPlannerTodo()"><input type="date" id="plannerTodoDeadline"><button class="btn primary" type="button" onclick="addPlannerTodo()">Add task</button></div>
-    <div id="plannerTodoList"></div>
-  </section>
-  </div>
-</div>
+  <dialog id="planComposer" class="planner-composer" aria-labelledby="planComposerTitle">
+    <div class="quick-plan planner-paste-card">
+      <div class="quick-plan-head"><h2 id="planComposerTitle">Plan a quiz</h2><button class="btn" type="button" onclick="closePlanComposer()" aria-label="Close quiz planner">×</button></div>
+      <div class="planner-input-heading"><label for="planJson">Quiz JSON</label><button id="planPasteBtn" class="btn" type="button" onclick="pasteFromClipboard('planJson','planJsonStatus','planPasteBtn')"><svg class="ui-icon"><use href="#icon-copy"/></svg>Paste</button></div>
+      <textarea id="planJson" class="home-json-input quick-plan-input" spellcheck="false" placeholder="Paste your quiz JSON…" autofocus></textarea>
+      <div id="planJsonStatus" class="paste-status" role="status">Ctrl/Cmd+Enter to plan</div>
+      <div class="quick-plan-foot"><button class="btn" type="button" onclick="clearQuickPlan()">Clear</button><button class="btn primary" type="button" onclick="saveQuickPlan()">Plan quiz</button></div>
+    </div>
+  </dialog>
 </section>
+
 
 <!-- SETTINGS -->
 <section id="settingsView" class="view">
@@ -604,7 +622,7 @@
     </div>
   </div>
   <p id="cbqPreviewEmpty" class="cbq-preview-empty" hidden></p>
-  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn" aria-label="Previous card" title="Previous (←)">←</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false" title="Flip (Space / Enter)">Show answer</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn" aria-label="Next card or finish preview" title="Next (→)">→</button></div>
+  <div class="cbq-preview-navigation"><button id="cbqPreviewPrevious" type="button" class="btn" aria-label="Previous card" title="Previous (←)">←</button><button id="cbqPreviewFlip" type="button" class="btn primary" aria-pressed="false" title="Flip (Space / Enter)">Show answer</button><button id="cbqPreviewReviewed" type="button" class="btn" hidden>Reviewed</button><button id="cbqPreviewRestart" type="button" class="btn primary" hidden>Review again</button><button id="cbqPreviewNext" type="button" class="btn" aria-label="Next card or finish preview" title="Next (→)">→</button></div>
 </dialog>
 
 
@@ -617,6 +635,8 @@
 <script src="js/flashcards.js"></script>
 <script src="js/prompt-lab.js"></script>
 <script src="js/session-files.js"></script>
+<script src="js/plan-review-queue.js"></script>
+<script src="js/planner-ui.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

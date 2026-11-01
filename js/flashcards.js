@@ -126,7 +126,7 @@
     if (!deck) return;
     const limit = mode === 'browse' ? C.MAX_CARDS : Number(container?.querySelector('[data-option=limit]')?.value || 20);
     const tag = container?.querySelector('[data-option=tag]')?.value || '';
-    const queue = C.queue(deck, { mode, limit, tag, shuffle: !!container?.querySelector('[data-option=shuffle]')?.checked });
+    const queue = mode==='review' ? deck.cards.filter(c=>c.progress.state!=='new'&&c.progress.due<=Date.now()).sort((a,b)=>a.progress.due-b.progress.due).slice(0,limit).map(c=>c.id) : C.queue(deck, { mode, limit, tag, shuffle: !!container?.querySelector('[data-option=shuffle]')?.checked });
     if (!queue.length) { notice('No cards are ready in this topic. Try another topic or browse the deck. ' + dueLabel(deck) + '.'); return; }
     const session = { deckId: deck.id, mode, queue, cursor: 0, revealed: false, startedAt: Date.now(), ratings: { again: 0, hard: 0, good: 0, easy: 0 } };
     if (save({ ...state, session })) { undo = null; editor = false; $('fcNotice').hidden = true; render(); $('fcStudyTitle').setAttribute('tabindex', '-1'); $('fcStudyTitle').focus(); }
@@ -321,7 +321,14 @@
     }
     return false;
   }
-  window.Flashcards = { refresh, renderLibrary, saveQuestion, copyPrompt, handleKey, validateBackup: C.validateStore };
+  function studyDue(deckId){
+    refresh();
+    const deck=state.decks.find(d=>d.id===deckId);
+    if(!deck){toast('This deck is no longer available.');return}
+    if(state.session&&!confirm('Start this review? Your card ratings are saved, but the current flashcard session will end.'))return;
+    showView('flashcards');start(deck,'review');
+  }
+  window.Flashcards = { refresh, renderLibrary, saveQuestion, studyDue, copyPrompt, handleKey, validateBackup: C.validateStore };
   document.addEventListener('DOMContentLoaded', () => {
     $('flashcardsView').addEventListener('click', handle);
     $('fcJson').addEventListener('input', () => { pending = null; $('fcPreview').hidden = true; $('fcImportStatus').textContent = ''; });
