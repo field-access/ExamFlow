@@ -1081,7 +1081,6 @@ function examflowKeyboardHandler(e){
       return;
     }
     if(e.shiftKey&&lower==="r"){e.preventDefault();retakeLastTest();return}
-    if(e.shiftKey&&lower==="s"){e.preventDefault();saveResultCopy();return}
     if(e.shiftKey&&lower==="c"){e.preventDefault();showView("home");return}
     return;
   }
@@ -1635,10 +1634,6 @@ function practiceMarkedQuestions(){
  toast(`Practice ready · ${questions.length} marked question${questions.length===1?"":"s"}`);
 }
 
-function saveResultCopy(){
- if(!lastResultSnapshot){toast("No result to download.");return}
- downloadQuizJSON({format:"quizflow-result",version:1,exportedAt:new Date().toISOString(),result:lastResultSnapshot},quizJSONFilename(lastResultSnapshot.name,"result"));toast("Result JSON downloaded.");
-}
 function retakeLastTest(){
  if(!lastResultSnapshot)return;
  const qs=lastResultSnapshot.questions;

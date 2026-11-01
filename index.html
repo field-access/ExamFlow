@@ -247,7 +247,6 @@
       <button id="copyQuestionBtn" class="modebtn copy-question-btn" type="button" onclick="copyCurrentQuestion()" title="Copy the question, answer and explanation (C)"><svg class="ui-icon"><use href="#icon-copy"/></svg>Copy question</button>
       <button class="modebtn" type="button" onclick="clearAnswer()" title="Clear your answer (Delete)">Clear answer</button>
       <button class="modebtn" type="button" onclick="saveSessionConfirmed()" title="Save progress in this browser (Alt/Option+S)">Save</button>
-      <button class="modebtn" type="button" onclick="exportSessionJSON()" title="Download this session with answers, review marks and timers"><svg class="ui-icon"><use href="#icon-file"/></svg>Session JSON</button>
     </div>
   </div>
   <div id="questionText" class="question-prompt quiz-rich-text" role="heading" aria-level="2">Paste a quiz JSON to start.</div>
@@ -318,7 +317,6 @@
       <div><h1>Test Results</h1><p id="resultSubtitle">CBQ · Practice Mode</p></div>
     </div>
     <div class="results-actions">
-      <button class="btn primary" onclick="saveResultCopy()">▣ Download result JSON</button>
       <button class="btn" onclick="showView('home')">← Change Exam</button>
       <button class="btn" onclick="retakeLastTest()">↻ Retake</button>
     </div>
@@ -501,7 +499,7 @@
 <div><span class="shortcut-keys"><kbd>Enter</kbd></span><span>Check / confirm</span></div>
 <div><span class="shortcut-keys"><kbd>←</kbd> / <kbd>→</kbd></span><span>Previous / next</span></div>
 <div><span class="shortcut-keys"><kbd>Backspace</kbd> / <kbd>Delete</kbd></span><span>Clear answer</span></div>
-<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>R</kbd> / <kbd>S</kbd> / <kbd>C</kbd></span><span>Retake / save / home</span></div>
+<div><span class="shortcut-keys"><kbd>Shift</kbd> + <kbd>R</kbd> / <kbd>C</kbd></span><span>Retake / home</span></div>
 </div></section>
 <section class="card local-data-panel" aria-labelledby="localDataTitle">
 <div class="local-data-header"><div><h3 id="localDataTitle"><svg class="ui-icon"><use href="#icon-database"/></svg>Local data</h3><p>Download a JSON file to keep offline or share.</p></div>

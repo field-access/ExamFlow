@@ -4,7 +4,6 @@ function downloadQuizJSON(data,filename){
  const link=document.createElement('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();
  setTimeout(()=>URL.revokeObjectURL(url),10000);
 }
-function quizJSONFilename(name,kind){return (String(name||'quiz').replace(/[<>:"/\\|?*\x00-\x1f]/g,'-').slice(0,90)||'quiz')+'-'+kind+'.json'}
 function captureCurrentSession(){
  if(!questions.length)return null;
  const sid=sessionId||id();
@@ -15,14 +14,7 @@ async function saveSessionConfirmed(){
   await QuizStorage.ready;clearTimeout(saveTimer);
   const session=saveSession();if(!session){toast(questions.length?'This session changed or was deleted. Reopen it before saving.':'Load a quiz before saving a session.');return}
   await QuizStorage.flush();toast('Session saved ✓');
- }catch(error){toast('Session could not be saved. Download session JSON to keep your progress.');}
-}
-function exportSessionJSON(sid){
- // Capture first so a pending autosave, failed database, or another tab cannot lose the latest answers.
- const session=(!sid||sid===sessionId)?captureCurrentSession():get(K.sessions,[]).find(s=>s.id===sid);
- if(!session){toast('No session to download. Load a quiz first.');return}
- downloadQuizJSON({format:'quizflow-session',version:1,exportedAt:new Date().toISOString(),session},quizJSONFilename(session.name,'session'));
- toast('Session JSON downloaded.');
+ }catch(error){toast('Session could not be saved. Use Settings → Local data → Download JSON to keep your progress.');}
 }
 function validateSessionJSON(value){
  if(!value||typeof value!=='object'||Array.isArray(value)||!Array.isArray(value.questions)||!value.questions.length||value.questions.length>10000)throw Error('Session needs 1–10,000 questions.');
