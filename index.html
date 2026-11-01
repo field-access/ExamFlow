@@ -28,6 +28,7 @@
 <link rel="stylesheet" href="css/home-focus.css">
 <link rel="stylesheet" href="css/library-storage.css">
 <link rel="stylesheet" href="css/plan-review.css">
+<link rel="stylesheet" href="css/study-suggestions.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=Lora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=Merriweather:wght@400;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Open+Sans:wght@400;500;600;700;800&family=Roboto:wght@400;500;700;900&family=Source+Serif+4:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -609,7 +610,7 @@
 <!-- SESSIONS -->
 <div id="sessionsModal" class="modal"><div class="modalbox" style="width:min(560px,100%)"><h2><svg class="ui-icon"><use href="#icon-database"/></svg> Saved sessions</h2><p>Restore a quiz exactly where you left it.</p><div id="mobileSessions"></div><div class="modalactions"><button class="btn" onclick="closeSessions()">Close</button></div></div></div>
 
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <dialog id="cbqPreviewDialog" class="cbq-preview-dialog" aria-labelledby="cbqPreviewTitle" aria-describedby="cbqPreviewNote">
   <div class="cbq-preview-heading"><h2 id="cbqPreviewTitle"></h2><button id="cbqPreviewClose" class="btn" type="button" aria-label="Close preview" title="Close (Esc)">×</button></div>
@@ -637,6 +638,7 @@
 <script src="js/session-files.js"></script>
 <script src="js/plan-review-queue.js"></script>
 <script src="js/planner-ui.js"></script>
+<script src="js/study-suggestions.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

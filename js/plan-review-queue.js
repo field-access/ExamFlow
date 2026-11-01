@@ -29,9 +29,8 @@ window.PlanReviewQueue=(()=>{
     if(Object.keys(next).length)saved[key]=next;else delete saved[key];
     put(K.reviewQueue,saved);
   }
-  function render(){
-    const host=document.getElementById('planReviewQueue');if(!host)return;
-    const latest=new Map(),now=Date.now(),rows=[];
+  function inventory(){
+    const latest=new Map(),now=Date.now(),quizzes=[],decks=[];
     const attempts=[...get(K.sessions,[]).map(source=>({kind:'session',source})),...get(K.results,[]).map(source=>({kind:'result',source}))];
     attempts.sort((a,b)=>String(b.source.updatedAt||b.source.date||b.source.timestamp||'').localeCompare(String(a.source.updatedAt||a.source.date||a.source.timestamp||'')));
     for(const entry of attempts){const key=entry.source.examId||entry.source.id;if(!latest.has(key))latest.set(key,entry)}
@@ -41,9 +40,7 @@ window.PlanReviewQueue=(()=>{
       if(!info.allowed)continue;
       const cards=pending(kind,source,info.cards);if(!cards.length)continue;
       count+=cards.length;
-      const marked=cards.filter(c=>c.review).length,mistakes=cards.filter(c=>c.mistake).length;
-      const reasons=[mistakes?`${mistakes} mistake${mistakes===1?'':'s'}`:'',marked?`${marked} marked`:''].filter(Boolean).join(' · ');
-      rows.push(`<article class="plan-review-row"><div><strong>${esc(source.name||'Untitled quiz')}</strong><small>${reasons}</small></div><button type="button" class="btn" data-plan-review="${esc(kind)}" data-source-id="${esc(source.id)}">Review</button></article>`);
+      quizzes.push({kind,source,cards,marked:cards.filter(c=>c.review).length,mistakes:cards.filter(c=>c.mistake).length});
     }
     const store=get(K.flashcards,{decks:[]});
     for(const deck of store.decks||[]){
@@ -51,8 +48,18 @@ window.PlanReviewQueue=(()=>{
       const due=deck.cards.filter(c=>c.progress&&c.progress.state!=='new'&&c.progress.due<=now).length;
       if(!due)continue;
       count+=due;
-      rows.push(`<article class="plan-review-row"><div><strong>${esc(deck.name)}</strong><small>${due} due flashcard${due===1?'':'s'}</small></div><button type="button" class="btn" data-plan-deck="${esc(deck.id)}">Study</button></article>`);
+      decks.push({deck,due});
     }
+    return {quizzes,decks,count};
+  }
+  function render(){
+    const host=document.getElementById('planReviewQueue');if(!host)return;
+    const {quizzes,decks,count}=inventory(),rows=[];
+    for(const {kind,source,marked,mistakes} of quizzes){
+      const reasons=[mistakes?`${mistakes} mistake${mistakes===1?'':'s'}`:'',marked?`${marked} marked`:''].filter(Boolean).join(' · ');
+      rows.push(`<article class="plan-review-row"><div><strong>${esc(source.name||'Untitled quiz')}</strong><small>${reasons}</small></div><button type="button" class="btn" data-plan-review="${esc(kind)}" data-source-id="${esc(source.id)}">Review</button></article>`);
+    }
+    for(const {deck,due} of decks)rows.push(`<article class="plan-review-row"><div><strong>${esc(deck.name)}</strong><small>${due} due flashcard${due===1?'':'s'}</small></div><button type="button" class="btn" data-plan-deck="${esc(deck.id)}">Study</button></article>`);
     document.getElementById('planReviewCount').textContent=String(count);
     host.innerHTML=rows.join('')||'<div class="empty">Nothing to review right now.</div>';
   }
@@ -68,5 +75,5 @@ window.PlanReviewQueue=(()=>{
     setInterval(()=>{if(document.getElementById('plannerView')?.classList.contains('active'))render()},60000);
     window.addEventListener('quizflow-library-change',()=>{if(document.getElementById('plannerView')?.classList.contains('active'))render()});
   });
-  return {render,pending,reviewed,removeQuestion,validateReceipts};
+  return {render,pending,reviewed,removeQuestion,validateReceipts,inventory};
 })();

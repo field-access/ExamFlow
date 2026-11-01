@@ -2,6 +2,8 @@
 
 ## Local library
 
+When the app opens, a dismissible **Study suggestions** panel shows your saved exam date/countdown and up to two useful next steps. It uses the same pending reviews as Plan, and prioritizes due flashcards, quiz mistakes/marked questions, overdue tasks, planned quizzes and important dates. Suggestions open the relevant review or page directly. All suggestions are computed locally from your saved library; no API is used. The panel closes when you dismiss it, change pages or receive a normal action notification.
+
 Quizzes, results, sessions, prompt slots, planner data and flashcards now use IndexedDB as the primary store. A memory cache keeps the existing interface responsive; growing libraries no longer need to fit in localStorage. The first launch migrates legacy browser data and eligible recovery snapshots, committing the new database before removing old cache entries. Existing backup snapshots are retained for recovery but are no longer rewritten on every answer.
 
 Settings → Local data shows library size, quiz/flashcard counts, browser usage and capacity, and saving status. Protect browser storage requests persistent storage; browsers decide whether to grant it. Retry saving retries pending writes. If a save fails, the app keeps the latest data in memory and shows an error: keep the tab open and export JSON before freeing space. JSON imports commit their included collections in one transaction. Exports include prompt slots and planner metadata as well as the existing portable quiz/deck fields, and never include API keys.

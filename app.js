@@ -2301,6 +2301,7 @@ function syncExamTitleBar(){
 
 function showView(name){
  closeMobileNav();
+ if(document.getElementById('toast')?.classList.contains('study-suggestions'))StudySuggestions.dismiss();
  if(name==="dashboard")name="home";
  if(name==="exam" && (!questions || questions.length===0)){
   toast("No quiz loaded. Please open a CBQ first.");
@@ -2321,7 +2322,7 @@ function showView(name){
 }
 function toggleMobileNav(){document.body.classList.toggle("mobile-nav-open")}
 function closeMobileNav(){document.body.classList.remove("mobile-nav-open")}
-function toast(s){const x=document.getElementById("toast");x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
+function toast(s){const x=document.getElementById("toast");x.classList.remove('study-suggestions');x.textContent=s;x.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>x.classList.remove("show"),2200)}
 
 
 let examAudioCtx=null;
@@ -2569,6 +2570,7 @@ window.addEventListener("beforeunload",saveSession);
 
 QuizStorage.ready.then(()=>{
  settings=loadSettings();initPromptLibrary();applySettings();timerState.examSeconds=seconds;timerState.practiceSeconds=5*60;timerState.running=false;updateTimerUI();render();renderSessions();renderDashboard();renderPlans();renderHome();renderTodos();QuizStorage.updatePanel();
+ StudySuggestions.show();
 });
 window.addEventListener("quizflow-library-change",event=>{
  if(event.detail.keys.includes(K.sessions)&&sessionId){clearTimeout(saveTimer);deletedSessionIds.add(sessionId);timerState.running=false;toast("This session changed in another tab. Reopen it from Continue studying before editing.")}

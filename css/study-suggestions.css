@@ -1,0 +1,14 @@
+#toast{pointer-events:none}
+#toast.study-suggestions.show{pointer-events:auto}
+#toast.study-suggestions{width:min(390px,calc(100vw - 32px));max-height:calc(100dvh - 48px);overflow-y:auto;box-sizing:border-box;right:20px;bottom:max(20px,env(safe-area-inset-bottom));padding:16px 18px;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:16px;box-shadow:0 8px 36px #0002;font:inherit}
+#toast .suggestion-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:8px}
+#toast .suggestion-heading>strong{font-size:14px;font-weight:600}
+#toast .suggestion-heading>button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:22px;cursor:pointer;min-width:30px;min-height:30px;border-radius:6px}
+#toast .suggestion-items>button{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;padding:12px 0;text-align:left;background:transparent;border:0;border-top:1px solid var(--line);color:var(--text);font:inherit;cursor:pointer}
+#toast .suggestion-items strong{display:block;font-size:14px;font-weight:550;line-height:1.4}
+#toast .suggestion-items small{display:block;font-size:12px;line-height:1.5;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}
+#toast .suggestion-items>button>span:last-child{color:var(--primary);font-size:22px;flex:none}
+#toast .suggestion-items>button:hover strong{color:var(--primary)}
+#toast .suggestion-plan{display:block;margin:4px 0 0 auto;padding:6px 0;border:0;background:transparent;color:var(--primary);font:inherit;font-size:12px;font-weight:500;line-height:1.5;cursor:pointer}
+#toast.study-suggestions button:focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:6px}
+@media(max-width:600px){#toast.study-suggestions{right:16px;bottom:max(16px,env(safe-area-inset-bottom));padding:14px 16px}}
